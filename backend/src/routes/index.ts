@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { adminRoutes } from "../modules/admin/admin.routes";
 import { authRoutes } from "../modules/auth/auth.routes";
+import { eventRoutes } from "../modules/events/events.routes";
 
 export const apiRoutes = Router();
 
@@ -13,3 +14,4 @@ apiRoutes.get("/health", (request, response) => {
 
 apiRoutes.use("/auth", authRoutes);
 apiRoutes.use("/admins", adminRoutes);
+apiRoutes.use("/events", eventRoutes);
