@@ -1,0 +1,34 @@
+import { UploadApiResponse } from "cloudinary";
+import { cloudinary } from "../../config/cloudinary";
+
+export interface UploadedMedia {
+  url: string;
+  publicId: string;
+}
+
+export const uploadBufferToCloudinary = async (
+  fileBuffer: Buffer,
+  folder: string,
+): Promise<UploadedMedia> => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: "image",
+      },
+      (error, result?: UploadApiResponse) => {
+        if (error || !result) {
+          reject(error || new Error("Cloudinary upload failed"));
+          return;
+        }
+
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id,
+        });
+      },
+    );
+
+    uploadStream.end(fileBuffer);
+  });
+};
