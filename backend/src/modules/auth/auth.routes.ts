@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { loginController } from "./auth.controller";
 
 export const authRoutes = Router();
 
@@ -8,3 +9,5 @@ authRoutes.get("/status", (request, response) => {
     message: "Auth module is ready",
   });
 });
+
+authRoutes.post("/login", loginController);
