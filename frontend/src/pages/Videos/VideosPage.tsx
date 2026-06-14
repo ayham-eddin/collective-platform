@@ -1,22 +1,27 @@
-const videos = [
-  {
-    title: "Share3 Festival",
-    subtitle: "The Synaptik live @ Share3 Festival",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
-  {
-    title: "Interview: Yassin Al-Haj Saleh",
-    subtitle: "Schu Fi Ma Fi Interview",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
-  {
-    title: "Live Performance",
-    subtitle: "Moments from our cultural events",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
-];
+import { useEffect, useState } from "react";
+import { getPublicVideos } from "../../services/videos.service";
+import type { VideoItem } from "../../types/video.types";
 
 export const VideosPage = () => {
+  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const loadVideos = async () => {
+      try {
+        const data = await getPublicVideos();
+        setVideos(data);
+      } catch {
+        setErrorMessage("Could not load videos");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadVideos();
+  }, []);
+
   return (
     <main className="bg-[#f4f3fb] text-[#252530]">
       <section className="relative min-h-[460px] overflow-hidden bg-black text-white">
@@ -32,6 +37,7 @@ export const VideosPage = () => {
         <div className="relative mx-auto flex min-h-[460px] max-w-7xl items-end px-6 py-20">
           <div>
             <p className="text-lg font-bold text-violet-300">Events Videos</p>
+
             <h1 className="mt-4 text-6xl font-black tracking-tight md:text-8xl">
               Events Videos
             </h1>
@@ -48,31 +54,44 @@ export const VideosPage = () => {
           <h2 className="mt-5 text-5xl font-black tracking-tight md:text-6xl">
             Videos von unseren Veranstaltungen
           </h2>
-
-          <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-zinc-700">
-            Sehen Sie sich Videos von einigen unserer Veranstaltungen,
-            Interviews und Live-Momenten an.
-          </p>
         </div>
+
+        {isLoading && (
+          <p className="mt-12 text-center text-zinc-500">Loading videos...</p>
+        )}
+
+        {errorMessage && (
+          <p className="mt-12 text-center text-red-500">{errorMessage}</p>
+        )}
+
+        {!isLoading && !errorMessage && videos.length === 0 && (
+          <p className="mt-12 text-center text-zinc-500">
+            No videos available.
+          </p>
+        )}
 
         <div className="mt-16 grid gap-12">
           {videos.map((video) => (
-            <article key={video.title}>
+            <article key={video._id}>
               <h3 className="mb-6 text-center text-3xl font-black">
-                {video.title}
+                {video.title.de}
               </h3>
 
-              <div className="overflow-hidden rounded-[2rem] bg-black shadow-2xl shadow-black/25">
-                <iframe
-                  src={video.embedUrl}
-                  title={video.title}
-                  className="aspect-video w-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              </div>
+              {video.type === "youtube" && video.youtubeUrl && (
+                <div className="overflow-hidden rounded-[2rem] bg-black shadow-2xl shadow-black/25">
+                  <iframe
+                    src={video.youtubeUrl.replace("watch?v=", "embed/")}
+                    title={video.title.de}
+                    className="aspect-video w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              )}
 
-              <p className="mt-4 text-center text-zinc-600">{video.subtitle}</p>
+              <p className="mt-4 text-center text-zinc-600">
+                {video.description.de}
+              </p>
             </article>
           ))}
         </div>
