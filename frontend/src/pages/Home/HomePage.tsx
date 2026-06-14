@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { EventCard } from "../../components/EventCard/EventCard";
 import { getPublicEvents } from "../../services/events.service";
 import type { EventItem } from "../../types/event.types";
 
-export function HomePage() {
+export const HomePage = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -23,131 +24,41 @@ export function HomePage() {
   }, []);
 
   return (
-    <main
-      style={{ minHeight: "100vh", background: "#0b0b10", color: "#ffffff" }}
-    >
-      <section
-        style={{ padding: "80px 24px", maxWidth: "1180px", margin: "0 auto" }}
-      >
-        <p style={{ color: "#9ca3ff", fontWeight: 700 }}>Collective Platform</p>
+    <main>
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <p className="font-bold text-violet-300">Schu Fi Ma Fi Kollektiv</p>
 
-        <h1
-          style={{
-            fontSize: "clamp(42px, 8vw, 96px)",
-            lineHeight: 1,
-            margin: "16px 0",
-          }}
-        >
-          Modern cultural events platform
+        <h1 className="mt-4 max-w-5xl text-5xl font-black leading-none tracking-tight md:text-8xl">
+          Schu Fi Ma Fi Kollektiv
         </h1>
 
-        <p
-          style={{
-            maxWidth: "720px",
-            color: "#c7c7d1",
-            fontSize: "20px",
-            lineHeight: 1.7,
-          }}
-        >
-          A modern collective website with events, gallery, videos, ticket
-          links, and a full admin CMS.
+        <p className="mt-6 max-w-3xl text-xl leading-8 text-zinc-400">
+          ist ein syrisches kulturelle Kollektiv, das seit 2018 in
+          Nordrhein-Westfalen aktiv ist und ein buntes Kulturprogramm in der
+          Kulturszene in NRW für alle im Schwerpunkt das syrische Publikum
+          gestaltet und präsentiert.
         </p>
       </section>
 
-      <section
-        style={{
-          padding: "40px 24px 100px",
-          maxWidth: "1180px",
-          margin: "0 auto",
-        }}
-      >
-        <h2 style={{ fontSize: "40px", marginBottom: "32px" }}>
-          Upcoming Events
+      <section className="mx-auto max-w-7xl px-6 pb-24">
+        <h2 className="mb-8 text-4xl font-black tracking-tight">
+          Featured Events
         </h2>
 
-        {isLoading && <p>Loading events...</p>}
+        {isLoading && <p className="text-zinc-400">Loading events...</p>}
 
-        {errorMessage && <p style={{ color: "#ff7070" }}>{errorMessage}</p>}
+        {errorMessage && <p className="text-red-400">{errorMessage}</p>}
 
         {!isLoading && !errorMessage && events.length === 0 && (
-          <p>No published events yet.</p>
+          <p className="text-zinc-400">No published events yet.</p>
         )}
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "24px",
-          }}
-        >
-          {events.map((event) => (
-            <article
-              key={event._id}
-              style={{
-                background: "#171720",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "24px",
-                overflow: "hidden",
-              }}
-            >
-              {event.coverImage && (
-                <img
-                  src={event.coverImage.url}
-                  alt={event.coverImage.alt?.en || event.title.en}
-                  style={{
-                    width: "100%",
-                    height: "260px",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-              )}
-
-              <div style={{ padding: "24px" }}>
-                <p style={{ color: "#9ca3ff", fontStyle: "italic" }}>
-                  {event.category || "Event"}
-                </p>
-
-                <h3 style={{ fontSize: "28px", margin: "8px 0" }}>
-                  {event.title.en}
-                </h3>
-
-                <p style={{ color: "#c7c7d1", lineHeight: 1.6 }}>
-                  {event.shortDescription.en}
-                </p>
-
-                <p style={{ marginTop: "18px", color: "#ffffff" }}>
-                  {new Date(event.eventDate).toLocaleDateString("en-GB")} ·{" "}
-                  {event.startTime}
-                  {event.endTime ? ` - ${event.endTime}` : ""}
-                </p>
-
-                <p style={{ color: "#c7c7d1" }}>{event.location.en}</p>
-
-                {event.ticketUrl && (
-                  <a
-                    href={event.ticketUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      display: "inline-block",
-                      marginTop: "20px",
-                      padding: "12px 18px",
-                      borderRadius: "999px",
-                      background: "#8b5cf6",
-                      color: "#ffffff",
-                      textDecoration: "none",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Buy tickets
-                  </a>
-                )}
-              </div>
-            </article>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {events.slice(0, 3).map((event) => (
+            <EventCard key={event._id} event={event} />
           ))}
         </div>
       </section>
     </main>
   );
-}
+};

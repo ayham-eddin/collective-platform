@@ -1,5 +1,5 @@
-import { api } from "./api";
 import type { EventItem } from "../types/event.types";
+import { api } from "./api";
 
 interface EventsResponse {
   success: boolean;
