@@ -34,6 +34,18 @@ export const Navbar = () => {
             Events
           </NavLink>
 
+          <NavLink to="/about" className={navLinkClass}>
+            Über uns
+          </NavLink>
+
+          <NavLink to="/videos" className={navLinkClass}>
+            Events Videos
+          </NavLink>
+
+          <NavLink to="/gallery" className={navLinkClass}>
+            Galerie
+          </NavLink>
+
           <a
             href="#contact"
             className="text-sm font-bold text-zinc-400 transition hover:text-white"
