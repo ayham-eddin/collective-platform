@@ -5,6 +5,9 @@ import { EventCard } from "../../components/EventCard/EventCard";
 import { getPublicEvents } from "../../services/events.service";
 import type { EventItem } from "../../types/event.types";
 
+const heroImageUrl =
+  "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
+
 export const HomePage = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,15 +48,11 @@ export const HomePage = () => {
     <main className="bg-[#f4f3fb] text-[#252530]">
       <section className="relative min-h-[760px] overflow-hidden bg-black text-white">
         <div className="absolute inset-0">
-          {featuredEvent?.coverImage ? (
-            <img
-              src={featuredEvent.coverImage.url}
-              alt={featuredEvent.coverImage.alt?.de || featuredEvent.title.de}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="h-full w-full bg-[radial-gradient(circle_at_top,#4c1d95,#08080c_55%)]" />
-          )}
+          <img
+            src={heroImageUrl}
+            alt="Schu Fi Ma Fi Kollektiv event atmosphere"
+            className="h-full w-full object-cover"
+          />
 
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/20" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/20" />
