@@ -4,6 +4,7 @@ import { MainLayout } from "../layouts/MainLayout";
 import { AboutPage } from "../pages/About/AboutPage";
 import { AdminAdminsPage } from "../pages/Admin/Admins/AdminAdminsPage";
 import { AdminDashboardPage } from "../pages/Admin/Dashboard/AdminDashboardPage";
+import { AdminEditEventPage } from "../pages/Admin/Events/AdminEditEventPage";
 import { AdminEventsPage } from "../pages/Admin/Events/AdminEventsPage";
 import { AdminGalleryPage } from "../pages/Admin/Gallery/AdminGalleryPage";
 import { AdminLoginPage } from "../pages/Admin/Login/AdminLoginPage";
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
           {
             path: "events",
             element: <AdminEventsPage />,
+          },
+          {
+            path: "events/:eventId/edit",
+            element: <AdminEditEventPage />,
           },
           {
             path: "gallery",

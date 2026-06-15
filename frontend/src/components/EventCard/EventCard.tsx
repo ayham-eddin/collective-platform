@@ -1,3 +1,4 @@
+import { CalendarDays, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { EventItem } from "../../types/event.types";
 
@@ -44,19 +45,45 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
             {event.shortDescription.de}
           </p>
 
-          <p className="mt-6 font-semibold text-white">
-            {eventDate} · {event.startTime}
-            {event.endTime ? ` - ${event.endTime}` : ""}
-          </p>
+          <div className="mt-6 grid gap-3 text-sm font-semibold text-zinc-300">
+            <p className="flex items-center gap-2">
+              <CalendarDays size={18} className="text-violet-300" />
+              {eventDate} · {event.startTime}
+              {event.endTime ? ` - ${event.endTime}` : ""}
+            </p>
 
-          <p className="mt-1 text-zinc-400">{event.location.de}</p>
+            <p className="flex items-center gap-2">
+              <MapPin size={18} className="text-violet-300" />
+              {event.location.de}
+            </p>
+          </div>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              to={`/events/${event.slug}`}
+              className="rounded-full bg-violet-600 px-5 py-3 text-sm font-black text-white transition hover:bg-violet-500"
+            >
+              Mehr erfahren
+            </Link>
+
+            {event.ticketUrl && (
+              <a
+                href={event.ticketUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-white/15 px-5 py-3 text-sm font-black text-white transition hover:border-white hover:bg-white hover:text-black"
+              >
+                Tickets
+              </a>
+            )}
+          </div>
         </div>
       </article>
     );
   }
 
   return (
-    <article className="group relative min-h-[360px] overflow-hidden rounded-[2rem] bg-zinc-900 shadow-2xl shadow-black/30">
+    <article className="group relative min-h-[430px] overflow-hidden rounded-[2rem] bg-zinc-900 shadow-2xl shadow-black/30">
       {event.coverImage && (
         <img
           src={event.coverImage.url}
@@ -65,13 +92,25 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
         />
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10 transition duration-500 group-hover:from-black/95" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10 transition duration-500 group-hover:from-black/95" />
 
-      <div className="absolute left-6 top-6 rounded-md bg-violet-600 px-5 py-3 text-sm font-black text-white">
+      <div className="absolute left-6 top-6 rounded-full bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-violet-950/30">
         {event.category || "Event"}
       </div>
 
-      <div className="relative flex min-h-[360px] flex-col justify-end p-7">
+      <div className="relative flex min-h-[430px] flex-col justify-end p-7">
+        <div className="mb-5 grid gap-2 text-sm font-semibold text-zinc-200">
+          <p className="flex items-center gap-2">
+            <CalendarDays size={17} className="text-violet-300" />
+            {eventDate}
+          </p>
+
+          <p className="flex items-center gap-2">
+            <MapPin size={17} className="text-violet-300" />
+            {event.location.de}
+          </p>
+        </div>
+
         <h3 className="text-3xl font-black tracking-tight text-white">
           {event.title.de}
         </h3>
@@ -85,7 +124,7 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
             to={`/events/${event.slug}`}
             className="rounded-full bg-white px-6 py-3 text-sm font-black text-black transition hover:bg-violet-200"
           >
-            Mehr lesen
+            Mehr erfahren
           </Link>
 
           {event.ticketUrl && (

@@ -1,5 +1,6 @@
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   deleteAdminEvent,
   getAdminEvents,
@@ -157,13 +158,13 @@ export const AdminEventsPage = () => {
 
                     <td className="px-6 py-5">
                       <div className="flex justify-end gap-2">
-                        <button
-                          type="button"
+                        <Link
+                          to={`/admin/events/${event._id}/edit`}
                           className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-violet-400 hover:text-violet-300"
                           aria-label="Edit event"
                         >
                           <Edit size={17} />
-                        </button>
+                        </Link>
 
                         <button
                           type="button"
