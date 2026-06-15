@@ -1,7 +1,12 @@
+import { SiteSettingsProvider } from "./components/SiteSettingsProvider";
 import { AppRouter } from "./routes/AppRouter";
 
 const App = () => {
-  return <AppRouter />;
+  return (
+    <SiteSettingsProvider>
+      <AppRouter />
+    </SiteSettingsProvider>
+  );
 };
 
 export default App;

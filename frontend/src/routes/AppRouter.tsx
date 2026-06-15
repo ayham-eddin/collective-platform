@@ -4,10 +4,13 @@ import { MainLayout } from "../layouts/MainLayout";
 import { AboutPage } from "../pages/About/AboutPage";
 import { AdminAdminsPage } from "../pages/Admin/Admins/AdminAdminsPage";
 import { AdminDashboardPage } from "../pages/Admin/Dashboard/AdminDashboardPage";
+import { AdminCreateEventPage } from "../pages/Admin/Events/AdminCreateEventPage";
 import { AdminEditEventPage } from "../pages/Admin/Events/AdminEditEventPage";
 import { AdminEventsPage } from "../pages/Admin/Events/AdminEventsPage";
 import { AdminGalleryPage } from "../pages/Admin/Gallery/AdminGalleryPage";
+import { AdminHomeContentPage } from "../pages/Admin/HomeContent/AdminHomeContentPage";
 import { AdminLoginPage } from "../pages/Admin/Login/AdminLoginPage";
+import { AdminSettingsPage } from "../pages/Admin/Settings/AdminSettingsPage";
 import { AdminTeamPage } from "../pages/Admin/Team/AdminTeamPage";
 import { AdminVideosPage } from "../pages/Admin/Videos/AdminVideosPage";
 import { EventDetailsPage } from "../pages/EventDetails/EventDetailsPage";
@@ -16,8 +19,6 @@ import { GalleryPage } from "../pages/Gallery/GalleryPage";
 import { HomePage } from "../pages/Home/HomePage";
 import { VideosPage } from "../pages/Videos/VideosPage";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
-import { AdminCreateEventPage } from "../pages/Admin/Events/AdminCreateEventPage";
-import { AdminHomeContentPage } from "../pages/Admin/HomeContent/AdminHomeContentPage";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
           {
             path: "home-content",
             element: <AdminHomeContentPage />,
+          },
+          {
+            path: "settings",
+            element: <AdminSettingsPage />,
           },
           {
             path: "events",
