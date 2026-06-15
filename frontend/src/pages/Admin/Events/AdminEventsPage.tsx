@@ -67,13 +67,13 @@ export const AdminEventsPage = () => {
           </p>
         </div>
 
-        <button
-          type="button"
+        <Link
+          to="/admin/events/create"
           className="inline-flex items-center gap-2 rounded-full bg-violet-600 px-5 py-3 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
         >
           <Plus size={18} />
           Add Event
-        </button>
+        </Link>
       </div>
 
       {isLoading && <p className="mt-10 text-zinc-400">Loading events...</p>}

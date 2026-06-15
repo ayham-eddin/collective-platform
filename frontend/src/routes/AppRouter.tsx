@@ -16,6 +16,7 @@ import { GalleryPage } from "../pages/Gallery/GalleryPage";
 import { HomePage } from "../pages/Home/HomePage";
 import { VideosPage } from "../pages/Videos/VideosPage";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
+import { AdminCreateEventPage } from "../pages/Admin/Events/AdminCreateEventPage";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
           {
             path: "events",
             element: <AdminEventsPage />,
+          },
+          {
+            path: "events/create",
+            element: <AdminCreateEventPage />,
           },
           {
             path: "events/:eventId/edit",

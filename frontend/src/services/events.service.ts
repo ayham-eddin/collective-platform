@@ -13,6 +13,8 @@ interface EventResponse {
 
 export type UpdateEventPayload = Partial<Omit<EventItem, "_id">>;
 
+export type CreateEventPayload = Omit<EventItem, "_id">;
+
 export const getPublicEvents = async (): Promise<EventItem[]> => {
   const response = await api.get<EventsResponse>("/events/public");
   return response.data.data;
@@ -51,5 +53,12 @@ export const updateAdminEvent = async (
 
 export const deleteAdminEvent = async (eventId: string): Promise<EventItem> => {
   const response = await api.delete<EventResponse>(`/events/admin/${eventId}`);
+  return response.data.data;
+};
+
+export const createAdminEvent = async (
+  payload: CreateEventPayload,
+): Promise<EventItem> => {
+  const response = await api.post<EventResponse>("/events/admin", payload);
   return response.data.data;
 };
