@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { GalleryLightbox } from "../../components/GalleryLightbox/GalleryLightbox";
 import { getPublicGalleryImages } from "../../services/gallery.service";
 import type { GalleryImageItem } from "../../types/gallery.types";
 
@@ -7,6 +8,7 @@ const fallbackHeroImage =
 
 export const GalleryPage = () => {
   const [images, setImages] = useState<GalleryImageItem[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -83,10 +85,12 @@ export const GalleryPage = () => {
         )}
 
         <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {images.map((item) => (
-            <article
+          {images.map((item, index) => (
+            <button
               key={item._id}
-              className="group relative min-h-[360px] overflow-hidden rounded-[2rem] bg-zinc-900 shadow-2xl shadow-black/20"
+              type="button"
+              onClick={() => setSelectedIndex(index)}
+              className="group relative min-h-[360px] overflow-hidden rounded-[2rem] bg-zinc-900 text-left shadow-2xl shadow-black/20"
             >
               <img
                 src={item.image.url}
@@ -111,10 +115,18 @@ export const GalleryPage = () => {
                   </p>
                 )}
               </div>
-            </article>
+            </button>
           ))}
         </div>
       </section>
+
+      {selectedIndex !== null && (
+        <GalleryLightbox
+          images={images}
+          currentIndex={selectedIndex}
+          onClose={() => setSelectedIndex(null)}
+        />
+      )}
     </main>
   );
 };
