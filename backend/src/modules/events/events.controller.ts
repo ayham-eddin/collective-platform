@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   createEvent,
+  getAdminEventById,
   getAdminEvents,
   getEventBySlug,
   getPublicEvents,
@@ -30,6 +31,18 @@ export const getAdminEventsController = async (
   response.status(200).json({
     success: true,
     data: events,
+  });
+};
+
+export const getAdminEventByIdController = async (
+  request: Request<{ id: string }>,
+  response: Response,
+): Promise<void> => {
+  const event = await getAdminEventById(request.params.id);
+
+  response.status(200).json({
+    success: true,
+    data: event,
   });
 };
 

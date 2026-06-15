@@ -10,6 +10,19 @@ export const getAdminEvents = async () => {
   return Event.find({ isDeleted: false }).sort({ eventDate: -1 });
 };
 
+export const getAdminEventById = async (id: string) => {
+  const event = await Event.findOne({
+    _id: id,
+    isDeleted: false,
+  });
+
+  if (!event) {
+    throw new Error("Event not found");
+  }
+
+  return event;
+};
+
 export const getPublicEvents = async () => {
   return Event.find({
     isDeleted: false,

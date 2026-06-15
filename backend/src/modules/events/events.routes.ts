@@ -4,6 +4,7 @@ import { requirePermission } from "../../middleware/permission.middleware";
 import {
   createEventController,
   deleteEventController,
+  getAdminEventByIdController,
   getAdminEventsController,
   getEventBySlugController,
   getPublicEventsController,
@@ -20,6 +21,13 @@ eventRoutes.get(
   authenticate,
   requirePermission("events", "read"),
   getAdminEventsController,
+);
+
+eventRoutes.get(
+  "/admin/:id",
+  authenticate,
+  requirePermission("events", "read"),
+  getAdminEventByIdController,
 );
 
 eventRoutes.post(
