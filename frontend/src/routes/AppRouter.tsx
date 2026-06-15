@@ -1,13 +1,61 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { AdminLayout } from "../layouts/AdminLayout/AdminLayout";
 import { MainLayout } from "../layouts/MainLayout";
 import { AboutPage } from "../pages/About/AboutPage";
+import { AdminAdminsPage } from "../pages/Admin/Admins/AdminAdminsPage";
+import { AdminDashboardPage } from "../pages/Admin/Dashboard/AdminDashboardPage";
+import { AdminEventsPage } from "../pages/Admin/Events/AdminEventsPage";
+import { AdminGalleryPage } from "../pages/Admin/Gallery/AdminGalleryPage";
+import { AdminLoginPage } from "../pages/Admin/Login/AdminLoginPage";
+import { AdminTeamPage } from "../pages/Admin/Team/AdminTeamPage";
+import { AdminVideosPage } from "../pages/Admin/Videos/AdminVideosPage";
 import { EventDetailsPage } from "../pages/EventDetails/EventDetailsPage";
 import { EventsPage } from "../pages/Events/EventsPage";
 import { GalleryPage } from "../pages/Gallery/GalleryPage";
 import { HomePage } from "../pages/Home/HomePage";
 import { VideosPage } from "../pages/Videos/VideosPage";
+import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 
 const router = createBrowserRouter([
+  {
+    path: "/admin/login",
+    element: <AdminLoginPage />,
+  },
+  {
+    element: <ProtectedAdminRoute />,
+    children: [
+      {
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <AdminDashboardPage />,
+          },
+          {
+            path: "events",
+            element: <AdminEventsPage />,
+          },
+          {
+            path: "gallery",
+            element: <AdminGalleryPage />,
+          },
+          {
+            path: "videos",
+            element: <AdminVideosPage />,
+          },
+          {
+            path: "team",
+            element: <AdminTeamPage />,
+          },
+          {
+            path: "admins",
+            element: <AdminAdminsPage />,
+          },
+        ],
+      },
+    ],
+  },
   {
     element: <MainLayout />,
     children: [
