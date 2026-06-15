@@ -5,6 +5,7 @@ import { eventRoutes } from "../modules/events/events.routes";
 import { galleryRoutes } from "../modules/gallery/gallery.routes";
 import { uploadRoutes } from "../modules/uploads/uploads.routes";
 import { videoRoutes } from "../modules/videos/videos.routes";
+import { teamRoutes } from "../modules/team/team.routes";
 
 export const apiRoutes = Router();
 
@@ -21,3 +22,4 @@ apiRoutes.use("/events", eventRoutes);
 apiRoutes.use("/gallery", galleryRoutes);
 apiRoutes.use("/uploads", uploadRoutes);
 apiRoutes.use("/videos", videoRoutes);
+apiRoutes.use("/team", teamRoutes);
