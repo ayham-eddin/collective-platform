@@ -20,6 +20,7 @@ export interface GalleryImageDocument extends Document {
   relatedEvent?: Types.ObjectId;
   status: GalleryImageStatus;
   isFeatured: boolean;
+  sortOrder: number;
   isDeleted: boolean;
 }
 
@@ -65,6 +66,10 @@ const galleryImageSchema = new Schema<GalleryImageDocument>(
     isFeatured: {
       type: Boolean,
       default: false,
+    },
+    sortOrder: {
+      type: Number,
+      default: 0,
     },
     isDeleted: {
       type: Boolean,

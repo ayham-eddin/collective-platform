@@ -5,14 +5,30 @@ import {
 
 type GalleryImageInput = Partial<GalleryImageDocument>;
 
+interface ReorderGalleryInput {
+  items: {
+    id: string;
+    sortOrder: number;
+  }[];
+}
+
 export const createGalleryImage = async (data: GalleryImageInput) => {
-  return GalleryImage.create(data);
+  const lastImage = await GalleryImage.findOne({ isDeleted: false }).sort({
+    sortOrder: -1,
+  });
+
+  const nextSortOrder = lastImage ? lastImage.sortOrder + 1 : 1;
+
+  return GalleryImage.create({
+    ...data,
+    sortOrder: data.sortOrder ?? nextSortOrder,
+  });
 };
 
 export const getAdminGalleryImages = async () => {
   return GalleryImage.find({ isDeleted: false })
     .populate("relatedEvent")
-    .sort({ createdAt: -1 });
+    .sort({ sortOrder: 1, createdAt: -1 });
 };
 
 export const getPublicGalleryImages = async () => {
@@ -21,7 +37,7 @@ export const getPublicGalleryImages = async () => {
     status: "published",
   })
     .populate("relatedEvent")
-    .sort({ createdAt: -1 });
+    .sort({ sortOrder: 1, createdAt: -1 });
 };
 
 export const getGalleryImageById = async (id: string) => {
@@ -55,6 +71,20 @@ export const updateGalleryImage = async (
   }
 
   return image;
+};
+
+export const reorderGalleryImages = async ({ items }: ReorderGalleryInput) => {
+  await Promise.all(
+    items.map((item) =>
+      GalleryImage.findOneAndUpdate(
+        { _id: item.id, isDeleted: false },
+        { sortOrder: item.sortOrder },
+        { new: true },
+      ),
+    ),
+  );
+
+  return getAdminGalleryImages();
 };
 
 export const softDeleteGalleryImage = async (id: string) => {

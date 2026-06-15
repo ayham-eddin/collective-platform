@@ -7,6 +7,7 @@ import {
   getAdminGalleryImagesController,
   getGalleryImageByIdController,
   getPublicGalleryImagesController,
+  reorderGalleryImagesController,
   updateGalleryImageController,
 } from "./gallery.controller";
 
@@ -27,6 +28,13 @@ galleryRoutes.post(
   authenticate,
   requirePermission("gallery", "create"),
   createGalleryImageController,
+);
+
+galleryRoutes.put(
+  "/admin/reorder",
+  authenticate,
+  requirePermission("gallery", "update"),
+  reorderGalleryImagesController,
 );
 
 galleryRoutes.put(

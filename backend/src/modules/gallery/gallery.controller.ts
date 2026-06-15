@@ -4,6 +4,7 @@ import {
   getAdminGalleryImages,
   getGalleryImageById,
   getPublicGalleryImages,
+  reorderGalleryImages,
   softDeleteGalleryImage,
   updateGalleryImage,
 } from "./gallery.service";
@@ -67,6 +68,19 @@ export const updateGalleryImageController = async (
     success: true,
     message: "Gallery image updated successfully",
     data: image,
+  });
+};
+
+export const reorderGalleryImagesController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const images = await reorderGalleryImages(request.body);
+
+  response.status(200).json({
+    success: true,
+    message: "Gallery images reordered successfully",
+    data: images,
   });
 };
 
