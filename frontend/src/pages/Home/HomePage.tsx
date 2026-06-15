@@ -3,29 +3,37 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { EventCard } from "../../components/EventCard/EventCard";
 import { getPublicEvents } from "../../services/events.service";
+import { getPublicHomeContent } from "../../services/homeContent.service";
 import type { EventItem } from "../../types/event.types";
+import type { HomeContentItem } from "../../types/homeContent.types";
 
-const heroImageUrl =
+const fallbackHeroImageUrl =
   "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
 
 export const HomePage = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [homeContent, setHomeContent] = useState<HomeContentItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const loadEvents = async () => {
+    const loadHomePageData = async () => {
       try {
-        const data = await getPublicEvents();
-        setEvents(data);
+        const [eventsData, contentData] = await Promise.all([
+          getPublicEvents(),
+          getPublicHomeContent(),
+        ]);
+
+        setEvents(eventsData);
+        setHomeContent(contentData);
       } catch {
-        setErrorMessage("Could not load events");
+        setErrorMessage("Could not load homepage content");
       } finally {
         setIsLoading(false);
       }
     };
 
-    void loadEvents();
+    void loadHomePageData();
   }, []);
 
   const featuredEvent = useMemo(() => {
@@ -44,13 +52,15 @@ export const HomePage = () => {
       })
     : "";
 
+  const heroImageUrl = homeContent?.heroImage?.url || fallbackHeroImageUrl;
+
   return (
     <main className="bg-[#f4f3fb] text-[#252530]">
       <section className="relative min-h-[760px] overflow-hidden bg-black text-white">
         <div className="absolute inset-0">
           <img
             src={heroImageUrl}
-            alt="Schu Fi Ma Fi Kollektiv event atmosphere"
+            alt={homeContent?.heroTitle.de || "Schu Fi Ma Fi Kollektiv"}
             className="h-full w-full object-cover"
           />
 
@@ -61,37 +71,42 @@ export const HomePage = () => {
         <div className="relative mx-auto flex min-h-[760px] max-w-7xl items-center px-6 py-24">
           <div className="max-w-3xl">
             <p className="text-lg font-black uppercase tracking-[0.35em] text-violet-300">
-              Schu Fi Ma Fi Kollektiv
+              {homeContent?.heroBadge.de || "Schu Fi Ma Fi Kollektiv"}
             </p>
 
             <h1 className="mt-6 text-6xl font-black leading-none tracking-tight md:text-8xl">
-              Kultur, Musik und Events in NRW.
+              {homeContent?.heroTitle.de || "Kultur, Musik und Events in NRW."}
             </h1>
 
             <p className="mt-8 max-w-2xl text-xl leading-9 text-zinc-200">
-              Ein syrisches kulturelles Kollektiv, das seit 2018 in
-              Nordrhein-Westfalen aktiv ist und ein buntes Kulturprogramm für
-              Community, Kunst und Begegnung gestaltet.
+              {homeContent?.heroSubtitle.de ||
+                "Ein syrisches kulturelles Kollektiv, das seit 2018 in Nordrhein-Westfalen aktiv ist."}
             </p>
 
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
-                to="/events"
+                to={homeContent?.primaryButton.url || "/events"}
                 className="rounded-full bg-violet-500 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-400"
               >
-                Events ansehen
+                {homeContent?.primaryButton.label.de || "Events ansehen"}
               </Link>
 
-              <a
-                href="#about-preview"
+              <Link
+                to={homeContent?.secondaryButton.url || "/about"}
                 className="rounded-full border border-white/30 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-white hover:text-black"
               >
-                Über uns
-              </a>
+                {homeContent?.secondaryButton.label.de || "Über uns"}
+              </Link>
             </div>
           </div>
         </div>
       </section>
+
+      {errorMessage && (
+        <p className="mx-auto max-w-7xl px-6 pt-8 text-red-500">
+          {errorMessage}
+        </p>
+      )}
 
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="text-center">
@@ -108,10 +123,6 @@ export const HomePage = () => {
 
         {isLoading && (
           <p className="mt-12 text-center text-zinc-500">Loading events...</p>
-        )}
-
-        {errorMessage && (
-          <p className="mt-12 text-center text-red-500">{errorMessage}</p>
         )}
 
         {!isLoading && !errorMessage && !featuredEvent && (
@@ -132,33 +143,6 @@ export const HomePage = () => {
                   className="h-[560px] w-full object-cover"
                 />
               )}
-
-              <button
-                type="button"
-                className="absolute left-6 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-black/40 text-3xl text-white backdrop-blur transition hover:bg-black"
-                aria-label="Previous image"
-              >
-                ‹
-              </button>
-
-              <button
-                type="button"
-                className="absolute right-6 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-black/40 text-3xl text-white backdrop-blur transition hover:bg-black"
-                aria-label="Next image"
-              >
-                ›
-              </button>
-
-              <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
-                {[0, 1, 2, 3, 4].map((dot) => (
-                  <span
-                    key={dot}
-                    className={`h-2.5 w-2.5 rounded-full ${
-                      dot === 0 ? "bg-black" : "bg-white/50"
-                    }`}
-                  />
-                ))}
-              </div>
             </div>
 
             <div>
@@ -249,24 +233,24 @@ export const HomePage = () => {
         <div className="flex items-center px-6 py-20 lg:px-20">
           <div className="max-w-2xl">
             <p className="text-xl font-bold italic text-violet-400">
-              Zusammenarbeit beginnen
+              {homeContent?.aboutEyebrow.de || "Zusammenarbeit beginnen"}
             </p>
 
             <h2 className="mt-6 text-5xl font-black leading-tight tracking-tight md:text-6xl">
-              Sind Sie bereit, Ihr bestes Event mit uns zu veranstalten?
+              {homeContent?.aboutTitle.de ||
+                "Sind Sie bereit, Ihr bestes Event mit uns zu veranstalten?"}
             </h2>
 
             <p className="mt-8 text-lg leading-8 text-zinc-800">
-              Sie suchen ein Team, das Veranstaltungen mit Kultur, Community und
-              Erfahrung organisiert? Wir entwickeln Programme, Events und
-              Begegnungen mit Leidenschaft.
+              {homeContent?.aboutText.de ||
+                "Sie suchen ein Team, das Veranstaltungen mit Kultur, Community und Erfahrung organisiert?"}
             </p>
 
             <Link
-              to="/events"
+              to={homeContent?.aboutButton.url || "/events"}
               className="mt-10 inline-flex rounded-full bg-violet-400 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
             >
-              Unsere Events
+              {homeContent?.aboutButton.label.de || "Unsere Events"}
             </Link>
           </div>
         </div>

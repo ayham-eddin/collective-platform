@@ -25,6 +25,10 @@ export const AdminLayout = () => {
               Dashboard
             </NavLink>
 
+            <NavLink to="/admin/home-content" className={adminLinkClass}>
+              Home Content
+            </NavLink>
+
             <NavLink to="/admin/events" className={adminLinkClass}>
               Events
             </NavLink>

@@ -6,6 +6,7 @@ import { galleryRoutes } from "../modules/gallery/gallery.routes";
 import { uploadRoutes } from "../modules/uploads/uploads.routes";
 import { videoRoutes } from "../modules/videos/videos.routes";
 import { teamRoutes } from "../modules/team/team.routes";
+import { homeContentRoutes } from "../modules/home-content/homeContent.routes";
 
 export const apiRoutes = Router();
 
@@ -23,3 +24,4 @@ apiRoutes.use("/gallery", galleryRoutes);
 apiRoutes.use("/uploads", uploadRoutes);
 apiRoutes.use("/videos", videoRoutes);
 apiRoutes.use("/team", teamRoutes);
+apiRoutes.use("/home-content", homeContentRoutes);

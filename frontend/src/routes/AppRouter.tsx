@@ -17,6 +17,7 @@ import { HomePage } from "../pages/Home/HomePage";
 import { VideosPage } from "../pages/Videos/VideosPage";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 import { AdminCreateEventPage } from "../pages/Admin/Events/AdminCreateEventPage";
+import { AdminHomeContentPage } from "../pages/Admin/HomeContent/AdminHomeContentPage";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <AdminDashboardPage />,
+          },
+          {
+            path: "home-content",
+            element: <AdminHomeContentPage />,
           },
           {
             path: "events",
