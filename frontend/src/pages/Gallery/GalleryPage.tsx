@@ -1,49 +1,40 @@
-const galleryImages = [
-  {
-    title: "Community Night",
-    category: "Event",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png",
-  },
-  {
-    title: "SAMA Festival",
-    category: "Festival",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781436366/collective-platform/events/dfunilrfat4wnccfw5eh.jpg",
-  },
-  {
-    title: "Live Music",
-    category: "Konzert",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png",
-  },
-  {
-    title: "Cultural Evening",
-    category: "Kultur",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781436366/collective-platform/events/dfunilrfat4wnccfw5eh.jpg",
-  },
-  {
-    title: "Team Moment",
-    category: "Team",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png",
-  },
-  {
-    title: "Festival Crowd",
-    category: "Community",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781436366/collective-platform/events/dfunilrfat4wnccfw5eh.jpg",
-  },
-];
+import { useEffect, useMemo, useState } from "react";
+import { getPublicGalleryImages } from "../../services/gallery.service";
+import type { GalleryImageItem } from "../../types/gallery.types";
+
+const fallbackHeroImage =
+  "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
 
 export const GalleryPage = () => {
+  const [images, setImages] = useState<GalleryImageItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const loadGalleryImages = async () => {
+      try {
+        const data = await getPublicGalleryImages();
+        setImages(data);
+      } catch {
+        setErrorMessage("Could not load gallery images");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadGalleryImages();
+  }, []);
+
+  const heroImage = useMemo(() => {
+    return images.find((image) => image.isFeatured) || images[0];
+  }, [images]);
+
   return (
     <main className="bg-[#f4f3fb] text-[#252530]">
       <section className="relative min-h-[460px] overflow-hidden bg-black text-white">
         <img
-          src={galleryImages[0].image}
-          alt="Schu Fi Ma Fi Gallery"
+          src={heroImage?.image.url || fallbackHeroImage}
+          alt={heroImage?.title.de || "Schu Fi Ma Fi Gallery"}
           className="absolute inset-0 h-full w-full object-cover"
         />
 
@@ -53,6 +44,7 @@ export const GalleryPage = () => {
         <div className="relative mx-auto flex min-h-[460px] max-w-7xl items-end px-6 py-20">
           <div>
             <p className="text-lg font-bold text-violet-300">Unsere Story</p>
+
             <h1 className="mt-4 text-6xl font-black tracking-tight md:text-8xl">
               Galerie
             </h1>
@@ -76,32 +68,48 @@ export const GalleryPage = () => {
           </p>
         </div>
 
+        {isLoading && (
+          <p className="mt-12 text-center text-zinc-500">Loading gallery...</p>
+        )}
+
+        {errorMessage && (
+          <p className="mt-12 text-center text-red-500">{errorMessage}</p>
+        )}
+
+        {!isLoading && !errorMessage && images.length === 0 && (
+          <p className="mt-12 text-center text-zinc-500">
+            No gallery images available.
+          </p>
+        )}
+
         <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {galleryImages.map((item) => (
+          {images.map((item) => (
             <article
-              key={`${item.title}-${item.category}`}
+              key={item._id}
               className="group relative min-h-[360px] overflow-hidden rounded-[2rem] bg-zinc-900 shadow-2xl shadow-black/20"
             >
               <img
-                src={item.image}
-                alt={item.title}
+                src={item.image.url}
+                alt={item.title.de}
                 className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
               />
 
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
               <div className="absolute left-6 top-6 rounded-md bg-violet-600 px-5 py-3 text-sm font-black text-white">
-                {item.category}
+                Galerie
               </div>
 
               <div className="absolute bottom-0 left-0 right-0 p-7">
                 <h3 className="text-3xl font-black tracking-tight text-white">
-                  {item.title}
+                  {item.title.de}
                 </h3>
 
-                <p className="mt-3 max-w-sm text-zinc-300">
-                  Ein Moment aus unserer Community.
-                </p>
+                {item.description?.de && (
+                  <p className="mt-3 max-w-sm text-zinc-300">
+                    {item.description.de}
+                  </p>
+                )}
               </div>
             </article>
           ))}
