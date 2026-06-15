@@ -10,6 +10,7 @@ export const EventsPage = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPreviousEvents, setShowPreviousEvents] = useState(false);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -26,9 +27,15 @@ export const EventsPage = () => {
     void loadEvents();
   }, []);
 
-  const heroEvent = useMemo(() => {
-    return events.find((event) => event.isFeatured) || events[0];
+  const featuredEvents = useMemo(() => {
+    return events.filter((event) => event.isFeatured);
   }, [events]);
+
+  const previousEvents = useMemo(() => {
+    return events.filter((event) => !event.isFeatured);
+  }, [events]);
+
+  const heroEvent = featuredEvents[0] || events[0];
 
   return (
     <main className="bg-[#0b0b10] text-white">
@@ -68,17 +75,16 @@ export const EventsPage = () => {
           <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
             <div>
               <p className="text-lg font-bold italic text-violet-300">
-                Programm
+                Featured Events
               </p>
 
               <h2 className="mt-3 text-5xl font-black tracking-tight md:text-6xl">
-                Alle Events
+                Aktuelle Highlights
               </h2>
             </div>
 
             <p className="max-w-xl text-zinc-400">
-              Hier findest du alle veröffentlichten Veranstaltungen mit Datum,
-              Ort, Tickets und weiteren Details.
+              Hier findest du die wichtigsten veröffentlichten Veranstaltungen.
             </p>
           </div>
 
@@ -90,11 +96,51 @@ export const EventsPage = () => {
             <p className="text-zinc-400">No published events yet.</p>
           )}
 
+          {!isLoading && !errorMessage && featuredEvents.length === 0 && (
+            <p className="text-zinc-400">No featured events yet.</p>
+          )}
+
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => (
+            {featuredEvents.map((event) => (
               <EventCard key={event._id} event={event} />
             ))}
           </div>
+
+          {previousEvents.length > 0 && (
+            <div className="mt-16 text-center">
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPreviousEvents((currentValue) => !currentValue)
+                }
+                className="rounded-full border border-white/15 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:border-violet-300 hover:text-violet-300"
+              >
+                {showPreviousEvents
+                  ? "Vergangene Events ausblenden"
+                  : "Vergangene Events anzeigen"}
+              </button>
+            </div>
+          )}
+
+          {showPreviousEvents && previousEvents.length > 0 && (
+            <section className="mt-20 border-t border-white/10 pt-16">
+              <div className="mb-12">
+                <p className="text-lg font-bold italic text-violet-300">
+                  Previous Events
+                </p>
+
+                <h2 className="mt-3 text-5xl font-black tracking-tight md:text-6xl">
+                  Vergangene Events
+                </h2>
+              </div>
+
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {previousEvents.map((event) => (
+                  <EventCard key={event._id} event={event} />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </section>
     </main>

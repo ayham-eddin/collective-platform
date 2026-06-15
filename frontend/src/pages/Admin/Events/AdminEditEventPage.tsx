@@ -1,11 +1,22 @@
-import { Plus, Save, Trash2 } from "lucide-react";
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { Plus, Save, Trash2, Upload } from "lucide-react";
+import {
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   getAdminEventById,
   updateAdminEvent,
 } from "../../../services/events.service";
-import type { EventItem, EventVideo } from "../../../types/event.types";
+import { uploadSingleImage } from "../../../services/uploads.service";
+import type {
+  EventImage,
+  EventItem,
+  EventVideo,
+} from "../../../types/event.types";
 
 type EventFormState = {
   titleDe: string;
@@ -113,6 +124,8 @@ export const AdminEditEventPage = () => {
   const [lineup, setLineup] = useState<string[]>([]);
   const [newArtist, setNewArtist] = useState("");
   const [videos, setVideos] = useState<EventVideo[]>([]);
+  const [coverImage, setCoverImage] = useState<EventImage | null>(null);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -154,6 +167,7 @@ export const AdminEditEventPage = () => {
 
         setLineup(event.lineup || []);
         setVideos((event.videos || []).map(normalizeVideo));
+        setCoverImage(event.coverImage || null);
       } catch {
         setErrorMessage("Could not load event.");
       } finally {
@@ -172,6 +186,36 @@ export const AdminEditEventPage = () => {
       ...currentState,
       [fieldName]: value,
     }));
+  };
+
+  const handleCoverUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const imageFile = event.target.files?.[0];
+
+    if (!imageFile) {
+      return;
+    }
+
+    setIsUploadingCover(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const uploadedImage = await uploadSingleImage(imageFile);
+
+      setCoverImage({
+        url: uploadedImage.url,
+        publicId: uploadedImage.publicId,
+        alt: {
+          de: formState.titleDe,
+          en: formState.titleEn,
+          ar: formState.titleAr,
+        },
+      });
+    } catch {
+      setErrorMessage("Could not upload cover image.");
+    } finally {
+      setIsUploadingCover(false);
+    }
   };
 
   const handleAddArtist = () => {
@@ -290,6 +334,17 @@ export const AdminEditEventPage = () => {
           en: formState.descriptionEn,
           ar: formState.descriptionAr,
         },
+        coverImage: coverImage
+          ? {
+              url: coverImage.url,
+              publicId: coverImage.publicId,
+              alt: {
+                de: formState.titleDe,
+                en: formState.titleEn,
+                ar: formState.titleAr,
+              },
+            }
+          : undefined,
         eventDate: formState.eventDate,
         startTime: formState.startTime,
         endTime: formState.endTime,
@@ -334,7 +389,8 @@ export const AdminEditEventPage = () => {
           </h1>
 
           <p className="mt-4 text-zinc-400">
-            Update event content, category, lineup and event videos.
+            Update event content, cover image, category, lineup and event
+            videos.
           </p>
         </div>
 
@@ -367,6 +423,31 @@ export const AdminEditEventPage = () => {
       )}
 
       <form onSubmit={handleSubmit} className="mt-10 grid gap-8">
+        <FormCard title="Cover Image">
+          <p className="mb-5 text-sm text-zinc-500">
+            Max image size: 10MB. Recommended width: 1600–2000px.
+          </p>
+
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:border-violet-400 hover:text-violet-300">
+            <Upload size={18} />
+            {isUploadingCover ? "Uploading..." : "Replace Cover"}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(event) => void handleCoverUpload(event)}
+              className="hidden"
+            />
+          </label>
+
+          {coverImage && (
+            <img
+              src={coverImage.url}
+              alt={coverImage.alt?.de || formState.titleDe || "Cover preview"}
+              className="mt-6 h-72 w-full rounded-3xl object-cover"
+            />
+          )}
+        </FormCard>
+
         <FormCard title="Title">
           <div className="grid gap-5 lg:grid-cols-3">
             <TextInput
@@ -669,7 +750,7 @@ export const AdminEditEventPage = () => {
 
         <button
           type="submit"
-          disabled={isSaving}
+          disabled={isSaving || isUploadingCover}
           className="inline-flex w-fit items-center gap-2 rounded-full bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Save size={18} />
