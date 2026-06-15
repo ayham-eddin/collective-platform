@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getPublicTeamMembers } from "../../services/team.service";
+import type { TeamMemberItem } from "../../types/team.types";
 
 const aboutHeroImageUrl =
   "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
@@ -9,34 +12,26 @@ const teamImageUrl =
 const storyImageUrl =
   "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
 
-const teamMembers = [
-  {
-    name: "Wesam Hero",
-    role: "Projektleiter",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781436366/collective-platform/events/dfunilrfat4wnccfw5eh.jpg",
-  },
-  {
-    name: "Heba",
-    role: "Mitglieder",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png",
-  },
-  {
-    name: "Sara Mukdad",
-    role: "Mitglieder",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781436366/collective-platform/events/dfunilrfat4wnccfw5eh.jpg",
-  },
-  {
-    name: "Samer Al",
-    role: "Mitglieder",
-    image:
-      "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png",
-  },
-];
-
 export const AboutPage = () => {
+  const [teamMembers, setTeamMembers] = useState<TeamMemberItem[]>([]);
+  const [isLoadingTeam, setIsLoadingTeam] = useState(true);
+  const [teamErrorMessage, setTeamErrorMessage] = useState("");
+
+  useEffect(() => {
+    const loadTeamMembers = async () => {
+      try {
+        const data = await getPublicTeamMembers();
+        setTeamMembers(data);
+      } catch {
+        setTeamErrorMessage("Could not load team members");
+      } finally {
+        setIsLoadingTeam(false);
+      }
+    };
+
+    void loadTeamMembers();
+  }, []);
+
   return (
     <main className="bg-[#f4f3fb] text-[#252530]">
       <section className="relative min-h-[560px] overflow-hidden bg-black text-white">
@@ -147,27 +142,45 @@ export const AboutPage = () => {
             </h2>
           </div>
 
+          {isLoadingTeam && (
+            <p className="mt-12 text-center text-zinc-500">
+              Loading team members...
+            </p>
+          )}
+
+          {teamErrorMessage && (
+            <p className="mt-12 text-center text-red-400">{teamErrorMessage}</p>
+          )}
+
+          {!isLoadingTeam && !teamErrorMessage && teamMembers.length === 0 && (
+            <p className="mt-12 text-center text-zinc-500">
+              No team members available.
+            </p>
+          )}
+
           <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {teamMembers.map((member) => (
               <article
-                key={member.name}
+                key={member._id}
                 className="group relative min-h-[420px] overflow-hidden rounded-[2rem] bg-zinc-900"
               >
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
-                />
+                {member.image && (
+                  <img
+                    src={member.image.url}
+                    alt={member.fullName}
+                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                  />
+                )}
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
                 <div className="absolute bottom-0 left-0 right-0 p-7">
                   <p className="text-lg font-bold italic text-violet-300">
-                    {member.role}
+                    {member.role.de}
                   </p>
 
                   <h3 className="mt-2 text-3xl font-black tracking-tight">
-                    {member.name}
+                    {member.fullName}
                   </h3>
                 </div>
               </article>
