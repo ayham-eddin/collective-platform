@@ -1,12 +1,60 @@
 import { useEffect, useMemo, useState } from "react";
 import { GalleryLightbox } from "../../components/GalleryLightbox/GalleryLightbox";
+import { useLanguage } from "../../contexts/useLanguage";
 import { getPublicGalleryImages } from "../../services/gallery.service";
-import type { GalleryImageItem } from "../../types/gallery.types";
+import type {
+  GalleryImageItem,
+  LocalizedText,
+} from "../../types/gallery.types";
 
 const fallbackHeroImage =
   "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
 
+const pageText = {
+  heroEyebrow: {
+    de: "Unsere Story",
+    en: "Our Story",
+    ar: "قصتنا",
+  },
+  heroTitle: {
+    de: "Galerie",
+    en: "Gallery",
+    ar: "المعرض",
+  },
+  sectionEyebrow: {
+    de: "Glückliche Momente",
+    en: "Happy Moments",
+    ar: "لحظات سعيدة",
+  },
+  sectionTitle: {
+    de: "Wir lieben es, besondere Momente zu teilen",
+    en: "We love sharing special moments",
+    ar: "نحب مشاركة اللحظات المميزة",
+  },
+  sectionDescription: {
+    de: "Hier finden Sie einige Bilder von Veranstaltungen, die wir organisiert haben.",
+    en: "Here you can find some photos from events we organized.",
+    ar: "هنا تجد بعض الصور من الفعاليات التي قمنا بتنظيمها.",
+  },
+  loading: {
+    de: "Galerie wird geladen...",
+    en: "Loading gallery...",
+    ar: "جاري تحميل المعرض...",
+  },
+  empty: {
+    de: "Noch keine Bilder in der Galerie.",
+    en: "No gallery images available.",
+    ar: "لا توجد صور في المعرض حالياً.",
+  },
+  category: {
+    de: "Galerie",
+    en: "Gallery",
+    ar: "المعرض",
+  },
+};
+
 export const GalleryPage = () => {
+  const { language } = useLanguage();
   const [images, setImages] = useState<GalleryImageItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +84,11 @@ export const GalleryPage = () => {
       <section className="relative min-h-[460px] overflow-hidden bg-black text-white">
         <img
           src={heroImage?.image.url || fallbackHeroImage}
-          alt={heroImage?.title.de || "Schu Fi Ma Fi Gallery"}
+          alt={getLocalizedText(
+            heroImage?.title,
+            language,
+            "Schu Fi Ma Fi Gallery",
+          )}
           className="absolute inset-0 h-full w-full object-cover"
         />
 
@@ -45,10 +97,12 @@ export const GalleryPage = () => {
 
         <div className="relative mx-auto flex min-h-[460px] max-w-7xl items-end px-6 py-20">
           <div>
-            <p className="text-lg font-bold text-violet-300">Unsere Story</p>
+            <p className="text-lg font-bold text-violet-300">
+              {pageText.heroEyebrow[language]}
+            </p>
 
             <h1 className="mt-4 text-6xl font-black tracking-tight md:text-8xl">
-              Galerie
+              {pageText.heroTitle[language]}
             </h1>
           </div>
         </div>
@@ -57,21 +111,22 @@ export const GalleryPage = () => {
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="max-w-4xl">
           <p className="text-xl font-bold italic text-violet-400">
-            Glückliche Momente
+            {pageText.sectionEyebrow[language]}
           </p>
 
           <h2 className="mt-5 text-5xl font-black leading-tight tracking-tight md:text-7xl">
-            Wir lieben es, besondere Momente zu teilen
+            {pageText.sectionTitle[language]}
           </h2>
 
           <p className="mt-8 text-lg leading-8 text-zinc-700">
-            Hier finden Sie einige Bilder von Veranstaltungen, die wir
-            organisiert haben.
+            {pageText.sectionDescription[language]}
           </p>
         </div>
 
         {isLoading && (
-          <p className="mt-12 text-center text-zinc-500">Loading gallery...</p>
+          <p className="mt-12 text-center text-zinc-500">
+            {pageText.loading[language]}
+          </p>
         )}
 
         {errorMessage && (
@@ -80,7 +135,7 @@ export const GalleryPage = () => {
 
         {!isLoading && !errorMessage && images.length === 0 && (
           <p className="mt-12 text-center text-zinc-500">
-            No gallery images available.
+            {pageText.empty[language]}
           </p>
         )}
 
@@ -94,24 +149,32 @@ export const GalleryPage = () => {
             >
               <img
                 src={item.image.url}
-                alt={item.title.de}
+                alt={getLocalizedText(
+                  item.title,
+                  language,
+                  pageText.category[language],
+                )}
                 className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
               />
 
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
               <div className="absolute left-6 top-6 rounded-md bg-violet-600 px-5 py-3 text-sm font-black text-white">
-                Galerie
+                {pageText.category[language]}
               </div>
 
               <div className="absolute bottom-0 left-0 right-0 p-7">
                 <h3 className="text-3xl font-black tracking-tight text-white">
-                  {item.title.de}
+                  {getLocalizedText(
+                    item.title,
+                    language,
+                    pageText.category[language],
+                  )}
                 </h3>
 
-                {item.description?.de && (
+                {item.description && (
                   <p className="mt-3 max-w-sm text-zinc-300">
-                    {item.description.de}
+                    {getLocalizedText(item.description, language, "")}
                   </p>
                 )}
               </div>
@@ -129,4 +192,12 @@ export const GalleryPage = () => {
       )}
     </main>
   );
+};
+
+const getLocalizedText = (
+  value: LocalizedText | undefined,
+  language: keyof LocalizedText,
+  fallback: string,
+) => {
+  return value?.[language] || value?.de || fallback;
 };

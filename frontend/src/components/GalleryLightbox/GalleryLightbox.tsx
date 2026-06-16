@@ -1,6 +1,10 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { GalleryImageItem } from "../../types/gallery.types";
+import { useLanguage } from "../../contexts/useLanguage";
+import type {
+  GalleryImageItem,
+  LocalizedText,
+} from "../../types/gallery.types";
 
 interface GalleryLightboxProps {
   images: GalleryImageItem[];
@@ -8,11 +12,35 @@ interface GalleryLightboxProps {
   onClose: () => void;
 }
 
+const lightboxText = {
+  close: {
+    de: "Galerie schließen",
+    en: "Close gallery",
+    ar: "إغلاق المعرض",
+  },
+  previous: {
+    de: "Vorheriges Bild",
+    en: "Previous image",
+    ar: "الصورة السابقة",
+  },
+  next: {
+    de: "Nächstes Bild",
+    en: "Next image",
+    ar: "الصورة التالية",
+  },
+  imageFallback: {
+    de: "Galeriebild",
+    en: "Gallery image",
+    ar: "صورة من المعرض",
+  },
+};
+
 export const GalleryLightbox = ({
   images,
   currentIndex,
   onClose,
 }: GalleryLightboxProps) => {
+  const { language } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(currentIndex);
 
   const showPreviousImage = () => {
@@ -55,6 +83,12 @@ export const GalleryLightbox = ({
     return null;
   }
 
+  const activeTitle = getLocalizedText(
+    activeImage.title,
+    language,
+    lightboxText.imageFallback[language],
+  );
+
   return (
     <div
       className="fixed inset-0 z-[100] bg-black/95 px-4 py-6 text-white"
@@ -66,7 +100,7 @@ export const GalleryLightbox = ({
         type="button"
         onClick={onClose}
         className="absolute right-5 top-5 z-20 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
-        aria-label="Close gallery"
+        aria-label={lightboxText.close[language]}
       >
         <X size={24} />
       </button>
@@ -80,7 +114,7 @@ export const GalleryLightbox = ({
               showPreviousImage();
             }}
             className="absolute left-5 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
-            aria-label="Previous image"
+            aria-label={lightboxText.previous[language]}
           >
             <ChevronLeft size={28} />
           </button>
@@ -92,7 +126,7 @@ export const GalleryLightbox = ({
               showNextImage();
             }}
             className="absolute right-5 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
-            aria-label="Next image"
+            aria-label={lightboxText.next[language]}
           >
             <ChevronRight size={28} />
           </button>
@@ -105,7 +139,7 @@ export const GalleryLightbox = ({
       >
         <img
           src={activeImage.image.url}
-          alt={activeImage.title.de}
+          alt={activeTitle}
           className="max-h-[72vh] max-w-full rounded-3xl object-contain shadow-2xl shadow-black"
         />
 
@@ -114,13 +148,23 @@ export const GalleryLightbox = ({
             {activeIndex + 1} / {images.length}
           </p>
 
-          <h2 className="mt-3 text-3xl font-black">{activeImage.title.de}</h2>
+          <h2 className="mt-3 text-3xl font-black">{activeTitle}</h2>
 
-          {activeImage.description?.de && (
-            <p className="mt-3 text-zinc-300">{activeImage.description.de}</p>
+          {activeImage.description && (
+            <p className="mt-3 text-zinc-300">
+              {getLocalizedText(activeImage.description, language, "")}
+            </p>
           )}
         </div>
       </div>
     </div>
   );
+};
+
+const getLocalizedText = (
+  value: LocalizedText | undefined,
+  language: keyof LocalizedText,
+  fallback: string,
+) => {
+  return value?.[language] || value?.de || fallback;
 };

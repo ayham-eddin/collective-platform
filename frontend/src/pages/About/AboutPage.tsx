@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../../contexts/useLanguage";
 import { getPublicTeamMembers } from "../../services/team.service";
 import type { TeamMemberItem } from "../../types/team.types";
 
@@ -12,7 +13,86 @@ const teamImageUrl =
 const storyImageUrl =
   "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
 
+const pageText = {
+  breadcrumbHome: {
+    de: "Home",
+    en: "Home",
+    ar: "الرئيسية",
+  },
+  breadcrumbAbout: {
+    de: "Über uns",
+    en: "About us",
+    ar: "من نحن",
+  },
+  heroTitle: {
+    de: "Über Uns",
+    en: "About Us",
+    ar: "من نحن",
+  },
+  historyEyebrow: {
+    de: "Unsere wertvolle Geschichte",
+    en: "Our valuable story",
+    ar: "قصتنا المميزة",
+  },
+  historyTitle: {
+    de: "Solides Team arbeitet für Schufimafi Collective",
+    en: "A strong team works for Schufimafi Collective",
+    ar: "فريق قوي يعمل من أجل شو في ما في",
+  },
+  historyTextOne: {
+    de: "Schu Fi Ma Fi ist ein syrisches kulturelles Kollektiv, das seit 2018 in der Kulturszene in Deutschland aktiv ist. Wir streben eine offene und gesunde Gesellschaft an, die auf Augenhöhe miteinander kommuniziert und sich austauscht.\n\nWir investieren in jedes Event.",
+    en: "Schu Fi Ma Fi is a Syrian cultural collective that has been active in the cultural scene in Germany since 2018. We aim for an open and healthy society that communicates and exchanges ideas on equal footing.\n\nWe invest in every event.",
+    ar: "شو في ما في هو تجمع ثقافي سوري نشط في المشهد الثقافي في ألمانيا منذ عام 2018. نسعى إلى مجتمع منفتح وصحي يتواصل ويتبادل الأفكار باحترام وعلى قدم المساواة.\n\nنستثمر في كل فعالية.",
+  },
+  historyTextTwo: {
+    de: "Wir geben uns die größte Mühe, jede Veranstaltung zu einem Erfolg zu machen und tun alles, was nötig ist. Wir sind die perfekte Wahl für Sie, wenn Sie Leute mit großer Erfahrung brauchen, um Ihre Veranstaltung zu managen.",
+    en: "We do our very best to make every event a success and do everything needed. We are the perfect choice when you need people with strong experience to manage your event.",
+    ar: "نبذل أقصى جهدنا لجعل كل فعالية ناجحة ونقوم بكل ما يلزم. نحن الخيار المناسب عندما تحتاج إلى أشخاص لديهم خبرة قوية لإدارة فعاليتك.",
+  },
+  eventsButton: {
+    de: "Unsere Events",
+    en: "Our Events",
+    ar: "فعالياتنا",
+  },
+  storyEyebrow: {
+    de: "Unsere Story",
+    en: "Our Story",
+    ar: "قصتنا",
+  },
+  storyTitle: {
+    de: "Wir lieben es, glückliche Momente zu teilen",
+    en: "We love sharing happy moments",
+    ar: "نحب مشاركة اللحظات السعيدة",
+  },
+  storyDescription: {
+    de: "Hier finden Sie einige Bilder von Veranstaltungen, die wir organisiert haben.",
+    en: "Here you can find some photos from events we organized.",
+    ar: "هنا تجد بعض الصور من الفعاليات التي قمنا بتنظيمها.",
+  },
+  teamEyebrow: {
+    de: "Unser Team",
+    en: "Our Team",
+    ar: "فريقنا",
+  },
+  teamTitle: {
+    de: "Solide Teamarbeit",
+    en: "Strong teamwork",
+    ar: "عمل جماعي قوي",
+  },
+  loadingTeam: {
+    de: "Teammitglieder werden geladen...",
+    en: "Loading team members...",
+    ar: "جاري تحميل أعضاء الفريق...",
+  },
+  noTeam: {
+    de: "Noch keine Teammitglieder verfügbar.",
+    en: "No team members available.",
+    ar: "لا يوجد أعضاء فريق حالياً.",
+  },
+};
+
 export const AboutPage = () => {
+  const { language } = useLanguage();
   const [teamMembers, setTeamMembers] = useState<TeamMemberItem[]>([]);
   const [isLoadingTeam, setIsLoadingTeam] = useState(true);
   const [teamErrorMessage, setTeamErrorMessage] = useState("");
@@ -48,14 +128,14 @@ export const AboutPage = () => {
           <div>
             <div className="mb-6 flex items-center gap-3 text-lg font-bold text-white/85">
               <Link to="/" className="transition hover:text-violet-300">
-                Home
+                {pageText.breadcrumbHome[language]}
               </Link>
               <span>›</span>
-              <span>Über uns</span>
+              <span>{pageText.breadcrumbAbout[language]}</span>
             </div>
 
             <h1 className="text-6xl font-black tracking-tight md:text-8xl">
-              Über Uns
+              {pageText.heroTitle[language]}
             </h1>
 
             <div className="mt-10 h-px w-full max-w-5xl border-t border-dashed border-white/50" />
@@ -66,37 +146,26 @@ export const AboutPage = () => {
       <section className="mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[1fr_0.9fr]">
         <div>
           <p className="text-xl font-bold italic text-violet-400">
-            Unsere wertvolle Geschichte
+            {pageText.historyEyebrow[language]}
           </p>
 
           <h2 className="mt-6 max-w-4xl text-5xl font-black leading-tight tracking-tight md:text-6xl">
-            Solides Team arbeitet für Schufimafi Collective
+            {pageText.historyTitle[language]}
           </h2>
 
           <div className="mt-10 grid gap-8 text-lg leading-8 text-zinc-800 md:grid-cols-2">
-            <p>
-              Schu Fi Ma Fi ist ein syrisches kulturelles Kollektiv, das seit
-              2018 in der Kulturszene in Deutschland aktiv ist. Wir streben eine
-              offene und gesunde Gesellschaft an, die auf Augenhöhe miteinander
-              kommuniziert und sich austauscht.
-              <br />
-              <br />
-              Wir investieren in jedes Event.
+            <p className="whitespace-pre-line">
+              {pageText.historyTextOne[language]}
             </p>
 
-            <p>
-              Wir geben uns die größte Mühe, jede Veranstaltung zu einem Erfolg
-              zu machen und tun alles, was nötig ist. Wir sind die perfekte Wahl
-              für Sie, wenn Sie Leute mit großer Erfahrung brauchen, um Ihre
-              Veranstaltung zu managen.
-            </p>
+            <p>{pageText.historyTextTwo[language]}</p>
           </div>
 
           <Link
             to="/events"
             className="mt-10 inline-flex rounded-full bg-violet-400 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
           >
-            Unsere Events
+            {pageText.eventsButton[language]}
           </Link>
         </div>
 
@@ -110,15 +179,16 @@ export const AboutPage = () => {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-24">
-        <p className="text-xl font-bold italic text-violet-400">Unsere Story</p>
+        <p className="text-xl font-bold italic text-violet-400">
+          {pageText.storyEyebrow[language]}
+        </p>
 
         <h2 className="mt-6 text-5xl font-black tracking-tight md:text-7xl">
-          Wir lieben es, glückliche Momente zu teilen
+          {pageText.storyTitle[language]}
         </h2>
 
         <p className="mt-8 max-w-3xl text-lg leading-8 text-zinc-700">
-          Hier finden Sie einige Bilder von Veranstaltungen, die wir organisiert
-          haben.
+          {pageText.storyDescription[language]}
         </p>
 
         <div className="mt-10 overflow-hidden rounded-[2rem] shadow-2xl shadow-black/20">
@@ -134,17 +204,17 @@ export const AboutPage = () => {
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center">
             <p className="text-xl font-bold italic text-violet-300">
-              Unser Team
+              {pageText.teamEyebrow[language]}
             </p>
 
             <h2 className="mt-4 text-5xl font-black tracking-tight md:text-6xl">
-              Solide Teamarbeit
+              {pageText.teamTitle[language]}
             </h2>
           </div>
 
           {isLoadingTeam && (
             <p className="mt-12 text-center text-zinc-500">
-              Loading team members...
+              {pageText.loadingTeam[language]}
             </p>
           )}
 
@@ -154,7 +224,7 @@ export const AboutPage = () => {
 
           {!isLoadingTeam && !teamErrorMessage && teamMembers.length === 0 && (
             <p className="mt-12 text-center text-zinc-500">
-              No team members available.
+              {pageText.noTeam[language]}
             </p>
           )}
 
@@ -176,7 +246,7 @@ export const AboutPage = () => {
 
                 <div className="absolute bottom-0 left-0 right-0 p-7">
                   <p className="text-lg font-bold italic text-violet-300">
-                    {member.role.de}
+                    {member.role[language] || member.role.de}
                   </p>
 
                   <h3 className="mt-2 text-3xl font-black tracking-tight">
