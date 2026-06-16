@@ -13,7 +13,9 @@ export type PermissionModule =
   | "videos"
   | "team"
   | "pages"
+  | "home-content"
   | "settings"
+  | "contact"
   | "admins";
 
 export interface Permission {
@@ -38,7 +40,9 @@ const permissionSchema = new Schema<Permission>(
         "videos",
         "team",
         "pages",
+        "home-content",
         "settings",
+        "contact",
         "admins",
       ],
     },
