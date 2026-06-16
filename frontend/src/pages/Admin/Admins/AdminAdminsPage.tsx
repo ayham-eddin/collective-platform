@@ -10,6 +10,7 @@ import {
   updateAdminRole,
   updateAdminUser,
 } from "../../../services/admin.service";
+import { getStoredAdmin } from "../../../services/auth.service";
 import type {
   AdminItem,
   AdminRole,
@@ -66,6 +67,8 @@ const initialRoleFormState: RoleFormState = {
 };
 
 export const AdminAdminsPage = () => {
+  const currentAdmin = getStoredAdmin();
+
   const [admins, setAdmins] = useState<AdminItem[]>([]);
   const [roles, setRoles] = useState<AdminRole[]>([]);
   const [formState, setFormState] = useState<AdminFormState>(initialFormState);
@@ -324,6 +327,13 @@ export const AdminAdminsPage = () => {
   };
 
   const handleToggleActive = async (admin: AdminItem) => {
+    const isCurrentAdmin = currentAdmin?.id === admin._id;
+
+    if (isCurrentAdmin) {
+      setErrorMessage("You cannot disable your own account.");
+      return;
+    }
+
     setMessageText("");
     setErrorMessage("");
 
@@ -344,7 +354,19 @@ export const AdminAdminsPage = () => {
     }
   };
 
-  const handleDeleteAdmin = async (adminId: string) => {
+  const handleDeleteAdmin = async (admin: AdminItem) => {
+    const isCurrentAdmin = currentAdmin?.id === admin._id;
+
+    if (isCurrentAdmin) {
+      setErrorMessage("You cannot delete your own account.");
+      return;
+    }
+
+    if (admin.role.isSuperAdmin) {
+      setErrorMessage("Super Admin accounts cannot be deleted.");
+      return;
+    }
+
     const confirmed = window.confirm(
       "Are you sure you want to delete this admin?",
     );
@@ -357,9 +379,9 @@ export const AdminAdminsPage = () => {
     setErrorMessage("");
 
     try {
-      await deleteAdminUser(adminId);
+      await deleteAdminUser(admin._id);
       setAdmins((currentAdmins) =>
-        currentAdmins.filter((admin) => admin._id !== adminId),
+        currentAdmins.filter((currentAdmin) => currentAdmin._id !== admin._id),
       );
       setMessageText("Admin deleted successfully.");
     } catch {
@@ -647,6 +669,7 @@ export const AdminAdminsPage = () => {
                   {admins.map((admin) => {
                     const isEditing = editingAdminId === admin._id;
                     const isSuperAdmin = admin.role.isSuperAdmin;
+                    const isCurrentAdmin = currentAdmin?.id === admin._id;
 
                     return (
                       <tr
@@ -678,6 +701,11 @@ export const AdminAdminsPage = () => {
                               <p className="mt-1 text-sm text-zinc-500">
                                 {admin.email}
                               </p>
+                              {isCurrentAdmin && (
+                                <p className="mt-2 text-xs font-black uppercase text-violet-300">
+                                  Current account
+                                </p>
+                              )}
                             </div>
                           )}
                         </td>
@@ -761,20 +789,31 @@ export const AdminAdminsPage = () => {
                                 <button
                                   type="button"
                                   onClick={() => void handleToggleActive(admin)}
-                                  className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-yellow-400 hover:text-yellow-300"
+                                  disabled={isCurrentAdmin}
+                                  className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-yellow-400 hover:text-yellow-300 disabled:cursor-not-allowed disabled:opacity-40"
                                   aria-label="Toggle admin status"
+                                  title={
+                                    isCurrentAdmin
+                                      ? "You cannot disable your own account"
+                                      : undefined
+                                  }
                                 >
                                   <Power size={17} />
                                 </button>
 
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    void handleDeleteAdmin(admin._id)
-                                  }
-                                  disabled={isSuperAdmin}
+                                  onClick={() => void handleDeleteAdmin(admin)}
+                                  disabled={isSuperAdmin || isCurrentAdmin}
                                   className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-red-400 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-40"
                                   aria-label="Delete admin"
+                                  title={
+                                    isCurrentAdmin
+                                      ? "You cannot delete your own account"
+                                      : isSuperAdmin
+                                        ? "Super Admin cannot be deleted"
+                                        : undefined
+                                  }
                                 >
                                   <Trash2 size={17} />
                                 </button>

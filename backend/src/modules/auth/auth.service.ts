@@ -1,6 +1,7 @@
 import { Admin } from "../../database/models/Admin";
-import { comparePassword } from "../../utils/password";
 import { signAccessToken, signRefreshToken } from "../../utils/jwt";
+import { comparePassword } from "../../utils/password";
+import type { Permission } from "../../database/models/Role";
 
 interface LoginInput {
   email: string;
@@ -32,6 +33,7 @@ export const loginAdmin = async ({ email, password }: LoginInput) => {
   const role = admin.role as unknown as {
     _id: string;
     name: string;
+    permissions: Permission[];
     isSuperAdmin: boolean;
   };
 
@@ -53,6 +55,7 @@ export const loginAdmin = async ({ email, password }: LoginInput) => {
       role: {
         id: role._id.toString(),
         name: role.name,
+        permissions: role.permissions,
         isSuperAdmin: role.isSuperAdmin,
       },
     },

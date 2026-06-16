@@ -20,6 +20,7 @@ import { EventsPage } from "../pages/Events/EventsPage";
 import { GalleryPage } from "../pages/Gallery/GalleryPage";
 import { HomePage } from "../pages/Home/HomePage";
 import { VideosPage } from "../pages/Videos/VideosPage";
+import { AdminPermissionRoute } from "./components/AdminPermissionRoute";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 
 const router = createBrowserRouter([
@@ -39,44 +40,106 @@ const router = createBrowserRouter([
             element: <AdminDashboardPage />,
           },
           {
-            path: "home-content",
-            element: <AdminHomeContentPage />,
+            element: (
+              <AdminPermissionRoute moduleName="home-content" action="read" />
+            ),
+            children: [
+              {
+                path: "home-content",
+                element: <AdminHomeContentPage />,
+              },
+            ],
           },
           {
-            path: "settings",
-            element: <AdminSettingsPage />,
+            element: (
+              <AdminPermissionRoute moduleName="settings" action="read" />
+            ),
+            children: [
+              {
+                path: "settings",
+                element: <AdminSettingsPage />,
+              },
+            ],
           },
           {
-            path: "messages",
-            element: <AdminMessagesPage />,
+            element: (
+              <AdminPermissionRoute moduleName="contact" action="read" />
+            ),
+            children: [
+              {
+                path: "messages",
+                element: <AdminMessagesPage />,
+              },
+            ],
           },
           {
-            path: "events",
-            element: <AdminEventsPage />,
+            element: <AdminPermissionRoute moduleName="events" action="read" />,
+            children: [
+              {
+                path: "events",
+                element: <AdminEventsPage />,
+              },
+            ],
           },
           {
-            path: "events/create",
-            element: <AdminCreateEventPage />,
+            element: (
+              <AdminPermissionRoute moduleName="events" action="create" />
+            ),
+            children: [
+              {
+                path: "events/create",
+                element: <AdminCreateEventPage />,
+              },
+            ],
           },
           {
-            path: "events/:eventId/edit",
-            element: <AdminEditEventPage />,
+            element: (
+              <AdminPermissionRoute moduleName="events" action="update" />
+            ),
+            children: [
+              {
+                path: "events/:eventId/edit",
+                element: <AdminEditEventPage />,
+              },
+            ],
           },
           {
-            path: "gallery",
-            element: <AdminGalleryPage />,
+            element: (
+              <AdminPermissionRoute moduleName="gallery" action="read" />
+            ),
+            children: [
+              {
+                path: "gallery",
+                element: <AdminGalleryPage />,
+              },
+            ],
           },
           {
-            path: "videos",
-            element: <AdminVideosPage />,
+            element: <AdminPermissionRoute moduleName="videos" action="read" />,
+            children: [
+              {
+                path: "videos",
+                element: <AdminVideosPage />,
+              },
+            ],
           },
           {
-            path: "team",
-            element: <AdminTeamPage />,
+            element: <AdminPermissionRoute moduleName="team" action="read" />,
+            children: [
+              {
+                path: "team",
+                element: <AdminTeamPage />,
+              },
+            ],
           },
           {
-            path: "admins",
-            element: <AdminAdminsPage />,
+            element: <AdminPermissionRoute moduleName="admins" action="read" />,
+            children: [
+              {
+                path: "admins",
+                element: <AdminAdminsPage />,
+              },
+            ],
           },
         ],
       },

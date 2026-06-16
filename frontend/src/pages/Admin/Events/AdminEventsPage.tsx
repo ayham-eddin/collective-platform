@@ -5,9 +5,17 @@ import {
   deleteAdminEvent,
   getAdminEvents,
 } from "../../../services/events.service";
+import { getStoredAdmin } from "../../../services/auth.service";
 import type { EventItem } from "../../../types/event.types";
+import { hasPermission } from "../../../utils/permissions";
 
 export const AdminEventsPage = () => {
+  const admin = getStoredAdmin();
+
+  const canCreateEvent = hasPermission(admin, "events", "create");
+  const canUpdateEvent = hasPermission(admin, "events", "update");
+  const canDeleteEvent = hasPermission(admin, "events", "delete");
+
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -29,6 +37,11 @@ export const AdminEventsPage = () => {
   }, []);
 
   const handleDelete = async (eventId: string) => {
+    if (!canDeleteEvent) {
+      setErrorMessage("You do not have permission to delete events.");
+      return;
+    }
+
     const confirmed = window.confirm(
       "Are you sure you want to delete this event?",
     );
@@ -38,6 +51,7 @@ export const AdminEventsPage = () => {
     }
 
     setDeleteMessage("");
+    setErrorMessage("");
 
     try {
       await deleteAdminEvent(eventId);
@@ -67,13 +81,25 @@ export const AdminEventsPage = () => {
           </p>
         </div>
 
-        <Link
-          to="/admin/events/create"
-          className="inline-flex items-center gap-2 rounded-full bg-violet-600 px-5 py-3 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
-        >
-          <Plus size={18} />
-          Add Event
-        </Link>
+        {canCreateEvent ? (
+          <Link
+            to="/admin/events/create"
+            className="inline-flex items-center gap-2 rounded-full bg-violet-600 px-5 py-3 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
+          >
+            <Plus size={18} />
+            Add Event
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled
+            title="You do not have permission to create events"
+            className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-zinc-700 px-5 py-3 text-sm font-black uppercase tracking-wide text-zinc-400 opacity-60"
+          >
+            <Plus size={18} />
+            Add Event
+          </button>
+        )}
       </div>
 
       {isLoading && <p className="mt-10 text-zinc-400">Loading events...</p>}
@@ -158,18 +184,36 @@ export const AdminEventsPage = () => {
 
                     <td className="px-6 py-5">
                       <div className="flex justify-end gap-2">
-                        <Link
-                          to={`/admin/events/${event._id}/edit`}
-                          className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-violet-400 hover:text-violet-300"
-                          aria-label="Edit event"
-                        >
-                          <Edit size={17} />
-                        </Link>
+                        {canUpdateEvent ? (
+                          <Link
+                            to={`/admin/events/${event._id}/edit`}
+                            className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-violet-400 hover:text-violet-300"
+                            aria-label="Edit event"
+                          >
+                            <Edit size={17} />
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled
+                            title="You do not have permission to edit events"
+                            className="grid h-10 w-10 cursor-not-allowed place-items-center rounded-full border border-white/10 text-zinc-600 opacity-50"
+                            aria-label="Edit event disabled"
+                          >
+                            <Edit size={17} />
+                          </button>
+                        )}
 
                         <button
                           type="button"
                           onClick={() => void handleDelete(event._id)}
-                          className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-red-400 hover:text-red-300"
+                          disabled={!canDeleteEvent}
+                          title={
+                            canDeleteEvent
+                              ? undefined
+                              : "You do not have permission to delete events"
+                          }
+                          className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-red-400 hover:text-red-300 disabled:cursor-not-allowed disabled:text-zinc-600 disabled:opacity-50"
                           aria-label="Delete event"
                         >
                           <Trash2 size={17} />

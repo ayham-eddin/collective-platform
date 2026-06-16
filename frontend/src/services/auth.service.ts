@@ -1,3 +1,4 @@
+import type { Permission } from "../types/admin.types";
 import { api } from "./api";
 
 interface LoginPayload {
@@ -16,6 +17,7 @@ interface LoginResponse {
       role: {
         id: string;
         name: string;
+        permissions: Permission[];
         isSuperAdmin: boolean;
       };
     };
