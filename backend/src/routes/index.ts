@@ -1,14 +1,15 @@
 import { Router } from "express";
 import { adminRoutes } from "../modules/admin/admin.routes";
 import { authRoutes } from "../modules/auth/auth.routes";
+import { contactRoutes } from "../modules/contact/contact.routes";
+import { dashboardRoutes } from "../modules/dashboard/dashboard.routes";
 import { eventRoutes } from "../modules/events/events.routes";
 import { galleryRoutes } from "../modules/gallery/gallery.routes";
-import { uploadRoutes } from "../modules/uploads/uploads.routes";
-import { videoRoutes } from "../modules/videos/videos.routes";
-import { teamRoutes } from "../modules/team/team.routes";
 import { homeContentRoutes } from "../modules/home-content/homeContent.routes";
 import { settingsRoutes } from "../modules/settings/settings.routes";
-import { contactRoutes } from "../modules/contact/contact.routes";
+import { teamRoutes } from "../modules/team/team.routes";
+import { uploadRoutes } from "../modules/uploads/uploads.routes";
+import { videoRoutes } from "../modules/videos/videos.routes";
 
 export const apiRoutes = Router();
 
@@ -29,3 +30,4 @@ apiRoutes.use("/team", teamRoutes);
 apiRoutes.use("/home-content", homeContentRoutes);
 apiRoutes.use("/settings", settingsRoutes);
 apiRoutes.use("/contact", contactRoutes);
+apiRoutes.use("/dashboard", dashboardRoutes);
