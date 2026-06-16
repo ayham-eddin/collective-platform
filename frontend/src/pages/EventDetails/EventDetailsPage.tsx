@@ -9,8 +9,9 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useLanguage } from "../../contexts/useLanguage";
 import { getPublicEventBySlug } from "../../services/events.service";
-import type { EventItem } from "../../types/event.types";
+import type { EventItem, LocalizedText } from "../../types/event.types";
 
 const getYoutubeEmbedUrl = (youtubeUrl: string) => {
   if (youtubeUrl.includes("watch?v=")) {
@@ -24,7 +25,92 @@ const getYoutubeEmbedUrl = (youtubeUrl: string) => {
   return youtubeUrl;
 };
 
+const localeMap = {
+  de: "de-DE",
+  en: "en-GB",
+  ar: "ar",
+};
+
+const pageText = {
+  loading: {
+    de: "Event wird geladen...",
+    en: "Loading event...",
+    ar: "جاري تحميل الفعالية...",
+  },
+  notFound: {
+    de: "Event nicht gefunden",
+    en: "Event not found",
+    ar: "لم يتم العثور على الفعالية",
+  },
+  backToEvents: {
+    de: "← Zurück zu Events",
+    en: "← Back to events",
+    ar: "→ العودة إلى الفعاليات",
+  },
+  eventFallback: {
+    de: "Event",
+    en: "Event",
+    ar: "فعالية",
+  },
+  lineup: {
+    de: "Lineup",
+    en: "Lineup",
+    ar: "البرنامج",
+  },
+  videos: {
+    de: "Videos",
+    en: "Videos",
+    ar: "فيديوهات",
+  },
+  eventDetails: {
+    de: "Event Details",
+    en: "Event Details",
+    ar: "تفاصيل الفعالية",
+  },
+  date: {
+    de: "Datum",
+    en: "Date",
+    ar: "التاريخ",
+  },
+  time: {
+    de: "Uhrzeit",
+    en: "Time",
+    ar: "الوقت",
+  },
+  location: {
+    de: "Ort",
+    en: "Location",
+    ar: "المكان",
+  },
+  copyAddress: {
+    de: "Adresse kopieren",
+    en: "Copy address",
+    ar: "نسخ العنوان",
+  },
+  addressCopied: {
+    de: "Adresse kopiert",
+    en: "Address copied",
+    ar: "تم نسخ العنوان",
+  },
+  copyFailed: {
+    de: "Kopieren fehlgeschlagen",
+    en: "Copy failed",
+    ar: "فشل النسخ",
+  },
+  openMaps: {
+    de: "Google Maps öffnen",
+    en: "Open Google Maps",
+    ar: "فتح Google Maps",
+  },
+  buyTickets: {
+    de: "Tickets kaufen",
+    en: "Buy tickets",
+    ar: "شراء التذاكر",
+  },
+};
+
 export const EventDetailsPage = () => {
+  const { language } = useLanguage();
   const { slug } = useParams<{ slug: string }>();
   const [event, setEvent] = useState<EventItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -58,18 +144,20 @@ export const EventDetailsPage = () => {
     }
 
     try {
-      await navigator.clipboard.writeText(event.location.de);
-      setCopyMessage("Adresse kopiert");
+      await navigator.clipboard.writeText(
+        getLocalizedText(event.location, language, ""),
+      );
+      setCopyMessage(pageText.addressCopied[language]);
       window.setTimeout(() => setCopyMessage(""), 1800);
     } catch {
-      setCopyMessage("Kopieren fehlgeschlagen");
+      setCopyMessage(pageText.copyFailed[language]);
     }
   };
 
   if (isLoading) {
     return (
       <main className="min-h-screen bg-[#0b0b10] px-6 py-20 text-zinc-400">
-        Loading event...
+        {pageText.loading[language]}
       </main>
     );
   }
@@ -77,20 +165,31 @@ export const EventDetailsPage = () => {
   if (errorMessage || !event) {
     return (
       <main className="min-h-screen bg-[#0b0b10] px-6 py-20">
-        <p className="text-red-400">{errorMessage || "Event not found"}</p>
+        <p className="text-red-400">
+          {errorMessage || pageText.notFound[language]}
+        </p>
 
         <Link to="/events" className="mt-6 inline-block text-violet-300">
-          Back to events
+          {pageText.backToEvents[language]}
         </Link>
       </main>
     );
   }
 
-  const eventDate = new Date(event.eventDate).toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  const eventDate = new Date(event.eventDate).toLocaleDateString(
+    localeMap[language],
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    },
+  );
+
+  const eventTitle = getLocalizedText(
+    event.title,
+    language,
+    pageText.eventFallback[language],
+  );
 
   return (
     <main className="bg-[#0b0b10] text-white">
@@ -111,19 +210,19 @@ export const EventDetailsPage = () => {
               to="/events"
               className="mb-8 inline-flex rounded-full border border-white/20 px-5 py-3 text-sm font-black text-white transition hover:bg-white hover:text-black"
             >
-              ← Zurück zu Events
+              {pageText.backToEvents[language]}
             </Link>
 
             <p className="text-lg font-black uppercase tracking-[0.35em] text-violet-300">
-              {event.category || "Event"}
+              {event.category || pageText.eventFallback[language]}
             </p>
 
             <h1 className="mt-5 text-6xl font-black leading-none tracking-tight md:text-8xl">
-              {event.title.de}
+              {eventTitle}
             </h1>
 
             <p className="mt-8 max-w-3xl text-xl leading-9 text-zinc-200">
-              {event.shortDescription.de}
+              {getLocalizedText(event.shortDescription, language, "")}
             </p>
           </div>
         </div>
@@ -132,12 +231,14 @@ export const EventDetailsPage = () => {
       <section className="mx-auto grid max-w-7xl gap-10 px-6 py-20 lg:grid-cols-[1fr_380px]">
         <div>
           <p className="text-xl leading-9 text-zinc-300">
-            {event.description.de}
+            {getLocalizedText(event.description, language, "")}
           </p>
 
           {event.lineup.length > 0 && (
             <div className="mt-14">
-              <h2 className="text-4xl font-black tracking-tight">Lineup</h2>
+              <h2 className="text-4xl font-black tracking-tight">
+                {pageText.lineup[language]}
+              </h2>
 
               <div className="mt-6 flex flex-wrap gap-3">
                 {event.lineup.map((artist) => (
@@ -156,7 +257,9 @@ export const EventDetailsPage = () => {
             <div className="mt-16">
               <div className="flex items-center gap-3">
                 <Video className="text-violet-300" size={26} />
-                <h2 className="text-4xl font-black tracking-tight">Videos</h2>
+                <h2 className="text-4xl font-black tracking-tight">
+                  {pageText.videos[language]}
+                </h2>
               </div>
 
               <div className="mt-8 grid gap-8">
@@ -167,18 +270,20 @@ export const EventDetailsPage = () => {
                   >
                     <iframe
                       src={getYoutubeEmbedUrl(video.youtubeUrl)}
-                      title={video.title.de}
+                      title={getLocalizedText(video.title, language, "Video")}
                       className="aspect-video w-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
                     />
 
                     <div className="p-6">
-                      <h3 className="text-2xl font-black">{video.title.de}</h3>
+                      <h3 className="text-2xl font-black">
+                        {getLocalizedText(video.title, language, "Video")}
+                      </h3>
 
-                      {video.description?.de && (
+                      {video.description && (
                         <p className="mt-2 text-zinc-400">
-                          {video.description.de}
+                          {getLocalizedText(video.description, language, "")}
                         </p>
                       )}
                     </div>
@@ -190,25 +295,27 @@ export const EventDetailsPage = () => {
         </div>
 
         <aside className="h-fit rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/20 lg:sticky lg:top-28">
-          <h2 className="text-2xl font-black">Event Details</h2>
+          <h2 className="text-2xl font-black">
+            {pageText.eventDetails[language]}
+          </h2>
 
           <div className="mt-6 grid gap-4">
             <DetailRow
               icon={<CalendarDays size={20} />}
-              label="Datum"
+              label={pageText.date[language]}
               value={eventDate}
             />
 
             <DetailRow
               icon={<Clock size={20} />}
-              label="Uhrzeit"
+              label={pageText.time[language]}
               value={`${event.startTime}${event.endTime ? ` - ${event.endTime}` : ""}`}
             />
 
             <DetailRow
               icon={<MapPin size={20} />}
-              label="Ort"
-              value={event.location.de}
+              label={pageText.location[language]}
+              value={getLocalizedText(event.location, language, "")}
             />
           </div>
 
@@ -219,7 +326,7 @@ export const EventDetailsPage = () => {
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-4 text-sm font-black text-white transition hover:border-violet-300 hover:text-violet-300"
             >
               <Copy size={18} />
-              Adresse kopieren
+              {pageText.copyAddress[language]}
             </button>
 
             {copyMessage && (
@@ -236,7 +343,7 @@ export const EventDetailsPage = () => {
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-4 text-sm font-black text-white transition hover:border-violet-300 hover:text-violet-300"
               >
                 <ExternalLink size={18} />
-                Google Maps öffnen
+                {pageText.openMaps[language]}
               </a>
             )}
 
@@ -248,7 +355,7 @@ export const EventDetailsPage = () => {
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-4 text-sm font-black text-white transition hover:bg-violet-500"
               >
                 <Ticket size={18} />
-                Tickets kaufen
+                {pageText.buyTickets[language]}
               </a>
             )}
           </div>
@@ -275,4 +382,12 @@ const DetailRow = ({ icon, label, value }: DetailRowProps) => {
       </div>
     </div>
   );
+};
+
+const getLocalizedText = (
+  value: LocalizedText | undefined,
+  language: keyof LocalizedText,
+  fallback: string,
+) => {
+  return value?.[language] || value?.de || fallback;
 };

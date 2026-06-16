@@ -1,11 +1,14 @@
 import { SiteSettingsProvider } from "./components/SiteSettingsProvider";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import { AppRouter } from "./routes/AppRouter";
 
 const App = () => {
   return (
-    <SiteSettingsProvider>
-      <AppRouter />
-    </SiteSettingsProvider>
+    <LanguageProvider>
+      <SiteSettingsProvider>
+        <AppRouter />
+      </SiteSettingsProvider>
+    </LanguageProvider>
   );
 };
 

@@ -1,12 +1,15 @@
 import clsx from "clsx";
-import { Menu, X } from "lucide-react";
+import { ChevronDown, Globe2, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import logoFallback from "../../assets/logo-white.png";
+import type { LanguageCode } from "../../contexts/language.types";
+import { useLanguage } from "../../contexts/useLanguage";
 import { getPublicSiteSettings } from "../../services/settings.service";
 import type { SiteSettingsItem } from "../../types/settings.types";
 
 export const Navbar = () => {
+  const { language } = useLanguage();
   const [settings, setSettings] = useState<SiteSettingsItem | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -24,7 +27,7 @@ export const Navbar = () => {
   }, []);
 
   const logoUrl = settings?.logo?.url || logoFallback;
-  const siteName = settings?.siteName.de || "Schu Fi Ma Fi Collective";
+  const siteName = settings?.siteName[language] || "Schu Fi Ma Fi Collective";
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -67,30 +70,32 @@ export const Navbar = () => {
 };
 
 const DesktopLinks = () => {
+  const { language } = useLanguage();
+
   return (
     <>
       <NavLink to="/" className={navLinkClass}>
-        Home
+        {getNavText("home", language)}
       </NavLink>
 
       <NavLink to="/events" className={navLinkClass}>
-        Events
+        {getNavText("events", language)}
       </NavLink>
 
       <NavLink to="/about" className={navLinkClass}>
-        Über uns
+        {getNavText("about", language)}
       </NavLink>
 
       <NavLink to="/videos" className={navLinkClass}>
-        Events Videos
+        {getNavText("videos", language)}
       </NavLink>
 
       <NavLink to="/gallery" className={navLinkClass}>
-        Galerie
+        {getNavText("gallery", language)}
       </NavLink>
 
       <NavLink to="/contact" className={navLinkClass}>
-        Contact
+        {getNavText("contact", language)}
       </NavLink>
 
       <LanguageSwitcher />
@@ -103,22 +108,24 @@ interface MobileLinksProps {
 }
 
 const MobileLinks = ({ onNavigate }: MobileLinksProps) => {
+  const { language } = useLanguage();
+
   return (
     <>
       <NavLink to="/" onClick={onNavigate} className={mobileNavLinkClass}>
-        Home
+        {getNavText("home", language)}
       </NavLink>
 
       <NavLink to="/events" onClick={onNavigate} className={mobileNavLinkClass}>
-        Events
+        {getNavText("events", language)}
       </NavLink>
 
       <NavLink to="/about" onClick={onNavigate} className={mobileNavLinkClass}>
-        Über uns
+        {getNavText("about", language)}
       </NavLink>
 
       <NavLink to="/videos" onClick={onNavigate} className={mobileNavLinkClass}>
-        Events Videos
+        {getNavText("videos", language)}
       </NavLink>
 
       <NavLink
@@ -126,7 +133,7 @@ const MobileLinks = ({ onNavigate }: MobileLinksProps) => {
         onClick={onNavigate}
         className={mobileNavLinkClass}
       >
-        Galerie
+        {getNavText("gallery", language)}
       </NavLink>
 
       <NavLink
@@ -134,7 +141,7 @@ const MobileLinks = ({ onNavigate }: MobileLinksProps) => {
         onClick={onNavigate}
         className={mobileNavLinkClass}
       >
-        Contact
+        {getNavText("contact", language)}
       </NavLink>
 
       <div className="mt-2">
@@ -145,21 +152,99 @@ const MobileLinks = ({ onNavigate }: MobileLinksProps) => {
 };
 
 const LanguageSwitcher = () => {
+  const { language, setLanguage, languageOptions } = useLanguage();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const activeLanguage =
+    languageOptions.find((option) => option.code === language) ||
+    languageOptions[0];
+
+  const handleSelectLanguage = (nextLanguage: LanguageCode) => {
+    setLanguage(nextLanguage);
+    setIsOpen(false);
+  };
+
   return (
-    <div className="flex w-fit items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-xs font-black text-zinc-400">
-      <button type="button" className="transition hover:text-white">
-        DE
+    <div className="relative w-fit">
+      <button
+        type="button"
+        onClick={() => setIsOpen((currentValue) => !currentValue)}
+        className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-xs font-black text-zinc-300 transition hover:border-violet-400 hover:text-white"
+        aria-label="Change language"
+      >
+        <Globe2 size={15} />
+        <span>{activeLanguage.flag}</span>
+        <span>{activeLanguage.shortLabel}</span>
+        <ChevronDown size={14} />
       </button>
-      <span>/</span>
-      <button type="button" className="transition hover:text-white">
-        EN
-      </button>
-      <span>/</span>
-      <button type="button" className="transition hover:text-white">
-        AR
-      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full z-50 mt-3 w-44 overflow-hidden rounded-2xl border border-white/10 bg-[#101018] p-2 shadow-2xl shadow-black/40">
+          {languageOptions.map((option) => (
+            <button
+              key={option.code}
+              type="button"
+              onClick={() => handleSelectLanguage(option.code)}
+              className={clsx(
+                "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-bold transition",
+                option.code === language
+                  ? "bg-violet-600 text-white"
+                  : "text-zinc-300 hover:bg-white/5 hover:text-white",
+              )}
+            >
+              <span>{option.flag}</span>
+              <span>{option.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
+};
+
+type NavTextKey =
+  | "home"
+  | "events"
+  | "about"
+  | "videos"
+  | "gallery"
+  | "contact";
+
+const navTexts: Record<NavTextKey, Record<LanguageCode, string>> = {
+  home: {
+    de: "Home",
+    en: "Home",
+    ar: "الرئيسية",
+  },
+  events: {
+    de: "Events",
+    en: "Events",
+    ar: "الفعاليات",
+  },
+  about: {
+    de: "Über uns",
+    en: "About us",
+    ar: "من نحن",
+  },
+  videos: {
+    de: "Events Videos",
+    en: "Event Videos",
+    ar: "فيديوهات",
+  },
+  gallery: {
+    de: "Galerie",
+    en: "Gallery",
+    ar: "المعرض",
+  },
+  contact: {
+    de: "Kontakt",
+    en: "Contact",
+    ar: "تواصل معنا",
+  },
+};
+
+const getNavText = (key: NavTextKey, language: LanguageCode) => {
+  return navTexts[key][language];
 };
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>

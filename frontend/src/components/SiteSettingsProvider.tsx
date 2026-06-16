@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { useLanguage } from "../contexts/useLanguage";
 import { getPublicSiteSettings } from "../services/settings.service";
 
 interface SiteSettingsProviderProps {
@@ -8,15 +9,20 @@ interface SiteSettingsProviderProps {
 export const SiteSettingsProvider = ({
   children,
 }: SiteSettingsProviderProps) => {
+  const { language } = useLanguage();
+
   useEffect(() => {
     const applySiteSettings = async () => {
       try {
         const settings = await getPublicSiteSettings();
 
-        document.title = settings.siteName.de;
+        document.title = settings.siteName[language];
 
         const descriptionMetaTag = getOrCreateMetaTag("description");
-        descriptionMetaTag.setAttribute("content", settings.siteDescription.de);
+        descriptionMetaTag.setAttribute(
+          "content",
+          settings.siteDescription[language],
+        );
 
         if (settings.favicon?.url) {
           const faviconLink = getOrCreateFaviconLink();
@@ -28,7 +34,7 @@ export const SiteSettingsProvider = ({
     };
 
     void applySiteSettings();
-  }, []);
+  }, [language]);
 
   return children;
 };

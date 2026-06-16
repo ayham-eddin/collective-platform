@@ -1,18 +1,60 @@
 import { CalendarDays, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { EventItem } from "../../types/event.types";
+import { useLanguage } from "../../contexts/useLanguage";
+import type { EventItem, LocalizedText } from "../../types/event.types";
 
 interface EventCardProps {
   event: EventItem;
   variant?: "overlay" | "default";
 }
 
+const localeMap = {
+  de: "de-DE",
+  en: "en-GB",
+  ar: "ar",
+};
+
+const cardText = {
+  event: {
+    de: "Event",
+    en: "Event",
+    ar: "فعالية",
+  },
+  readMore: {
+    de: "Mehr erfahren",
+    en: "Read more",
+    ar: "اقرأ المزيد",
+  },
+  tickets: {
+    de: "Tickets",
+    en: "Tickets",
+    ar: "التذاكر",
+  },
+};
+
 export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
-  const eventDate = new Date(event.eventDate).toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  const { language } = useLanguage();
+
+  const eventDate = new Date(event.eventDate).toLocaleDateString(
+    localeMap[language],
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    },
+  );
+
+  const eventTitle = getLocalizedText(
+    event.title,
+    language,
+    cardText.event[language],
+  );
+  const eventShortDescription = getLocalizedText(
+    event.shortDescription,
+    language,
+    "",
+  );
+  const eventLocation = getLocalizedText(event.location, language, "");
 
   if (variant === "default") {
     return (
@@ -21,7 +63,7 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
           <Link to={`/events/${event.slug}`} className="block overflow-hidden">
             <img
               src={event.coverImage.url}
-              alt={event.coverImage.alt?.de || event.title.de}
+              alt={getLocalizedText(event.coverImage.alt, language, eventTitle)}
               className="h-72 w-full object-cover transition duration-700 hover:scale-105"
             />
           </Link>
@@ -29,7 +71,7 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
 
         <div className="p-7">
           <p className="text-sm font-bold italic text-violet-300">
-            {event.category || "Event"}
+            {event.category || cardText.event[language]}
           </p>
 
           <h3 className="mt-2 text-3xl font-black tracking-tight">
@@ -37,12 +79,12 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
               to={`/events/${event.slug}`}
               className="text-white transition hover:text-violet-300"
             >
-              {event.title.de}
+              {eventTitle}
             </Link>
           </h3>
 
           <p className="mt-4 line-clamp-3 leading-7 text-zinc-400">
-            {event.shortDescription.de}
+            {eventShortDescription}
           </p>
 
           <div className="mt-6 grid gap-3 text-sm font-semibold text-zinc-300">
@@ -54,7 +96,7 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
 
             <p className="flex items-center gap-2">
               <MapPin size={18} className="text-violet-300" />
-              {event.location.de}
+              {eventLocation}
             </p>
           </div>
 
@@ -63,7 +105,7 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
               to={`/events/${event.slug}`}
               className="rounded-full bg-violet-600 px-5 py-3 text-sm font-black text-white transition hover:bg-violet-500"
             >
-              Mehr erfahren
+              {cardText.readMore[language]}
             </Link>
 
             {event.ticketUrl && (
@@ -73,7 +115,7 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
                 rel="noreferrer"
                 className="rounded-full border border-white/15 px-5 py-3 text-sm font-black text-white transition hover:border-white hover:bg-white hover:text-black"
               >
-                Tickets
+                {cardText.tickets[language]}
               </a>
             )}
           </div>
@@ -87,7 +129,7 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
       {event.coverImage && (
         <img
           src={event.coverImage.url}
-          alt={event.coverImage.alt?.de || event.title.de}
+          alt={getLocalizedText(event.coverImage.alt, language, eventTitle)}
           className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
         />
       )}
@@ -95,7 +137,7 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10 transition duration-500 group-hover:from-black/95" />
 
       <div className="absolute left-6 top-6 rounded-full bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-violet-950/30">
-        {event.category || "Event"}
+        {event.category || cardText.event[language]}
       </div>
 
       <div className="relative flex min-h-[430px] flex-col justify-end p-7">
@@ -107,16 +149,16 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
 
           <p className="flex items-center gap-2">
             <MapPin size={17} className="text-violet-300" />
-            {event.location.de}
+            {eventLocation}
           </p>
         </div>
 
         <h3 className="text-3xl font-black tracking-tight text-white">
-          {event.title.de}
+          {eventTitle}
         </h3>
 
         <p className="mt-3 line-clamp-2 max-w-md leading-7 text-zinc-200">
-          {event.shortDescription.de}
+          {eventShortDescription}
         </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -124,7 +166,7 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
             to={`/events/${event.slug}`}
             className="rounded-full bg-white px-6 py-3 text-sm font-black text-black transition hover:bg-violet-200"
           >
-            Mehr erfahren
+            {cardText.readMore[language]}
           </Link>
 
           {event.ticketUrl && (
@@ -134,11 +176,19 @@ export const EventCard = ({ event, variant = "overlay" }: EventCardProps) => {
               rel="noreferrer"
               className="rounded-full border border-white/30 px-6 py-3 text-sm font-black text-white transition hover:bg-white hover:text-black"
             >
-              Tickets
+              {cardText.tickets[language]}
             </a>
           )}
         </div>
       </div>
     </article>
   );
+};
+
+const getLocalizedText = (
+  value: LocalizedText | undefined,
+  language: keyof LocalizedText,
+  fallback: string,
+) => {
+  return value?.[language] || value?.de || fallback;
 };

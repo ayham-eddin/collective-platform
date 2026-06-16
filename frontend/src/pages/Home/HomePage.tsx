@@ -2,15 +2,74 @@ import { CalendarDays, Clock, MapPin } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { EventCard } from "../../components/EventCard/EventCard";
+import { useLanguage } from "../../contexts/useLanguage";
 import { getPublicEvents } from "../../services/events.service";
 import { getPublicHomeContent } from "../../services/homeContent.service";
 import type { EventItem } from "../../types/event.types";
-import type { HomeContentItem } from "../../types/homeContent.types";
+import type {
+  HomeContentItem,
+  LocalizedText,
+} from "../../types/homeContent.types";
 
 const fallbackHeroImageUrl =
   "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
 
+const localeMap = {
+  de: "de-DE",
+  en: "en-GB",
+  ar: "ar",
+};
+
+const pageText = {
+  upcomingEyebrow: {
+    de: "Kommende Events",
+    en: "Upcoming Events",
+    ar: "الفعاليات القادمة",
+  },
+  upcomingTitle: {
+    de: "Kommende Events",
+    en: "Upcoming Events",
+    ar: "الفعاليات القادمة",
+  },
+  loadingEvents: {
+    de: "Events werden geladen...",
+    en: "Loading events...",
+    ar: "جاري تحميل الفعاليات...",
+  },
+  noEvents: {
+    de: "Noch keine veröffentlichten Events.",
+    en: "No published events yet.",
+    ar: "لا توجد فعاليات منشورة بعد.",
+  },
+  eventFallback: {
+    de: "Event",
+    en: "Event",
+    ar: "فعالية",
+  },
+  lineup: {
+    de: "LINEUP",
+    en: "LINEUP",
+    ar: "البرنامج",
+  },
+  buyTickets: {
+    de: "Tickets kaufen",
+    en: "Buy tickets",
+    ar: "شراء التذاكر",
+  },
+  pastEyebrow: {
+    de: "Vergangene Events",
+    en: "Past Events",
+    ar: "فعاليات سابقة",
+  },
+  pastTitle: {
+    de: "Frühere Veranstaltungen, die wir organisiert haben",
+    en: "Previous events we organized",
+    ar: "فعاليات سابقة قمنا بتنظيمها",
+  },
+};
+
 export const HomePage = () => {
+  const { language } = useLanguage();
   const [events, setEvents] = useState<EventItem[]>([]);
   const [homeContent, setHomeContent] = useState<HomeContentItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,11 +104,14 @@ export const HomePage = () => {
   }, [events, featuredEvent]);
 
   const featuredDate = featuredEvent
-    ? new Date(featuredEvent.eventDate).toLocaleDateString("de-DE", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      })
+    ? new Date(featuredEvent.eventDate).toLocaleDateString(
+        localeMap[language],
+        {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        },
+      )
     : "";
 
   const heroImageUrl = homeContent?.heroImage?.url || fallbackHeroImageUrl;
@@ -60,7 +122,11 @@ export const HomePage = () => {
         <div className="absolute inset-0">
           <img
             src={heroImageUrl}
-            alt={homeContent?.heroTitle.de || "Schu Fi Ma Fi Kollektiv"}
+            alt={getLocalizedText(
+              homeContent?.heroTitle,
+              language,
+              "Schu Fi Ma Fi Kollektiv",
+            )}
             className="h-full w-full object-cover"
           />
 
@@ -71,16 +137,27 @@ export const HomePage = () => {
         <div className="relative mx-auto flex min-h-[760px] max-w-7xl items-center px-6 py-24">
           <div className="max-w-3xl">
             <p className="text-lg font-black uppercase tracking-[0.35em] text-violet-300">
-              {homeContent?.heroBadge.de || "Schu Fi Ma Fi Kollektiv"}
+              {getLocalizedText(
+                homeContent?.heroBadge,
+                language,
+                "Schu Fi Ma Fi Kollektiv",
+              )}
             </p>
 
             <h1 className="mt-6 text-6xl font-black leading-none tracking-tight md:text-8xl">
-              {homeContent?.heroTitle.de || "Kultur, Musik und Events in NRW."}
+              {getLocalizedText(
+                homeContent?.heroTitle,
+                language,
+                "Kultur, Musik und Events in NRW.",
+              )}
             </h1>
 
             <p className="mt-8 max-w-2xl text-xl leading-9 text-zinc-200">
-              {homeContent?.heroSubtitle.de ||
-                "Ein syrisches kulturelles Kollektiv, das seit 2018 in Nordrhein-Westfalen aktiv ist."}
+              {getLocalizedText(
+                homeContent?.heroSubtitle,
+                language,
+                "Ein syrisches kulturelles Kollektiv, das seit 2018 in Nordrhein-Westfalen aktiv ist.",
+              )}
             </p>
 
             <div className="mt-10 flex flex-wrap gap-4">
@@ -88,14 +165,22 @@ export const HomePage = () => {
                 to={homeContent?.primaryButton.url || "/events"}
                 className="rounded-full bg-violet-500 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-400"
               >
-                {homeContent?.primaryButton.label.de || "Events ansehen"}
+                {getLocalizedText(
+                  homeContent?.primaryButton.label,
+                  language,
+                  "Events ansehen",
+                )}
               </Link>
 
               <Link
                 to={homeContent?.secondaryButton.url || "/about"}
                 className="rounded-full border border-white/30 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-white hover:text-black"
               >
-                {homeContent?.secondaryButton.label.de || "Über uns"}
+                {getLocalizedText(
+                  homeContent?.secondaryButton.label,
+                  language,
+                  "Über uns",
+                )}
               </Link>
             </div>
           </div>
@@ -111,23 +196,25 @@ export const HomePage = () => {
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="text-center">
           <p className="text-lg font-bold italic text-violet-400">
-            Kommende Events
+            {pageText.upcomingEyebrow[language]}
           </p>
 
           <h2 className="mt-4 text-5xl font-black tracking-tight md:text-6xl">
-            Kommende Events
+            {pageText.upcomingTitle[language]}
           </h2>
 
           <div className="mx-auto mt-6 h-1 w-24 rounded-full bg-violet-500" />
         </div>
 
         {isLoading && (
-          <p className="mt-12 text-center text-zinc-500">Loading events...</p>
+          <p className="mt-12 text-center text-zinc-500">
+            {pageText.loadingEvents[language]}
+          </p>
         )}
 
         {!isLoading && !errorMessage && !featuredEvent && (
           <p className="mt-12 text-center text-zinc-500">
-            No published events yet.
+            {pageText.noEvents[language]}
           </p>
         )}
 
@@ -137,9 +224,15 @@ export const HomePage = () => {
               {featuredEvent.coverImage && (
                 <img
                   src={featuredEvent.coverImage.url}
-                  alt={
-                    featuredEvent.coverImage.alt?.de || featuredEvent.title.de
-                  }
+                  alt={getLocalizedText(
+                    featuredEvent.coverImage.alt,
+                    language,
+                    getLocalizedText(
+                      featuredEvent.title,
+                      language,
+                      pageText.eventFallback[language],
+                    ),
+                  )}
                   className="h-[560px] w-full object-cover"
                 />
               )}
@@ -147,11 +240,15 @@ export const HomePage = () => {
 
             <div>
               <p className="text-xl font-bold italic text-violet-400">
-                {featuredEvent.category || "Event"}
+                {featuredEvent.category || pageText.eventFallback[language]}
               </p>
 
               <h3 className="mt-4 text-5xl font-black tracking-tight md:text-6xl">
-                {featuredEvent.title.de}
+                {getLocalizedText(
+                  featuredEvent.title,
+                  language,
+                  pageText.eventFallback[language],
+                )}
               </h3>
 
               <div className="mt-8 flex flex-wrap gap-4">
@@ -168,12 +265,14 @@ export const HomePage = () => {
               </div>
 
               <p className="mt-8 text-xl leading-9 text-zinc-800">
-                {featuredEvent.description.de}
+                {getLocalizedText(featuredEvent.description, language, "")}
               </p>
 
               {featuredEvent.lineup.length > 0 && (
                 <div className="mt-6 text-xl leading-9 text-zinc-800">
-                  <p className="font-black">———— LINEUP ————</p>
+                  <p className="font-black">
+                    ———— {pageText.lineup[language]} ————
+                  </p>
                   {featuredEvent.lineup.map((artist) => (
                     <p key={artist}>– {artist}</p>
                   ))}
@@ -183,7 +282,7 @@ export const HomePage = () => {
               <div className="mt-10 flex items-center justify-between gap-4 bg-violet-500 px-7 py-6 text-white">
                 <div className="flex items-center gap-3 font-black">
                   <MapPin size={22} />
-                  {featuredEvent.location.de}
+                  {getLocalizedText(featuredEvent.location, language, "")}
                 </div>
 
                 {featuredEvent.ticketUrl && (
@@ -193,7 +292,7 @@ export const HomePage = () => {
                     rel="noreferrer"
                     className="rounded-full bg-white/25 px-7 py-4 text-sm font-black uppercase tracking-wide transition hover:bg-white hover:text-violet-700"
                   >
-                    Tickets kaufen
+                    {pageText.buyTickets[language]}
                   </a>
                 )}
               </div>
@@ -205,11 +304,11 @@ export const HomePage = () => {
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="text-center">
           <p className="text-lg font-bold italic text-violet-400">
-            Vergangene Events
+            {pageText.pastEyebrow[language]}
           </p>
 
           <h2 className="mt-4 text-5xl font-black tracking-tight md:text-6xl">
-            Frühere Veranstaltungen, die wir organisiert haben
+            {pageText.pastTitle[language]}
           </h2>
 
           <div className="mx-auto mt-6 h-1 w-24 rounded-full bg-violet-500" />
@@ -233,28 +332,50 @@ export const HomePage = () => {
         <div className="flex items-center px-6 py-20 lg:px-20">
           <div className="max-w-2xl">
             <p className="text-xl font-bold italic text-violet-400">
-              {homeContent?.aboutEyebrow.de || "Zusammenarbeit beginnen"}
+              {getLocalizedText(
+                homeContent?.aboutEyebrow,
+                language,
+                "Zusammenarbeit beginnen",
+              )}
             </p>
 
             <h2 className="mt-6 text-5xl font-black leading-tight tracking-tight md:text-6xl">
-              {homeContent?.aboutTitle.de ||
-                "Sind Sie bereit, Ihr bestes Event mit uns zu veranstalten?"}
+              {getLocalizedText(
+                homeContent?.aboutTitle,
+                language,
+                "Sind Sie bereit, Ihr bestes Event mit uns zu veranstalten?",
+              )}
             </h2>
 
             <p className="mt-8 text-lg leading-8 text-zinc-800">
-              {homeContent?.aboutText.de ||
-                "Sie suchen ein Team, das Veranstaltungen mit Kultur, Community und Erfahrung organisiert?"}
+              {getLocalizedText(
+                homeContent?.aboutText,
+                language,
+                "Sie suchen ein Team, das Veranstaltungen mit Kultur, Community und Erfahrung organisiert?",
+              )}
             </p>
 
             <Link
               to={homeContent?.aboutButton.url || "/events"}
               className="mt-10 inline-flex rounded-full bg-violet-400 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
             >
-              {homeContent?.aboutButton.label.de || "Unsere Events"}
+              {getLocalizedText(
+                homeContent?.aboutButton.label,
+                language,
+                "Unsere Events",
+              )}
             </Link>
           </div>
         </div>
       </section>
     </main>
   );
+};
+
+const getLocalizedText = (
+  value: LocalizedText | undefined,
+  language: keyof LocalizedText,
+  fallback: string,
+) => {
+  return value?.[language] || value?.de || fallback;
 };
