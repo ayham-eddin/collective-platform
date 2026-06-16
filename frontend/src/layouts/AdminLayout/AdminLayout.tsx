@@ -33,6 +33,10 @@ export const AdminLayout = () => {
               Settings
             </NavLink>
 
+            <NavLink to="/admin/messages" className={adminLinkClass}>
+              Messages
+            </NavLink>
+
             <NavLink to="/admin/events" className={adminLinkClass}>
               Events
             </NavLink>

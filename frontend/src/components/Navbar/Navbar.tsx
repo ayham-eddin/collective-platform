@@ -89,12 +89,9 @@ const DesktopLinks = () => {
         Galerie
       </NavLink>
 
-      <a
-        href="#contact"
-        className="text-sm font-bold text-zinc-400 transition hover:text-white"
-      >
+      <NavLink to="/contact" className={navLinkClass}>
         Contact
-      </a>
+      </NavLink>
 
       <LanguageSwitcher />
     </>
@@ -132,13 +129,13 @@ const MobileLinks = ({ onNavigate }: MobileLinksProps) => {
         Galerie
       </NavLink>
 
-      <a
-        href="#contact"
+      <NavLink
+        to="/contact"
         onClick={onNavigate}
-        className="rounded-2xl px-4 py-3 text-base font-bold text-zinc-300 transition hover:bg-white/5 hover:text-white"
+        className={mobileNavLinkClass}
       >
         Contact
-      </a>
+      </NavLink>
 
       <div className="mt-2">
         <LanguageSwitcher />

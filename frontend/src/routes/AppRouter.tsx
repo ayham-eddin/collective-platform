@@ -10,9 +10,11 @@ import { AdminEventsPage } from "../pages/Admin/Events/AdminEventsPage";
 import { AdminGalleryPage } from "../pages/Admin/Gallery/AdminGalleryPage";
 import { AdminHomeContentPage } from "../pages/Admin/HomeContent/AdminHomeContentPage";
 import { AdminLoginPage } from "../pages/Admin/Login/AdminLoginPage";
+import { AdminMessagesPage } from "../pages/Admin/Messages/AdminMessagesPage";
 import { AdminSettingsPage } from "../pages/Admin/Settings/AdminSettingsPage";
 import { AdminTeamPage } from "../pages/Admin/Team/AdminTeamPage";
 import { AdminVideosPage } from "../pages/Admin/Videos/AdminVideosPage";
+import { ContactPage } from "../pages/Contact/ContactPage";
 import { EventDetailsPage } from "../pages/EventDetails/EventDetailsPage";
 import { EventsPage } from "../pages/Events/EventsPage";
 import { GalleryPage } from "../pages/Gallery/GalleryPage";
@@ -43,6 +45,10 @@ const router = createBrowserRouter([
           {
             path: "settings",
             element: <AdminSettingsPage />,
+          },
+          {
+            path: "messages",
+            element: <AdminMessagesPage />,
           },
           {
             path: "events",
@@ -86,6 +92,10 @@ const router = createBrowserRouter([
       {
         path: "/about",
         element: <AboutPage />,
+      },
+      {
+        path: "/contact",
+        element: <ContactPage />,
       },
       {
         path: "/events",

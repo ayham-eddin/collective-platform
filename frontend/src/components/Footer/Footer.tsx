@@ -68,6 +68,9 @@ export const Footer = () => {
             <Link to="/videos" className="transition hover:text-white">
               Events Videos
             </Link>
+            <Link to="/contact" className="transition hover:text-white">
+              Kontakt
+            </Link>
           </div>
         </div>
 

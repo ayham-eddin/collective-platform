@@ -8,6 +8,7 @@ import { videoRoutes } from "../modules/videos/videos.routes";
 import { teamRoutes } from "../modules/team/team.routes";
 import { homeContentRoutes } from "../modules/home-content/homeContent.routes";
 import { settingsRoutes } from "../modules/settings/settings.routes";
+import { contactRoutes } from "../modules/contact/contact.routes";
 
 export const apiRoutes = Router();
 
@@ -27,3 +28,4 @@ apiRoutes.use("/videos", videoRoutes);
 apiRoutes.use("/team", teamRoutes);
 apiRoutes.use("/home-content", homeContentRoutes);
 apiRoutes.use("/settings", settingsRoutes);
+apiRoutes.use("/contact", contactRoutes);
