@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { TeamCarousel } from "../../components/TeamCarousel/TeamCarousel";
 import { useLanguage } from "../../contexts/useLanguage";
 import { getPublicTeamMembers } from "../../services/team.service";
 import type { TeamMemberItem } from "../../types/team.types";
@@ -75,9 +76,14 @@ const pageText = {
     ar: "فريقنا",
   },
   teamTitle: {
-    de: "Solide Teamarbeit",
-    en: "Strong teamwork",
-    ar: "عمل جماعي قوي",
+    de: "Menschen hinter dem Kollektiv",
+    en: "People behind the collective",
+    ar: "الأشخاص وراء التجمع",
+  },
+  teamDescription: {
+    de: "Lernen Sie das Team kennen, das unsere Veranstaltungen, Ideen und kulturellen Momente möglich macht.",
+    en: "Meet the team that makes our events, ideas and cultural moments possible.",
+    ar: "تعرّف على الفريق الذي يجعل فعالياتنا وأفكارنا ولحظاتنا الثقافية ممكنة.",
   },
   loadingTeam: {
     de: "Teammitglieder werden geladen...",
@@ -88,6 +94,11 @@ const pageText = {
     de: "Noch keine Teammitglieder verfügbar.",
     en: "No team members available.",
     ar: "لا يوجد أعضاء فريق حالياً.",
+  },
+  featuredLabel: {
+    de: "Featured",
+    en: "Featured",
+    ar: "مميز",
   },
 };
 
@@ -200,9 +211,9 @@ export const AboutPage = () => {
         </div>
       </section>
 
-      <section className="bg-[#08080c] py-24 text-white">
+      <section className="overflow-hidden bg-[#08080c] py-24 text-white">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center">
+          <div className="mx-auto max-w-3xl text-center">
             <p className="text-xl font-bold italic text-violet-300">
               {pageText.teamEyebrow[language]}
             </p>
@@ -210,6 +221,10 @@ export const AboutPage = () => {
             <h2 className="mt-4 text-5xl font-black tracking-tight md:text-6xl">
               {pageText.teamTitle[language]}
             </h2>
+
+            <p className="mt-6 text-lg leading-8 text-zinc-400">
+              {pageText.teamDescription[language]}
+            </p>
           </div>
 
           {isLoadingTeam && (
@@ -228,34 +243,13 @@ export const AboutPage = () => {
             </p>
           )}
 
-          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {teamMembers.map((member) => (
-              <article
-                key={member._id}
-                className="group relative min-h-[420px] overflow-hidden rounded-[2rem] bg-zinc-900"
-              >
-                {member.image && (
-                  <img
-                    src={member.image.url}
-                    alt={member.fullName}
-                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
-                  />
-                )}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-
-                <div className="absolute bottom-0 left-0 right-0 p-7">
-                  <p className="text-lg font-bold italic text-violet-300">
-                    {member.role[language] || member.role.de}
-                  </p>
-
-                  <h3 className="mt-2 text-3xl font-black tracking-tight">
-                    {member.fullName}
-                  </h3>
-                </div>
-              </article>
-            ))}
-          </div>
+          {!isLoadingTeam && !teamErrorMessage && teamMembers.length > 0 && (
+            <TeamCarousel
+              members={teamMembers}
+              language={language}
+              featuredLabel={pageText.featuredLabel[language]}
+            />
+          )}
         </div>
       </section>
     </main>
