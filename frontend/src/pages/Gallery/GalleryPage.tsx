@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { GalleryLightbox } from "../../components/GalleryLightbox/GalleryLightbox";
 import { useLanguage } from "../../contexts/useLanguage";
 import { getPublicGalleryImages } from "../../services/gallery.service";
@@ -36,6 +36,21 @@ const pageText = {
     en: "Here you can find some photos from events we organized.",
     ar: "هنا تجد بعض الصور من الفعاليات التي قمنا بتنظيمها.",
   },
+  searchPlaceholder: {
+    de: "Bilder suchen...",
+    en: "Search images...",
+    ar: "ابحث في الصور...",
+  },
+  searchButton: {
+    de: "Suchen",
+    en: "Search",
+    ar: "بحث",
+  },
+  clearButton: {
+    de: "Zurücksetzen",
+    en: "Clear",
+    ar: "مسح",
+  },
   loading: {
     de: "Galerie wird geladen...",
     en: "Loading gallery...",
@@ -51,20 +66,79 @@ const pageText = {
     en: "Gallery",
     ar: "المعرض",
   },
+  previous: {
+    de: "Zurück",
+    en: "Previous",
+    ar: "السابق",
+  },
+  next: {
+    de: "Weiter",
+    en: "Next",
+    ar: "التالي",
+  },
+  page: {
+    de: "Seite",
+    en: "Page",
+    ar: "الصفحة",
+  },
+  of: {
+    de: "von",
+    en: "of",
+    ar: "من",
+  },
 };
 
 export const GalleryPage = () => {
   const { language } = useLanguage();
   const [images, setImages] = useState<GalleryImageItem[]>([]);
+  const [heroImages, setHeroImages] = useState<GalleryImageItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  const [page, setPage] = useState(1);
+  const [limit] = useState(6);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const loadGalleryImages = async (targetPage: number) => {
+    const response = await getPublicGalleryImages({
+      page: targetPage,
+      limit,
+      search,
+    });
+
+    setImages(response.data);
+    setTotalPages(response.pagination.totalPages || 1);
+  };
+
   useEffect(() => {
-    const loadGalleryImages = async () => {
+    const loadInitialHeroImages = async () => {
       try {
-        const data = await getPublicGalleryImages();
-        setImages(data);
+        const response = await getPublicGalleryImages({
+          page: 1,
+          limit: 6,
+          search: "",
+        });
+
+        setHeroImages(response.data);
+      } catch {
+        setHeroImages([]);
+      }
+    };
+
+    void loadInitialHeroImages();
+  }, []);
+
+  useEffect(() => {
+    const run = async () => {
+      setIsLoading(true);
+      setErrorMessage("");
+
+      try {
+        await loadGalleryImages(page);
       } catch {
         setErrorMessage("Could not load gallery images");
       } finally {
@@ -72,12 +146,30 @@ export const GalleryPage = () => {
       }
     };
 
-    void loadGalleryImages();
-  }, []);
+    void run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, limit, search]);
 
   const heroImage = useMemo(() => {
-    return images.find((image) => image.isFeatured) || images[0];
-  }, [images]);
+    return (
+      heroImages.find((image) => image.isFeatured) ||
+      heroImages[0] ||
+      images.find((image) => image.isFeatured) ||
+      images[0]
+    );
+  }, [heroImages, images]);
+
+  const handleApplySearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPage(1);
+    setSearch(searchInput);
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setSearch("");
+    setPage(1);
+  };
 
   return (
     <main className="bg-[#f4f3fb] text-[#252530]">
@@ -122,6 +214,36 @@ export const GalleryPage = () => {
             {pageText.sectionDescription[language]}
           </p>
         </div>
+
+        <form
+          onSubmit={handleApplySearch}
+          className="mt-12 flex flex-wrap gap-3 rounded-[2rem] bg-white p-4 shadow-xl shadow-black/5"
+        >
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            placeholder={pageText.searchPlaceholder[language]}
+            className="min-w-[240px] flex-1 rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-4 font-semibold outline-none transition focus:border-violet-400 focus:bg-white"
+          />
+
+          <button
+            type="submit"
+            className="rounded-2xl bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
+          >
+            {pageText.searchButton[language]}
+          </button>
+
+          {search && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="rounded-2xl border border-zinc-200 px-7 py-4 text-sm font-black uppercase tracking-wide text-zinc-700 transition hover:border-violet-400 hover:text-violet-600"
+            >
+              {pageText.clearButton[language]}
+            </button>
+          )}
+        </form>
 
         {isLoading && (
           <p className="mt-12 text-center text-zinc-500">
@@ -181,6 +303,33 @@ export const GalleryPage = () => {
             </button>
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
+            <button
+              type="button"
+              disabled={page === 1}
+              onClick={() => setPage((currentPage) => currentPage - 1)}
+              className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-black text-zinc-700 transition hover:border-violet-500 hover:text-violet-600 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {pageText.previous[language]}
+            </button>
+
+            <span className="text-sm font-black text-zinc-500">
+              {pageText.page[language]} {page} {pageText.of[language]}{" "}
+              {totalPages}
+            </span>
+
+            <button
+              type="button"
+              disabled={page === totalPages}
+              onClick={() => setPage((currentPage) => currentPage + 1)}
+              className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-black text-zinc-700 transition hover:border-violet-500 hover:text-violet-600 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {pageText.next[language]}
+            </button>
+          </div>
+        )}
       </section>
 
       {selectedIndex !== null && (

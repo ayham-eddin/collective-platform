@@ -4,15 +4,19 @@ export interface LocalizedText {
   ar: string;
 }
 
+export type GalleryImageStatus = "draft" | "published" | "archived";
+
+export interface GalleryImageFile {
+  url: string;
+  publicId: string;
+}
+
 export interface GalleryImageItem {
   _id: string;
   title: LocalizedText;
   description?: LocalizedText;
-  image: {
-    url: string;
-    publicId: string;
-  };
-  status: "draft" | "published" | "archived";
+  image: GalleryImageFile;
+  status: GalleryImageStatus;
   isFeatured: boolean;
   sortOrder: number;
   createdAt: string;
@@ -22,11 +26,8 @@ export interface GalleryImageItem {
 export interface CreateGalleryImagePayload {
   title: LocalizedText;
   description?: LocalizedText;
-  image: {
-    url: string;
-    publicId: string;
-  };
-  status: "draft" | "published" | "archived";
+  image: GalleryImageFile;
+  status: GalleryImageStatus;
   isFeatured: boolean;
   sortOrder?: number;
 }
@@ -34,7 +35,8 @@ export interface CreateGalleryImagePayload {
 export interface UpdateGalleryImagePayload {
   title?: LocalizedText;
   description?: LocalizedText;
-  status?: "draft" | "published" | "archived";
+  image?: GalleryImageFile;
+  status?: GalleryImageStatus;
   isFeatured?: boolean;
   sortOrder?: number;
 }

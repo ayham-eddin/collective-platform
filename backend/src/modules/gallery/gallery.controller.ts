@@ -26,11 +26,26 @@ export const getAdminGalleryImagesController = async (
   request: Request,
   response: Response,
 ): Promise<void> => {
-  const images = await getAdminGalleryImages();
+  const page = Number(request.query.page || 1);
+  const limit = Number(request.query.limit || 12);
+  const status = String(request.query.status || "all") as
+    | "draft"
+    | "published"
+    | "archived"
+    | "all";
+  const search = String(request.query.search || "");
+
+  const result = await getAdminGalleryImages({
+    page,
+    limit,
+    status,
+    search,
+  });
 
   response.status(200).json({
     success: true,
-    data: images,
+    data: result.items,
+    pagination: result.pagination,
   });
 };
 
@@ -38,11 +53,20 @@ export const getPublicGalleryImagesController = async (
   request: Request,
   response: Response,
 ): Promise<void> => {
-  const images = await getPublicGalleryImages();
+  const page = Number(request.query.page || 1);
+  const limit = Number(request.query.limit || 6);
+  const search = String(request.query.search || "");
+
+  const result = await getPublicGalleryImages({
+    page,
+    limit,
+    search,
+  });
 
   response.status(200).json({
     success: true,
-    data: images,
+    data: result.items,
+    pagination: result.pagination,
   });
 };
 
