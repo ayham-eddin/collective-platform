@@ -20,3 +20,18 @@ export const uploadSingleImage = async (
 
   return response.data.data;
 };
+
+export const uploadSingleVideo = async (
+  videoFile: File,
+): Promise<UploadedMedia> => {
+  const formData = new FormData();
+  formData.append("video", videoFile);
+
+  const response = await api.post<UploadResponse>("/uploads/video", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data.data;
+};

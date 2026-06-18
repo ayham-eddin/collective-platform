@@ -1,17 +1,17 @@
 import { Router } from "express";
 import multer from "multer";
 import { authenticate } from "../../middleware/auth.middleware";
-import { requirePermission } from "../../middleware/permission.middleware";
 import {
   uploadMultipleImagesController,
   uploadSingleImageController,
+  uploadSingleVideoController,
 } from "./uploads.controller";
 
 export const uploadRoutes = Router();
 
 const storage = multer.memoryStorage();
 
-const upload = multer({
+const imageUpload = multer({
   storage,
   limits: {
     fileSize: 15 * 1024 * 1024,
@@ -26,18 +26,38 @@ const upload = multer({
   },
 });
 
+const videoUpload = multer({
+  storage,
+  limits: {
+    fileSize: 200 * 1024 * 1024,
+  },
+  fileFilter: (request, file, callback) => {
+    if (!file.mimetype.startsWith("video/")) {
+      callback(new Error("Only video files are allowed"));
+      return;
+    }
+
+    callback(null, true);
+  },
+});
+
 uploadRoutes.post(
   "/single",
   authenticate,
-  requirePermission("gallery", "create"),
-  upload.single("image"),
+  imageUpload.single("image"),
   uploadSingleImageController,
 );
 
 uploadRoutes.post(
   "/multiple",
   authenticate,
-  requirePermission("gallery", "create"),
-  upload.array("images", 10),
+  imageUpload.array("images", 10),
   uploadMultipleImagesController,
+);
+
+uploadRoutes.post(
+  "/video",
+  authenticate,
+  videoUpload.single("video"),
+  uploadSingleVideoController,
 );

@@ -116,7 +116,7 @@ export const VideosPage = () => {
           {videos.map((video) => {
             const title = video.title[language] || video.title.de;
             const description =
-              video.description[language] || video.description.de;
+              video.description?.[language] || video.description?.de || "";
 
             return (
               <article key={video._id}>
@@ -127,7 +127,7 @@ export const VideosPage = () => {
                 {video.type === "youtube" && video.youtubeUrl && (
                   <div className="overflow-hidden rounded-[2rem] bg-black shadow-2xl shadow-black/25">
                     <iframe
-                      src={video.youtubeUrl.replace("watch?v=", "embed/")}
+                      src={getYoutubeEmbedUrl(video.youtubeUrl)}
                       title={title}
                       className="aspect-video w-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -136,7 +136,7 @@ export const VideosPage = () => {
                   </div>
                 )}
 
-                {video.type === "upload" && video.videoFile?.url && (
+                {video.type === "uploaded" && video.videoFile?.url && (
                   <div className="overflow-hidden rounded-[2rem] bg-black shadow-2xl shadow-black/25">
                     <video
                       src={video.videoFile.url}
@@ -147,7 +147,11 @@ export const VideosPage = () => {
                   </div>
                 )}
 
-                <p className="mt-4 text-center text-zinc-600">{description}</p>
+                {description && (
+                  <p className="mt-4 text-center text-zinc-600">
+                    {description}
+                  </p>
+                )}
               </article>
             );
           })}
@@ -155,4 +159,16 @@ export const VideosPage = () => {
       </section>
     </main>
   );
+};
+
+const getYoutubeEmbedUrl = (youtubeUrl: string) => {
+  if (youtubeUrl.includes("watch?v=")) {
+    return youtubeUrl.replace("watch?v=", "embed/");
+  }
+
+  if (youtubeUrl.includes("youtu.be/")) {
+    return youtubeUrl.replace("youtu.be/", "www.youtube.com/embed/");
+  }
+
+  return youtubeUrl;
 };

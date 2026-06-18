@@ -25,11 +25,31 @@ export const getAdminVideosController = async (
   request: Request,
   response: Response,
 ): Promise<void> => {
-  const videos = await getAdminVideos();
+  const page = Number(request.query.page || 1);
+  const limit = Number(request.query.limit || 10);
+  const status = String(request.query.status || "all") as
+    | "draft"
+    | "published"
+    | "archived"
+    | "all";
+  const type = String(request.query.type || "all") as
+    | "youtube"
+    | "uploaded"
+    | "all";
+  const search = String(request.query.search || "");
+
+  const result = await getAdminVideos({
+    page,
+    limit,
+    status,
+    type,
+    search,
+  });
 
   response.status(200).json({
     success: true,
-    data: videos,
+    data: result.items,
+    pagination: result.pagination,
   });
 };
 

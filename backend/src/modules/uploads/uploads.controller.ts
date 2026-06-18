@@ -18,12 +18,40 @@ export const uploadSingleImageController = async (
   const uploadedImage = await uploadBufferToCloudinary(
     request.file.buffer,
     folder,
+    "image",
   );
 
   response.status(201).json({
     success: true,
     message: "Image uploaded successfully",
     data: uploadedImage,
+  });
+};
+
+export const uploadSingleVideoController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  if (!request.file) {
+    response.status(400).json({
+      success: false,
+      message: "No video uploaded",
+    });
+    return;
+  }
+
+  const folder = request.body.folder || "collective-platform/videos";
+
+  const uploadedVideo = await uploadBufferToCloudinary(
+    request.file.buffer,
+    folder,
+    "video",
+  );
+
+  response.status(201).json({
+    success: true,
+    message: "Video uploaded successfully",
+    data: uploadedVideo,
   });
 };
 
@@ -44,7 +72,7 @@ export const uploadMultipleImagesController = async (
   const folder = request.body.folder || "collective-platform/gallery";
 
   const uploadedImages = await Promise.all(
-    files.map((file) => uploadBufferToCloudinary(file.buffer, folder)),
+    files.map((file) => uploadBufferToCloudinary(file.buffer, folder, "image")),
   );
 
   response.status(201).json({

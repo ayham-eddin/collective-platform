@@ -9,12 +9,13 @@ export interface UploadedMedia {
 export const uploadBufferToCloudinary = async (
   fileBuffer: Buffer,
   folder: string,
+  resourceType: "image" | "video" = "image",
 ): Promise<UploadedMedia> => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder,
-        resource_type: "image",
+        resource_type: resourceType,
       },
       (error, result?: UploadApiResponse) => {
         if (error || !result) {
