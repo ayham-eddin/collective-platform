@@ -1,11 +1,4 @@
-import {
-  ArrowDown,
-  ArrowUp,
-  ImagePlus,
-  Save,
-  Trash2,
-  Upload,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, ImagePlus, Trash2 } from "lucide-react";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { getStoredAdmin } from "../../../services/auth.service";
 import {
@@ -22,28 +15,11 @@ import type {
 } from "../../../types/gallery.types";
 import type { UploadedMedia } from "../../../types/upload.types";
 import { hasPermission } from "../../../utils/permissions";
-
-type GalleryFormState = {
-  titleDe: string;
-  titleEn: string;
-  titleAr: string;
-  descriptionDe: string;
-  descriptionEn: string;
-  descriptionAr: string;
-  status: GalleryImageStatus;
-  isFeatured: boolean;
-};
-
-const initialFormState: GalleryFormState = {
-  titleDe: "",
-  titleEn: "",
-  titleAr: "",
-  descriptionDe: "",
-  descriptionEn: "",
-  descriptionAr: "",
-  status: "published",
-  isFeatured: false,
-};
+import {
+  initialGalleryFormState,
+  type GalleryFormState,
+} from "./adminGalleryForm.types";
+import { AdminGalleryForm } from "./components/AdminGalleryForm";
 
 export const AdminGalleryPage = () => {
   const admin = getStoredAdmin();
@@ -53,8 +29,9 @@ export const AdminGalleryPage = () => {
   const canDeleteGallery = hasPermission(admin, "gallery", "delete");
 
   const [images, setImages] = useState<GalleryImageItem[]>([]);
-  const [formState, setFormState] =
-    useState<GalleryFormState>(initialFormState);
+  const [formState, setFormState] = useState<GalleryFormState>(
+    initialGalleryFormState,
+  );
   const [uploadedImage, setUploadedImage] = useState<UploadedMedia | null>(
     null,
   );
@@ -117,7 +94,7 @@ export const AdminGalleryPage = () => {
   };
 
   const resetForm = () => {
-    setFormState(initialFormState);
+    setFormState(initialGalleryFormState);
     setUploadedImage(null);
     setEditingImageId(null);
     setMessage("");
@@ -383,131 +360,17 @@ export const AdminGalleryPage = () => {
       )}
 
       {(canCreateGallery || (editingImageId && canUpdateGallery)) && (
-        <form
+        <AdminGalleryForm
+          formState={formState}
+          uploadedImage={uploadedImage}
+          editingImageId={editingImageId}
+          isUploading={isUploading}
+          isSaving={isSaving}
           onSubmit={handleSubmit}
-          className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6"
-        >
-          <h2 className="text-2xl font-black">
-            {editingImageId ? "Edit Image" : "Create Image"}
-          </h2>
-
-          <div className="mt-6">
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:border-violet-400 hover:text-violet-300">
-              <Upload size={18} />
-              {isUploading ? "Uploading..." : "Upload Image"}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(event) => void handleImageUpload(event)}
-                disabled={isUploading}
-                className="hidden"
-              />
-            </label>
-
-            {uploadedImage && (
-              <img
-                src={uploadedImage.url}
-                alt="Gallery preview"
-                className="mt-6 h-72 w-full rounded-3xl object-cover"
-              />
-            )}
-          </div>
-
-          <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            <TextInput
-              label="Title DE"
-              value={formState.titleDe}
-              onChange={(value) => updateField("titleDe", value)}
-            />
-            <TextInput
-              label="Title EN"
-              value={formState.titleEn}
-              onChange={(value) => updateField("titleEn", value)}
-            />
-            <TextInput
-              label="Title AR"
-              value={formState.titleAr}
-              onChange={(value) => updateField("titleAr", value)}
-            />
-          </div>
-
-          <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            <TextAreaInput
-              label="Description DE"
-              value={formState.descriptionDe}
-              onChange={(value) => updateField("descriptionDe", value)}
-            />
-            <TextAreaInput
-              label="Description EN"
-              value={formState.descriptionEn}
-              onChange={(value) => updateField("descriptionEn", value)}
-            />
-            <TextAreaInput
-              label="Description AR"
-              value={formState.descriptionAr}
-              onChange={(value) => updateField("descriptionAr", value)}
-            />
-          </div>
-
-          <div className="mt-6 grid gap-5 lg:grid-cols-2">
-            <label className="grid gap-2">
-              <span className="text-sm font-bold text-zinc-300">Status</span>
-              <select
-                value={formState.status}
-                onChange={(event) =>
-                  updateField(
-                    "status",
-                    event.target.value as GalleryImageStatus,
-                  )
-                }
-                className={inputClassName}
-              >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
-              </select>
-            </label>
-
-            <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-4">
-              <input
-                type="checkbox"
-                checked={formState.isFeatured}
-                onChange={(event) =>
-                  updateField("isFeatured", event.target.checked)
-                }
-                className="h-5 w-5"
-              />
-              <span className="text-sm font-bold text-zinc-300">
-                Featured image
-              </span>
-            </label>
-          </div>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <button
-              type="submit"
-              disabled={isSaving || isUploading}
-              className="inline-flex items-center gap-2 rounded-full bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <Save size={18} />
-              {isSaving
-                ? "Saving..."
-                : editingImageId
-                  ? "Save Changes"
-                  : "Create Image"}
-            </button>
-
-            {editingImageId && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="rounded-full border border-white/10 px-7 py-4 text-sm font-bold text-zinc-300 transition hover:border-zinc-400 hover:text-white"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
+          onFieldChange={updateField}
+          onImageUpload={handleImageUpload}
+          onCancelEdit={resetForm}
+        />
       )}
 
       <section className="mt-12">
@@ -681,46 +544,6 @@ export const AdminGalleryPage = () => {
         )}
       </section>
     </section>
-  );
-};
-
-interface TextInputProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}
-
-const TextInput = ({ label, value, onChange }: TextInputProps) => {
-  return (
-    <label className="grid gap-2">
-      <span className="text-sm font-bold text-zinc-300">{label}</span>
-      <input
-        type="text"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className={inputClassName}
-      />
-    </label>
-  );
-};
-
-interface TextAreaInputProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}
-
-const TextAreaInput = ({ label, value, onChange }: TextAreaInputProps) => {
-  return (
-    <label className="grid gap-2">
-      <span className="text-sm font-bold text-zinc-300">{label}</span>
-      <textarea
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        rows={4}
-        className={inputClassName}
-      />
-    </label>
   );
 };
 
