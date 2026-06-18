@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLanguage } from "../../contexts/useLanguage";
 import type {
@@ -9,7 +9,11 @@ import type {
 interface GalleryLightboxProps {
   images: GalleryImageItem[];
   currentIndex: number;
+  totalItems: number;
+  isLoadingMore: boolean;
+  hasMoreImages: boolean;
   onClose: () => void;
+  onLoadMore: () => Promise<void>;
 }
 
 const lightboxText = {
@@ -28,6 +32,11 @@ const lightboxText = {
     en: "Next image",
     ar: "الصورة التالية",
   },
+  loadingMore: {
+    de: "Weitere Bilder werden geladen...",
+    en: "Loading more images...",
+    ar: "جاري تحميل المزيد من الصور...",
+  },
   imageFallback: {
     de: "Galeriebild",
     en: "Gallery image",
@@ -38,35 +47,52 @@ const lightboxText = {
 export const GalleryLightbox = ({
   images,
   currentIndex,
+  totalItems,
+  isLoadingMore,
+  hasMoreImages,
   onClose,
+  onLoadMore,
 }: GalleryLightboxProps) => {
   const { language } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(currentIndex);
 
-  const showPreviousImage = () => {
+  const activeImage = images[activeIndex];
+
+  const goToPreviousImage = () => {
     setActiveIndex((index) => (index === 0 ? images.length - 1 : index - 1));
   };
 
-  const showNextImage = () => {
-    setActiveIndex((index) => (index === images.length - 1 ? 0 : index + 1));
+  const goToNextImage = () => {
+    setActiveIndex((index) => {
+      const isLastLoadedImage = index === images.length - 1;
+
+      if (isLastLoadedImage && !hasMoreImages) {
+        return 0;
+      }
+
+      if (isLastLoadedImage && hasMoreImages) {
+        void onLoadMore();
+        return index + 1;
+      }
+
+      return index + 1;
+    });
   };
 
   useEffect(() => {
     const handleKeyboardNavigation = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
+        return;
       }
 
-      if (event.key === "ArrowRight") {
-        setActiveIndex((index) =>
-          index === images.length - 1 ? 0 : index + 1,
-        );
+      if (event.key === "ArrowRight" && !isLoadingMore) {
+        goToNextImage();
+        return;
       }
 
       if (event.key === "ArrowLeft") {
-        setActiveIndex((index) =>
-          index === 0 ? images.length - 1 : index - 1,
-        );
+        goToPreviousImage();
       }
     };
 
@@ -75,12 +101,19 @@ export const GalleryLightbox = ({
     return () => {
       window.removeEventListener("keydown", handleKeyboardNavigation);
     };
-  }, [images.length, onClose]);
-
-  const activeImage = images[activeIndex];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images.length, hasMoreImages, isLoadingMore, onClose]);
 
   if (!activeImage) {
-    return null;
+    return (
+      <div
+        className="fixed inset-0 z-[100] grid place-items-center bg-black/95 px-4 py-6 text-white"
+        role="dialog"
+        aria-modal="true"
+      >
+        <Loader2 size={32} className="animate-spin text-violet-300" />
+      </div>
+    );
   }
 
   const activeTitle = getLocalizedText(
@@ -111,7 +144,7 @@ export const GalleryLightbox = ({
             type="button"
             onClick={(event) => {
               event.stopPropagation();
-              showPreviousImage();
+              goToPreviousImage();
             }}
             className="absolute left-5 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
             aria-label={lightboxText.previous[language]}
@@ -123,12 +156,17 @@ export const GalleryLightbox = ({
             type="button"
             onClick={(event) => {
               event.stopPropagation();
-              showNextImage();
+              goToNextImage();
             }}
-            className="absolute right-5 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            disabled={isLoadingMore}
+            className="absolute right-5 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-wait disabled:opacity-60"
             aria-label={lightboxText.next[language]}
           >
-            <ChevronRight size={28} />
+            {isLoadingMore ? (
+              <Loader2 size={24} className="animate-spin" />
+            ) : (
+              <ChevronRight size={28} />
+            )}
           </button>
         </>
       )}
@@ -145,7 +183,7 @@ export const GalleryLightbox = ({
 
         <div className="max-w-3xl text-center">
           <p className="text-sm font-bold text-violet-300">
-            {activeIndex + 1} / {images.length}
+            {Math.min(activeIndex + 1, totalItems)} / {totalItems}
           </p>
 
           <h2 className="mt-3 text-3xl font-black">{activeTitle}</h2>
@@ -153,6 +191,12 @@ export const GalleryLightbox = ({
           {activeImage.description && (
             <p className="mt-3 text-zinc-300">
               {getLocalizedText(activeImage.description, language, "")}
+            </p>
+          )}
+
+          {isLoadingMore && (
+            <p className="mt-4 text-sm font-bold text-zinc-400">
+              {lightboxText.loadingMore[language]}
             </p>
           )}
         </div>

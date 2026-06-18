@@ -8,7 +8,7 @@ const startServer = async (): Promise<void> => {
     await connectDatabase();
     await seedSuperAdmin();
 
-    app.listen(Number(env.port), () => {
+    app.listen(Number(env.port), "0.0.0.0", () => {
       console.log(`Server running on port ${env.port}`);
     });
   } catch (error) {

@@ -94,9 +94,16 @@ export const GalleryPage = () => {
   const [heroImages, setHeroImages] = useState<GalleryImageItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
+  const [lightboxImages, setLightboxImages] = useState<GalleryImageItem[]>([]);
+  const [lightboxPage, setLightboxPage] = useState(1);
+  const [lightboxTotalPages, setLightboxTotalPages] = useState(1);
+  const [lightboxTotalItems, setLightboxTotalItems] = useState(0);
+  const [isLightboxLoadingMore, setIsLightboxLoadingMore] = useState(false);
+
   const [page, setPage] = useState(1);
   const [limit] = useState(6);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
 
@@ -112,6 +119,7 @@ export const GalleryPage = () => {
 
     setImages(response.data);
     setTotalPages(response.pagination.totalPages || 1);
+    setTotalItems(response.pagination.totalItems);
   };
 
   useEffect(() => {
@@ -163,13 +171,65 @@ export const GalleryPage = () => {
     event.preventDefault();
     setPage(1);
     setSearch(searchInput);
+    setSelectedIndex(null);
+    setLightboxImages([]);
+    setLightboxPage(1);
+    setLightboxTotalPages(1);
+    setLightboxTotalItems(0);
   };
 
   const handleClearSearch = () => {
     setSearchInput("");
     setSearch("");
     setPage(1);
+    setSelectedIndex(null);
+    setLightboxImages([]);
+    setLightboxPage(1);
+    setLightboxTotalPages(1);
+    setLightboxTotalItems(0);
   };
+
+  const handleOpenLightbox = (index: number) => {
+    const pageOffset = (page - 1) * limit;
+
+    setLightboxImages(images);
+    setLightboxPage(page);
+    setLightboxTotalPages(totalPages);
+    setLightboxTotalItems(totalItems);
+    setSelectedIndex(pageOffset + index);
+  };
+
+  const loadMoreLightboxImages = async () => {
+    if (isLightboxLoadingMore || lightboxPage >= lightboxTotalPages) {
+      return;
+    }
+
+    const nextPage = lightboxPage + 1;
+
+    setIsLightboxLoadingMore(true);
+
+    try {
+      const response = await getPublicGalleryImages({
+        page: nextPage,
+        limit,
+        search,
+      });
+
+      setLightboxImages((currentImages) => [
+        ...currentImages,
+        ...response.data,
+      ]);
+      setLightboxPage(response.pagination.page);
+      setLightboxTotalPages(response.pagination.totalPages || 1);
+      setLightboxTotalItems(response.pagination.totalItems);
+    } finally {
+      setIsLightboxLoadingMore(false);
+    }
+  };
+
+  const lightboxStartOffset = (page - 1) * limit;
+  const lightboxCurrentIndex =
+    selectedIndex !== null ? selectedIndex - lightboxStartOffset : 0;
 
   return (
     <main className="bg-[#f4f3fb] text-[#252530]">
@@ -266,7 +326,7 @@ export const GalleryPage = () => {
             <button
               key={item._id}
               type="button"
-              onClick={() => setSelectedIndex(index)}
+              onClick={() => handleOpenLightbox(index)}
               className="group relative min-h-[360px] overflow-hidden rounded-[2rem] bg-zinc-900 text-left shadow-2xl shadow-black/20"
             >
               <img
@@ -334,8 +394,12 @@ export const GalleryPage = () => {
 
       {selectedIndex !== null && (
         <GalleryLightbox
-          images={images}
-          currentIndex={selectedIndex}
+          images={lightboxImages}
+          currentIndex={lightboxCurrentIndex}
+          totalItems={lightboxTotalItems || totalItems}
+          isLoadingMore={isLightboxLoadingMore}
+          hasMoreImages={lightboxPage < lightboxTotalPages}
+          onLoadMore={loadMoreLightboxImages}
           onClose={() => setSelectedIndex(null)}
         />
       )}
