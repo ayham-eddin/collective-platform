@@ -1,5 +1,6 @@
 import type {
   ContactMessageItem,
+  ContactMessageStatus,
   CreateContactMessagePayload,
   UpdateContactMessagePayload,
 } from "../types/contact.types";
@@ -13,6 +14,19 @@ interface ContactMessageResponse {
 interface ContactMessagesResponse {
   success: boolean;
   data: ContactMessageItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+  };
+}
+
+export interface GetAdminContactMessagesParams {
+  page: number;
+  limit: number;
+  status: ContactMessageStatus | "all";
+  search: string;
 }
 
 export const createContactMessage = async (
@@ -26,11 +40,14 @@ export const createContactMessage = async (
   return response.data.data;
 };
 
-export const getAdminContactMessages = async (): Promise<
-  ContactMessageItem[]
-> => {
-  const response = await api.get<ContactMessagesResponse>("/contact/admin");
-  return response.data.data;
+export const getAdminContactMessages = async (
+  params: GetAdminContactMessagesParams,
+): Promise<ContactMessagesResponse> => {
+  const response = await api.get<ContactMessagesResponse>("/contact/admin", {
+    params,
+  });
+
+  return response.data;
 };
 
 export const updateAdminContactMessage = async (

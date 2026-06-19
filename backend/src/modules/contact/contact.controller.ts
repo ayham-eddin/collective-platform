@@ -23,11 +23,26 @@ export const getAdminContactMessagesController = async (
   request: Request,
   response: Response,
 ): Promise<void> => {
-  const messages = await getAdminContactMessages();
+  const page = Number(request.query.page || 1);
+  const limit = Number(request.query.limit || 10);
+  const status = String(request.query.status || "all") as
+    | "unread"
+    | "read"
+    | "archived"
+    | "all";
+  const search = String(request.query.search || "");
+
+  const result = await getAdminContactMessages({
+    page,
+    limit,
+    status,
+    search,
+  });
 
   response.status(200).json({
     success: true,
-    data: messages,
+    data: result.items,
+    pagination: result.pagination,
   });
 };
 
