@@ -57,11 +57,25 @@ export const getPublicVideosController = async (
   request: Request,
   response: Response,
 ): Promise<void> => {
-  const videos = await getPublicVideos();
+  const page = Number(request.query.page || 1);
+  const limit = Number(request.query.limit || 6);
+  const type = String(request.query.type || "all") as
+    | "youtube"
+    | "uploaded"
+    | "all";
+  const search = String(request.query.search || "");
+
+  const result = await getPublicVideos({
+    page,
+    limit,
+    type,
+    search,
+  });
 
   response.status(200).json({
     success: true,
-    data: videos,
+    data: result.items,
+    pagination: result.pagination,
   });
 };
 

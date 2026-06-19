@@ -47,7 +47,7 @@ export const AdminVideosPage = () => {
   const [editVideoFile, setEditVideoFile] = useState<MediaFile | null>(null);
 
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit, setLimit] = useState(6);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
@@ -341,6 +341,11 @@ export const AdminVideosPage = () => {
     setPage(1);
   };
 
+  const handleLimitChange = (value: number) => {
+    setLimit(value);
+    setPage(1);
+  };
+
   return (
     <section>
       <p className="text-sm font-black uppercase tracking-[0.35em] text-violet-300">
@@ -433,7 +438,7 @@ export const AdminVideosPage = () => {
           </form>
         </div>
 
-        <div className="mt-6 grid gap-5 md:grid-cols-2">
+        <div className="mt-6 grid gap-5 md:grid-cols-3">
           <label className="grid gap-2">
             <span className="text-sm font-bold text-zinc-300">Status</span>
             <select
@@ -464,6 +469,20 @@ export const AdminVideosPage = () => {
               <option value="all">All types</option>
               <option value="youtube">YouTube</option>
               <option value="uploaded">Uploaded</option>
+            </select>
+          </label>
+          <label className="grid gap-2">
+            <span className="text-sm font-bold text-zinc-300">Per page</span>
+            <select
+              value={limit}
+              onChange={(event) =>
+                handleLimitChange(Number(event.target.value))
+              }
+              className={inputClassName}
+            >
+              <option value={6}>6 videos</option>
+              <option value={10}>10 videos</option>
+              <option value={20}>20 videos</option>
             </select>
           </label>
         </div>

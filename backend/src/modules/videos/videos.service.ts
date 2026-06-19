@@ -9,7 +9,7 @@ type VideoQuery = {
   $or?: Array<Record<string, { $regex: string; $options: string }>>;
 };
 
-interface GetAdminVideosOptions {
+interface GetVideosOptions {
   page: number;
   limit: number;
   status?: VideoStatus | "all";
@@ -21,13 +21,11 @@ export const createVideo = async (data: VideoInput) => {
   return Video.create(data);
 };
 
-export const getAdminVideos = async ({
-  page,
-  limit,
+const buildVideoQuery = ({
   status = "all",
   type = "all",
   search = "",
-}: GetAdminVideosOptions) => {
+}: Pick<GetVideosOptions, "status" | "type" | "search">): VideoQuery => {
   const query: VideoQuery = {
     isDeleted: false,
   };
@@ -50,6 +48,18 @@ export const getAdminVideos = async ({
       { "description.ar": { $regex: search, $options: "i" } },
     ];
   }
+
+  return query;
+};
+
+const getPaginatedVideos = async ({
+  page,
+  limit,
+  status = "all",
+  type = "all",
+  search = "",
+}: GetVideosOptions) => {
+  const query = buildVideoQuery({ status, type, search });
 
   const safePage = Math.max(page, 1);
   const safeLimit = Math.min(Math.max(limit, 1), 50);
@@ -75,13 +85,23 @@ export const getAdminVideos = async ({
   };
 };
 
-export const getPublicVideos = async () => {
-  return Video.find({
-    isDeleted: false,
+export const getAdminVideos = async (options: GetVideosOptions) => {
+  return getPaginatedVideos(options);
+};
+
+export const getPublicVideos = async ({
+  page,
+  limit,
+  type = "all",
+  search = "",
+}: Omit<GetVideosOptions, "status">) => {
+  return getPaginatedVideos({
+    page,
+    limit,
     status: "published",
-  })
-    .populate("relatedEvent")
-    .sort({ createdAt: -1 });
+    type,
+    search,
+  });
 };
 
 export const getVideoById = async (id: string) => {

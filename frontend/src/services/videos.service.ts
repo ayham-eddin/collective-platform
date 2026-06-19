@@ -9,11 +9,6 @@ import type {
 interface VideosResponse {
   success: boolean;
   data: VideoItem[];
-}
-
-interface AdminVideosResponse {
-  success: boolean;
-  data: VideoItem[];
   pagination: {
     page: number;
     limit: number;
@@ -27,6 +22,13 @@ interface VideoResponse {
   data: VideoItem;
 }
 
+export interface GetPublicVideosParams {
+  page: number;
+  limit: number;
+  type: VideoType | "all";
+  search: string;
+}
+
 export interface GetAdminVideosParams {
   page: number;
   limit: number;
@@ -35,15 +37,20 @@ export interface GetAdminVideosParams {
   search: string;
 }
 
-export const getPublicVideos = async (): Promise<VideoItem[]> => {
-  const response = await api.get<VideosResponse>("/videos/public");
-  return response.data.data;
+export const getPublicVideos = async (
+  params: GetPublicVideosParams,
+): Promise<VideosResponse> => {
+  const response = await api.get<VideosResponse>("/videos/public", {
+    params,
+  });
+
+  return response.data;
 };
 
 export const getAdminVideos = async (
   params: GetAdminVideosParams,
-): Promise<AdminVideosResponse> => {
-  const response = await api.get<AdminVideosResponse>("/videos/admin", {
+): Promise<VideosResponse> => {
+  const response = await api.get<VideosResponse>("/videos/admin", {
     params,
   });
 
