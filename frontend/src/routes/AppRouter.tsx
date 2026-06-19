@@ -133,7 +133,13 @@ const router = createBrowserRouter([
             ],
           },
           {
-            element: <AdminPermissionRoute moduleName="admins" action="read" />,
+            element: (
+              <AdminPermissionRoute
+                moduleName="admins"
+                action="read"
+                superAdminOnly
+              />
+            ),
             children: [
               {
                 path: "admins",
