@@ -11,60 +11,22 @@ import {
   updateAdminUser,
 } from "../../../services/admin.service";
 import { getStoredAdmin } from "../../../services/auth.service";
+import type { AdminItem, AdminRole } from "../../../types/admin.types";
+import {
+  initialFormState,
+  initialRoleFormState,
+  inputClassName,
+  permissionModules,
+} from "./adminAdmins.constants";
 import type {
-  AdminItem,
-  AdminRole,
+  AdminFormState,
   Permission,
   PermissionAction,
   PermissionModule,
-} from "../../../types/admin.types";
-
-type AdminFormState = {
-  fullName: string;
-  email: string;
-  password: string;
-  roleId: string;
-};
-
-type RoleFormState = {
-  name: string;
-  permissions: Permission[];
-};
-
-const permissionModules: PermissionModule[] = [
-  "events",
-  "gallery",
-  "videos",
-  "team",
-  "pages",
-  "home-content",
-  "settings",
-  "contact",
-  "admins",
-];
-
-const permissionActions: PermissionAction[] = [
-  "read",
-  "create",
-  "update",
-  "delete",
-  "publish",
-];
-
-const initialFormState: AdminFormState = {
-  fullName: "",
-  email: "",
-  password: "",
-  roleId: "",
-};
-
-const initialRoleFormState: RoleFormState = {
-  name: "",
-  permissions: permissionModules.map((moduleName) => ({
-    module: moduleName,
-    actions: [],
-  })),
-};
+  RoleFormState,
+} from "./adminAdmins.types";
+import { PermissionEditor } from "./components/PermissionEditor";
+import { TextInput } from "./components/TextInput";
 
 export const AdminAdminsPage = () => {
   const currentAdmin = getStoredAdmin();
@@ -343,8 +305,10 @@ export const AdminAdminsPage = () => {
       });
 
       setAdmins((currentAdmins) =>
-        currentAdmins.map((currentAdmin) =>
-          currentAdmin._id === updatedAdmin._id ? updatedAdmin : currentAdmin,
+        currentAdmins.map((currentAdminItem) =>
+          currentAdminItem._id === updatedAdmin._id
+            ? updatedAdmin
+            : currentAdminItem,
         ),
       );
 
@@ -381,7 +345,9 @@ export const AdminAdminsPage = () => {
     try {
       await deleteAdminUser(admin._id);
       setAdmins((currentAdmins) =>
-        currentAdmins.filter((currentAdmin) => currentAdmin._id !== admin._id),
+        currentAdmins.filter(
+          (currentAdminItem) => currentAdminItem._id !== admin._id,
+        ),
       );
       setMessageText("Admin deleted successfully.");
     } catch {
@@ -833,93 +799,3 @@ export const AdminAdminsPage = () => {
     </section>
   );
 };
-
-interface PermissionEditorProps {
-  permissions: Permission[];
-  onToggle: (moduleName: PermissionModule, action: PermissionAction) => void;
-}
-
-const PermissionEditor = ({ permissions, onToggle }: PermissionEditorProps) => {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-white/10">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[820px] border-collapse">
-          <thead className="bg-white/[0.04] text-left text-sm text-zinc-400">
-            <tr>
-              <th className="px-4 py-3">Module</th>
-              {permissionActions.map((action) => (
-                <th key={action} className="px-4 py-3 capitalize">
-                  {action}
-                </th>
-              ))}
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-white/10">
-            {permissionModules.map((moduleName) => {
-              const currentPermission = permissions.find(
-                (permission) => permission.module === moduleName,
-              );
-
-              return (
-                <tr key={moduleName}>
-                  <td className="px-4 py-3 text-sm font-black text-white">
-                    {moduleName}
-                  </td>
-
-                  {permissionActions.map((action) => (
-                    <td key={action} className="px-4 py-3">
-                      <input
-                        type="checkbox"
-                        checked={
-                          currentPermission?.actions.includes(action) || false
-                        }
-                        onChange={() => onToggle(moduleName, action)}
-                        className="h-5 w-5"
-                      />
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
-
-interface TextInputProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  type?: "text" | "email" | "password";
-  required?: boolean;
-  placeholder?: string;
-}
-
-const TextInput = ({
-  label,
-  value,
-  onChange,
-  type = "text",
-  required = false,
-  placeholder,
-}: TextInputProps) => {
-  return (
-    <label className="grid gap-2">
-      <span className="text-sm font-bold text-zinc-300">{label}</span>
-      <input
-        type={type}
-        value={value}
-        required={required}
-        placeholder={placeholder}
-        onChange={(event) => onChange(event.target.value)}
-        className={inputClassName}
-      />
-    </label>
-  );
-};
-
-const inputClassName =
-  "w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-white outline-none transition placeholder:text-zinc-600 focus:border-violet-400";
