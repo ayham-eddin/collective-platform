@@ -14,13 +14,13 @@ homeContentRoutes.get("/public", getPublicHomeContentController);
 homeContentRoutes.get(
   "/admin",
   authenticate,
-  requirePermission("homeContent", "read"),
+  requirePermission("home-content", "read"),
   getAdminHomeContentController,
 );
 
 homeContentRoutes.put(
   "/admin",
   authenticate,
-  requirePermission("homeContent", "update"),
+  requirePermission("home-content", "update"),
   updateHomeContentController,
 );
