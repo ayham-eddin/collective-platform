@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { EventCard } from "../../components/EventCard/EventCard";
 import { useLanguage } from "../../contexts/useLanguage";
 import { getPublicEvents } from "../../services/events.service";
@@ -38,6 +38,21 @@ const pageText = {
     en: "Here you can find the most important published events.",
     ar: "هنا تجد أهم الفعاليات المنشورة.",
   },
+  searchPlaceholder: {
+    de: "Events suchen...",
+    en: "Search events...",
+    ar: "ابحث عن فعالية...",
+  },
+  searchButton: {
+    de: "Suchen",
+    en: "Search",
+    ar: "بحث",
+  },
+  clearButton: {
+    de: "Zurücksetzen",
+    en: "Clear",
+    ar: "مسح",
+  },
   loading: {
     de: "Events werden geladen...",
     en: "Loading events...",
@@ -73,6 +88,26 @@ const pageText = {
     en: "Past Events",
     ar: "فعاليات سابقة",
   },
+  previous: {
+    de: "Zurück",
+    en: "Previous",
+    ar: "السابق",
+  },
+  next: {
+    de: "Weiter",
+    en: "Next",
+    ar: "التالي",
+  },
+  page: {
+    de: "Seite",
+    en: "Page",
+    ar: "الصفحة",
+  },
+  of: {
+    de: "von",
+    en: "of",
+    ar: "من",
+  },
 };
 
 export const EventsPage = () => {
@@ -82,11 +117,30 @@ export const EventsPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showPreviousEvents, setShowPreviousEvents] = useState(false);
 
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(3);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+
+  const loadEvents = async (targetPage: number) => {
+    const response = await getPublicEvents({
+      page: targetPage,
+      limit,
+      search,
+    });
+
+    setEvents(response.data);
+    setTotalPages(response.pagination.totalPages || 1);
+  };
+
   useEffect(() => {
-    const loadEvents = async () => {
+    const run = async () => {
+      setIsLoading(true);
+      setErrorMessage("");
+
       try {
-        const data = await getPublicEvents();
-        setEvents(data);
+        await loadEvents(page);
       } catch {
         setErrorMessage("Could not load events");
       } finally {
@@ -94,8 +148,9 @@ export const EventsPage = () => {
       }
     };
 
-    void loadEvents();
-  }, []);
+    void run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, limit, search]);
 
   const featuredEvents = useMemo(() => {
     return events.filter((event) => event.isFeatured);
@@ -106,6 +161,18 @@ export const EventsPage = () => {
   }, [events]);
 
   const heroEvent = featuredEvents[0] || events[0];
+
+  const handleApplySearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPage(1);
+    setSearch(searchInput);
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setSearch("");
+    setPage(1);
+  };
 
   return (
     <main className="bg-[#0b0b10] text-white">
@@ -161,6 +228,36 @@ export const EventsPage = () => {
             </p>
           </div>
 
+          <form
+            onSubmit={handleApplySearch}
+            className="mb-12 flex flex-wrap gap-3 rounded-[2rem] bg-white/5 p-4 backdrop-blur"
+          >
+            <input
+              type="search"
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder={pageText.searchPlaceholder[language]}
+              className="min-w-[240px] flex-1 rounded-2xl border border-white/10 bg-black/30 px-5 py-4 font-semibold text-white outline-none transition placeholder:text-zinc-600 focus:border-violet-400"
+            />
+
+            <button
+              type="submit"
+              className="rounded-2xl bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
+            >
+              {pageText.searchButton[language]}
+            </button>
+
+            {search && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="rounded-2xl border border-white/10 px-7 py-4 text-sm font-black uppercase tracking-wide text-zinc-300 transition hover:border-violet-400 hover:text-violet-300"
+              >
+                {pageText.clearButton[language]}
+              </button>
+            )}
+          </form>
+
           {isLoading && (
             <p className="text-zinc-400">{pageText.loading[language]}</p>
           )}
@@ -171,9 +268,12 @@ export const EventsPage = () => {
             <p className="text-zinc-400">{pageText.noEvents[language]}</p>
           )}
 
-          {!isLoading && !errorMessage && featuredEvents.length === 0 && (
-            <p className="text-zinc-400">{pageText.noFeatured[language]}</p>
-          )}
+          {!isLoading &&
+            !errorMessage &&
+            events.length > 0 &&
+            featuredEvents.length === 0 && (
+              <p className="text-zinc-400">{pageText.noFeatured[language]}</p>
+            )}
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {featuredEvents.map((event) => (
@@ -216,6 +316,52 @@ export const EventsPage = () => {
               </div>
             </section>
           )}
+          <div className="mt-12 flex flex-col gap-5 rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 md:flex-row md:items-end md:justify-between">
+            <div className="flex flex-wrap items-center justify-center gap-3 md:justify-start">
+              <button
+                type="button"
+                disabled={page === 1}
+                onClick={() => setPage((currentPage) => currentPage - 1)}
+                className="rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {pageText.previous[language]}
+              </button>
+
+              <span className="rounded-full bg-white/5 px-5 py-3 text-sm font-black text-zinc-400">
+                {pageText.page[language]} {page} {pageText.of[language]}{" "}
+                {totalPages}
+              </span>
+
+              <button
+                type="button"
+                disabled={page === totalPages}
+                onClick={() => setPage((currentPage) => currentPage + 1)}
+                className="rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {pageText.next[language]}
+              </button>
+            </div>
+
+            <label className="grid gap-2 md:min-w-[220px]">
+              <span className="text-sm font-bold text-zinc-400">
+                Events per page
+              </span>
+
+              <select
+                value={limit}
+                onChange={(event) => {
+                  setLimit(Number(event.target.value));
+                  setPage(1);
+                }}
+                className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 font-semibold text-white outline-none transition focus:border-violet-400"
+              >
+                <option value={3}>3 Events</option>
+                <option value={6}>6 Events</option>
+                <option value={9}>9 Events</option>
+                <option value={24}>24 Events</option>
+              </select>
+            </label>
+          </div>
         </div>
       </section>
     </main>

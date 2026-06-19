@@ -26,11 +26,31 @@ export const getAdminEventsController = async (
   request: Request,
   response: Response,
 ): Promise<void> => {
-  const events = await getAdminEvents();
+  const page = Number(request.query.page || 1);
+  const limit = Number(request.query.limit || 10);
+  const status = String(request.query.status || "all") as
+    | "draft"
+    | "published"
+    | "archived"
+    | "all";
+  const featured = String(request.query.featured || "all") as
+    | "all"
+    | "true"
+    | "false";
+  const search = String(request.query.search || "");
+
+  const result = await getAdminEvents({
+    page,
+    limit,
+    status,
+    featured,
+    search,
+  });
 
   response.status(200).json({
     success: true,
-    data: events,
+    data: result.items,
+    pagination: result.pagination,
   });
 };
 
@@ -50,11 +70,20 @@ export const getPublicEventsController = async (
   request: Request,
   response: Response,
 ): Promise<void> => {
-  const events = await getPublicEvents();
+  const page = Number(request.query.page || 1);
+  const limit = Number(request.query.limit || 50);
+  const search = String(request.query.search || "");
+
+  const result = await getPublicEvents({
+    page,
+    limit,
+    search,
+  });
 
   response.status(200).json({
     success: true,
-    data: events,
+    data: result.items,
+    pagination: result.pagination,
   });
 };
 

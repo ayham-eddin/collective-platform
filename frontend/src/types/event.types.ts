@@ -4,6 +4,8 @@ export interface LocalizedText {
   ar: string;
 }
 
+export type EventStatus = "draft" | "published" | "archived";
+
 export interface EventImage {
   url: string;
   publicId: string;
@@ -33,6 +35,6 @@ export interface EventItem {
   ticketUrl?: string;
   lineup: string[];
   category?: string;
-  status: "draft" | "published" | "archived";
+  status: EventStatus;
   isFeatured: boolean;
 }

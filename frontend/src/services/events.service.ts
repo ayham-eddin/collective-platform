@@ -1,9 +1,15 @@
-import type { EventItem } from "../types/event.types";
+import type { EventItem, EventStatus } from "../types/event.types";
 import { api } from "./api";
 
 interface EventsResponse {
   success: boolean;
   data: EventItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+  };
 }
 
 interface EventResponse {
@@ -11,13 +17,32 @@ interface EventResponse {
   data: EventItem;
 }
 
+export interface GetAdminEventsParams {
+  page: number;
+  limit: number;
+  status: EventStatus | "all";
+  featured: "all" | "true" | "false";
+  search: string;
+}
+
+export interface GetPublicEventsParams {
+  page: number;
+  limit: number;
+  search: string;
+}
+
 export type UpdateEventPayload = Partial<Omit<EventItem, "_id">>;
 
 export type CreateEventPayload = Omit<EventItem, "_id">;
 
-export const getPublicEvents = async (): Promise<EventItem[]> => {
-  const response = await api.get<EventsResponse>("/events/public");
-  return response.data.data;
+export const getPublicEvents = async (
+  params: GetPublicEventsParams,
+): Promise<EventsResponse> => {
+  const response = await api.get<EventsResponse>("/events/public", {
+    params,
+  });
+
+  return response.data;
 };
 
 export const getPublicEventBySlug = async (
@@ -27,9 +52,14 @@ export const getPublicEventBySlug = async (
   return response.data.data;
 };
 
-export const getAdminEvents = async (): Promise<EventItem[]> => {
-  const response = await api.get<EventsResponse>("/events/admin");
-  return response.data.data;
+export const getAdminEvents = async (
+  params: GetAdminEventsParams,
+): Promise<EventsResponse> => {
+  const response = await api.get<EventsResponse>("/events/admin", {
+    params,
+  });
+
+  return response.data;
 };
 
 export const getAdminEventById = async (
