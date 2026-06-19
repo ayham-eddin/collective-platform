@@ -78,12 +78,16 @@ export const HomePage = () => {
   useEffect(() => {
     const loadHomePageData = async () => {
       try {
-        const [eventsData, contentData] = await Promise.all([
-          getPublicEvents(),
+        const [eventsResponse, contentData] = await Promise.all([
+          getPublicEvents({
+            page: 1,
+            limit: 6,
+            search: "",
+          }),
           getPublicHomeContent(),
         ]);
 
-        setEvents(eventsData);
+        setEvents(eventsResponse.data);
         setHomeContent(contentData);
       } catch {
         setErrorMessage("Could not load homepage content");
@@ -117,8 +121,8 @@ export const HomePage = () => {
   const heroImageUrl = homeContent?.heroImage?.url || fallbackHeroImageUrl;
 
   return (
-    <main className="bg-[#f4f3fb] text-[#252530]">
-      <section className="relative min-h-[760px] overflow-hidden bg-black text-white">
+    <main className="overflow-hidden bg-[#f4f3fb] text-[#252530]">
+      <section className="relative min-h-[620px] overflow-hidden bg-black text-white sm:min-h-[700px] lg:min-h-[760px]">
         <div className="absolute inset-0">
           <img
             src={heroImageUrl}
@@ -130,13 +134,13 @@ export const HomePage = () => {
             className="h-full w-full object-cover"
           />
 
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/20" />
         </div>
 
-        <div className="relative mx-auto flex min-h-[760px] max-w-7xl items-center px-6 py-24">
+        <div className="relative mx-auto flex min-h-[620px] max-w-7xl items-center px-5 py-20 sm:min-h-[700px] sm:px-6 lg:min-h-[760px] lg:py-24">
           <div className="max-w-3xl">
-            <p className="text-lg font-black uppercase tracking-[0.35em] text-violet-300">
+            <p className="break-words text-sm font-black uppercase tracking-[0.28em] text-violet-300 sm:text-base lg:text-lg lg:tracking-[0.35em]">
               {getLocalizedText(
                 homeContent?.heroBadge,
                 language,
@@ -144,7 +148,7 @@ export const HomePage = () => {
               )}
             </p>
 
-            <h1 className="mt-6 text-6xl font-black leading-none tracking-tight md:text-8xl">
+            <h1 className="mt-6 max-w-[95vw] break-words text-[3rem] font-black leading-[0.95] tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
               {getLocalizedText(
                 homeContent?.heroTitle,
                 language,
@@ -152,7 +156,7 @@ export const HomePage = () => {
               )}
             </h1>
 
-            <p className="mt-8 max-w-2xl text-xl leading-9 text-zinc-200">
+            <p className="mt-7 max-w-2xl text-base leading-8 text-zinc-200 sm:text-lg lg:text-xl lg:leading-9">
               {getLocalizedText(
                 homeContent?.heroSubtitle,
                 language,
@@ -160,10 +164,10 @@ export const HomePage = () => {
               )}
             </p>
 
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-9 flex gap-3">
               <Link
                 to={homeContent?.primaryButton.url || "/events"}
-                className="rounded-full bg-violet-500 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-400"
+                className="btn btn-primary"
               >
                 {getLocalizedText(
                   homeContent?.primaryButton.label,
@@ -174,7 +178,7 @@ export const HomePage = () => {
 
               <Link
                 to={homeContent?.secondaryButton.url || "/about"}
-                className="rounded-full border border-white/30 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-white hover:text-black"
+                className="btn btn-secondary-dark"
               >
                 {getLocalizedText(
                   homeContent?.secondaryButton.label,
@@ -188,18 +192,18 @@ export const HomePage = () => {
       </section>
 
       {errorMessage && (
-        <p className="mx-auto max-w-7xl px-6 pt-8 text-red-500">
+        <p className="mx-auto max-w-7xl px-5 pt-8 text-red-500 sm:px-6">
           {errorMessage}
         </p>
       )}
 
-      <section className="mx-auto max-w-7xl px-6 py-24">
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 lg:py-24">
         <div className="text-center">
-          <p className="text-lg font-bold italic text-violet-400">
+          <p className="text-base font-bold italic text-violet-500 sm:text-lg">
             {pageText.upcomingEyebrow[language]}
           </p>
 
-          <h2 className="mt-4 text-5xl font-black tracking-tight md:text-6xl">
+          <h2 className="mt-4 break-words text-4xl font-black leading-tight tracking-tight sm:text-5xl md:text-6xl">
             {pageText.upcomingTitle[language]}
           </h2>
 
@@ -219,8 +223,8 @@ export const HomePage = () => {
         )}
 
         {featuredEvent && (
-          <div className="mt-16 grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr]">
-            <div className="relative overflow-hidden rounded-[2rem] bg-zinc-900 shadow-2xl shadow-black/25">
+          <div className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12">
+            <div className="relative overflow-hidden rounded-[1.5rem] bg-zinc-900 shadow-2xl shadow-black/25 sm:rounded-[2rem]">
               {featuredEvent.coverImage && (
                 <img
                   src={featuredEvent.coverImage.url}
@@ -233,17 +237,17 @@ export const HomePage = () => {
                       pageText.eventFallback[language],
                     ),
                   )}
-                  className="h-[560px] w-full object-cover"
+                  className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[560px]"
                 />
               )}
             </div>
 
             <div>
-              <p className="text-xl font-bold italic text-violet-400">
+              <p className="text-base font-bold italic text-violet-500 sm:text-xl">
                 {featuredEvent.category || pageText.eventFallback[language]}
               </p>
 
-              <h3 className="mt-4 text-5xl font-black tracking-tight md:text-6xl">
+              <h3 className="mt-4 break-words text-4xl font-black leading-tight tracking-tight sm:text-5xl md:text-6xl">
                 {getLocalizedText(
                   featuredEvent.title,
                   language,
@@ -251,37 +255,35 @@ export const HomePage = () => {
                 )}
               </h3>
 
-              <div className="mt-8 flex flex-wrap gap-4">
-                <div className="inline-flex items-center gap-3 bg-violet-200 px-5 py-4 font-semibold text-zinc-900">
+              <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
+                <div className="inline-flex items-center gap-3 rounded-2xl bg-violet-200 px-5 py-4 text-sm font-semibold text-zinc-900 sm:text-base">
                   <CalendarDays size={20} />
                   {featuredDate}
                 </div>
 
-                <div className="inline-flex items-center gap-3 bg-violet-200 px-5 py-4 font-semibold text-zinc-900">
+                <div className="inline-flex items-center gap-3 rounded-2xl bg-violet-200 px-5 py-4 text-sm font-semibold text-zinc-900 sm:text-base">
                   <Clock size={20} />
                   {featuredEvent.startTime}
                   {featuredEvent.endTime ? ` - ${featuredEvent.endTime}` : ""}
                 </div>
               </div>
 
-              <p className="mt-8 text-xl leading-9 text-zinc-800">
+              <p className="mt-7 break-words text-base leading-8 text-zinc-800 sm:text-lg lg:text-xl lg:leading-9">
                 {getLocalizedText(featuredEvent.description, language, "")}
               </p>
 
               {featuredEvent.lineup.length > 0 && (
-                <div className="mt-6 text-xl leading-9 text-zinc-800">
-                  <p className="font-black">
-                    ———— {pageText.lineup[language]} ————
-                  </p>
+                <div className="mt-6 break-words text-base leading-8 text-zinc-800 sm:text-lg">
+                  <p className="font-black">{pageText.lineup[language]}</p>
                   {featuredEvent.lineup.map((artist) => (
                     <p key={artist}>– {artist}</p>
                   ))}
                 </div>
               )}
 
-              <div className="mt-10 flex items-center justify-between gap-4 bg-violet-500 px-7 py-6 text-white">
-                <div className="flex items-center gap-3 font-black">
-                  <MapPin size={22} />
+              <div className="mt-9 grid gap-4 rounded-[1.5rem] bg-violet-600 px-5 py-5 text-white sm:flex sm:items-center sm:justify-between sm:px-7 sm:py-6">
+                <div className="flex items-start gap-3 break-words font-black">
+                  <MapPin size={22} className="mt-0.5 shrink-0" />
                   {getLocalizedText(featuredEvent.location, language, "")}
                 </div>
 
@@ -290,7 +292,7 @@ export const HomePage = () => {
                     href={featuredEvent.ticketUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="rounded-full bg-white/25 px-7 py-4 text-sm font-black uppercase tracking-wide transition hover:bg-white hover:text-violet-700"
+                    className="btn btn-secondary-light"
                   >
                     {pageText.buyTickets[language]}
                   </a>
@@ -301,20 +303,20 @@ export const HomePage = () => {
         )}
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-24">
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 lg:py-24">
         <div className="text-center">
-          <p className="text-lg font-bold italic text-violet-400">
+          <p className="text-base font-bold italic text-violet-500 sm:text-lg">
             {pageText.pastEyebrow[language]}
           </p>
 
-          <h2 className="mt-4 text-5xl font-black tracking-tight md:text-6xl">
+          <h2 className="mt-4 break-words text-4xl font-black leading-tight tracking-tight sm:text-5xl md:text-6xl">
             {pageText.pastTitle[language]}
           </h2>
 
           <div className="mx-auto mt-6 h-1 w-24 rounded-full bg-violet-500" />
         </div>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:mt-16 lg:grid-cols-3">
           {(pastEvents.length > 0 ? pastEvents : events)
             .slice(0, 6)
             .map((event) => (
@@ -327,11 +329,11 @@ export const HomePage = () => {
         id="about-preview"
         className="grid bg-[#dfe3f7] text-[#252530] lg:grid-cols-2"
       >
-        <div className="min-h-[520px] bg-[radial-gradient(circle_at_center,#312e81,#0b0b10)]" />
+        <div className="min-h-[320px] bg-[radial-gradient(circle_at_center,#312e81,#0b0b10)] sm:min-h-[420px] lg:min-h-[520px]" />
 
-        <div className="flex items-center px-6 py-20 lg:px-20">
+        <div className="flex items-center px-5 py-16 sm:px-6 sm:py-20 lg:px-20">
           <div className="max-w-2xl">
-            <p className="text-xl font-bold italic text-violet-400">
+            <p className="text-base font-bold italic text-violet-500 sm:text-xl">
               {getLocalizedText(
                 homeContent?.aboutEyebrow,
                 language,
@@ -339,7 +341,7 @@ export const HomePage = () => {
               )}
             </p>
 
-            <h2 className="mt-6 text-5xl font-black leading-tight tracking-tight md:text-6xl">
+            <h2 className="mt-5 break-words text-4xl font-black leading-tight tracking-tight sm:text-5xl md:text-6xl">
               {getLocalizedText(
                 homeContent?.aboutTitle,
                 language,
@@ -347,7 +349,7 @@ export const HomePage = () => {
               )}
             </h2>
 
-            <p className="mt-8 text-lg leading-8 text-zinc-800">
+            <p className="mt-7 text-base leading-8 text-zinc-800 sm:text-lg">
               {getLocalizedText(
                 homeContent?.aboutText,
                 language,
@@ -357,7 +359,7 @@ export const HomePage = () => {
 
             <Link
               to={homeContent?.aboutButton.url || "/events"}
-              className="mt-10 inline-flex rounded-full bg-violet-400 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
+              className="btn btn-primary mt-9"
             >
               {getLocalizedText(
                 homeContent?.aboutButton.label,

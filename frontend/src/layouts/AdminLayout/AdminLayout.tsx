@@ -5,6 +5,7 @@ import type {
   PermissionAction,
   PermissionModule,
 } from "../../types/admin.types";
+import { ScrollToTop } from "../../routes/components/ScrollToTop";
 
 interface AdminNavItem {
   label: string;
@@ -109,6 +110,7 @@ export const AdminLayout = () => {
 
   return (
     <main className="min-h-screen bg-[#0b0b10] text-white">
+      <ScrollToTop />
       <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
         <aside className="border-r border-white/10 bg-[#08080c] px-6 py-8">
           <div>

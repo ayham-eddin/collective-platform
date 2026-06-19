@@ -287,10 +287,7 @@ export const GalleryPage = () => {
             className="min-w-[240px] flex-1 rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-4 font-semibold outline-none transition focus:border-violet-400 focus:bg-white"
           />
 
-          <button
-            type="submit"
-            className="rounded-2xl bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
-          >
+          <button type="submit" className="btn btn-primary">
             {pageText.searchButton[language]}
           </button>
 
@@ -384,7 +381,7 @@ export const GalleryPage = () => {
               type="button"
               disabled={page === totalPages}
               onClick={() => setPage((currentPage) => currentPage + 1)}
-              className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-black text-zinc-700 transition hover:border-violet-500 hover:text-violet-600 disabled:cursor-not-allowed disabled:opacity-40"
+              className=""
             >
               {pageText.next[language]}
             </button>

@@ -172,10 +172,7 @@ export const AboutPage = () => {
             <p>{pageText.historyTextTwo[language]}</p>
           </div>
 
-          <Link
-            to="/events"
-            className="mt-10 inline-flex rounded-full bg-violet-400 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
-          >
+          <Link to="/events" className="mt-10 btn btn-primary">
             {pageText.eventsButton[language]}
           </Link>
         </div>

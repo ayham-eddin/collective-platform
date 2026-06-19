@@ -323,7 +323,7 @@ export const EventDetailsPage = () => {
             <button
               type="button"
               onClick={() => void handleCopyAddress()}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-4 text-sm font-black text-white transition hover:border-violet-300 hover:text-violet-300"
+              className="btn btn-secondary-dark"
             >
               <Copy size={18} />
               {pageText.copyAddress[language]}
@@ -340,7 +340,7 @@ export const EventDetailsPage = () => {
                 href={event.googleMapsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-4 text-sm font-black text-white transition hover:border-violet-300 hover:text-violet-300"
+                className="btn btn-secondary-light"
               >
                 <ExternalLink size={18} />
                 {pageText.openMaps[language]}
@@ -352,7 +352,7 @@ export const EventDetailsPage = () => {
                 href={event.ticketUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-4 text-sm font-black text-white transition hover:bg-violet-500"
+                className="btn btn-primary"
               >
                 <Ticket size={18} />
                 {pageText.buyTickets[language]}

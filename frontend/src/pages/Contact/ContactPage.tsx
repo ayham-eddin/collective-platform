@@ -269,7 +269,7 @@ export const ContactPage = () => {
           <button
             type="submit"
             disabled={isSending}
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-violet-600 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn btn-primary mt-9"
           >
             <Send size={18} />
             {isSending ? pageText.sending[language] : pageText.send[language]}

@@ -108,6 +108,11 @@ const pageText = {
     en: "of",
     ar: "من",
   },
+  perPage: {
+    de: "Events pro Seite",
+    en: "Events per page",
+    ar: "عدد الفعاليات",
+  },
 };
 
 export const EventsPage = () => {
@@ -175,8 +180,8 @@ export const EventsPage = () => {
   };
 
   return (
-    <main className="bg-[#0b0b10] text-white">
-      <section className="relative min-h-[460px] overflow-hidden bg-black">
+    <main className="overflow-hidden bg-[#0b0b10] text-white">
+      <section className="relative min-h-[520px] overflow-hidden bg-black sm:min-h-[580px] lg:min-h-[640px]">
         <img
           src={heroEvent?.coverImage?.url || fallbackHeroImage}
           alt={getLocalizedText(
@@ -184,66 +189,63 @@ export const EventsPage = () => {
             language,
             "Schu Fi Ma Fi Events",
           )}
-          className="absolute inset-0 h-full w-full object-cover opacity-60"
+          className="absolute inset-0 h-full w-full object-cover opacity-55"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/65 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b10] via-transparent to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b10] via-black/20 to-black/40" />
 
-        <div className="relative mx-auto flex min-h-[460px] max-w-7xl items-end px-6 py-20">
+        <div className="relative mx-auto flex min-h-[520px] max-w-7xl items-end px-5 py-14 sm:min-h-[580px] sm:px-6 sm:py-20 lg:min-h-[640px]">
           <div className="max-w-4xl">
-            <p className="text-lg font-black uppercase tracking-[0.35em] text-violet-300">
+            <p className="text-sm font-black uppercase tracking-[0.35em] text-violet-300 sm:text-base lg:text-lg">
               {pageText.heroEyebrow[language]}
             </p>
 
-            <h1 className="mt-5 text-6xl font-black leading-none tracking-tight md:text-8xl">
+            <h1 className="mt-5 max-w-[95vw] break-words text-[3rem] font-black leading-[0.95] tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
               {pageText.heroTitle[language]}
             </h1>
 
-            <p className="mt-6 max-w-2xl text-xl leading-8 text-zinc-300">
+            <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-200 sm:text-lg lg:text-xl">
               {pageText.heroSubtitle[language]}
             </p>
           </div>
         </div>
       </section>
 
-      <section className="relative mx-auto max-w-7xl px-6 py-24">
+      <section className="relative mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 lg:py-24">
         <div className="absolute left-0 top-10 h-72 w-72 rounded-full bg-violet-600/20 blur-3xl" />
         <div className="absolute right-0 top-40 h-72 w-72 rounded-full bg-fuchsia-600/10 blur-3xl" />
 
         <div className="relative">
-          <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+          <div className="mb-10 grid gap-5 lg:grid-cols-[1fr_0.8fr] lg:items-end">
             <div>
-              <p className="text-lg font-bold italic text-violet-300">
+              <p className="text-base font-bold italic text-violet-300 sm:text-lg">
                 {pageText.featuredEyebrow[language]}
               </p>
 
-              <h2 className="mt-3 text-5xl font-black tracking-tight md:text-6xl">
+              <h2 className="mt-3 break-words text-4xl font-black leading-tight tracking-tight sm:text-5xl md:text-6xl">
                 {pageText.featuredTitle[language]}
               </h2>
             </div>
 
-            <p className="max-w-xl text-zinc-400">
+            <p className="max-w-xl text-base leading-8 text-zinc-400">
               {pageText.featuredDescription[language]}
             </p>
           </div>
 
           <form
             onSubmit={handleApplySearch}
-            className="mb-12 flex flex-wrap gap-3 rounded-[2rem] bg-white/5 p-4 backdrop-blur"
+            className="mb-12 grid gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4 backdrop-blur sm:rounded-[2rem] md:grid-cols-[1fr_auto_auto]"
           >
             <input
               type="search"
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
               placeholder={pageText.searchPlaceholder[language]}
-              className="min-w-[240px] flex-1 rounded-2xl border border-white/10 bg-black/30 px-5 py-4 font-semibold text-white outline-none transition placeholder:text-zinc-600 focus:border-violet-400"
+              className="min-h-12 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-base font-semibold text-white outline-none transition placeholder:text-zinc-500 focus:border-violet-400 sm:px-5 sm:py-4"
             />
 
-            <button
-              type="submit"
-              className="rounded-2xl bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500"
-            >
+            <button type="submit" className="btn btn-primary">
               {pageText.searchButton[language]}
             </button>
 
@@ -251,7 +253,7 @@ export const EventsPage = () => {
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="rounded-2xl border border-white/10 px-7 py-4 text-sm font-black uppercase tracking-wide text-zinc-300 transition hover:border-violet-400 hover:text-violet-300"
+                className="min-h-12 rounded-2xl border border-white/10 px-6 py-3 text-sm font-black uppercase tracking-wide text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 sm:px-7 sm:py-4"
               >
                 {pageText.clearButton[language]}
               </button>
@@ -282,13 +284,13 @@ export const EventsPage = () => {
           </div>
 
           {previousEvents.length > 0 && (
-            <div className="mt-16 text-center">
+            <div className="mt-14 text-center">
               <button
                 type="button"
                 onClick={() =>
                   setShowPreviousEvents((currentValue) => !currentValue)
                 }
-                className="rounded-full border border-white/15 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:border-violet-300 hover:text-violet-300"
+                className="rounded-full border border-white/15 px-6 py-3 text-sm font-black uppercase tracking-wide text-white transition hover:border-violet-300 hover:text-violet-300 sm:px-8 sm:py-4"
               >
                 {showPreviousEvents
                   ? pageText.hidePrevious[language]
@@ -298,13 +300,13 @@ export const EventsPage = () => {
           )}
 
           {showPreviousEvents && previousEvents.length > 0 && (
-            <section className="mt-20 border-t border-white/10 pt-16">
-              <div className="mb-12">
-                <p className="text-lg font-bold italic text-violet-300">
+            <section className="mt-16 border-t border-white/10 pt-14">
+              <div className="mb-10">
+                <p className="text-base font-bold italic text-violet-300 sm:text-lg">
                   {pageText.previousEyebrow[language]}
                 </p>
 
-                <h2 className="mt-3 text-5xl font-black tracking-tight md:text-6xl">
+                <h2 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl md:text-6xl">
                   {pageText.previousTitle[language]}
                 </h2>
               </div>
@@ -316,51 +318,54 @@ export const EventsPage = () => {
               </div>
             </section>
           )}
-          <div className="mt-12 flex flex-col gap-5 rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 md:flex-row md:items-end md:justify-between">
-            <div className="flex flex-wrap items-center justify-center gap-3 md:justify-start">
-              <button
-                type="button"
-                disabled={page === 1}
-                onClick={() => setPage((currentPage) => currentPage - 1)}
-                className="rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {pageText.previous[language]}
-              </button>
 
-              <span className="rounded-full bg-white/5 px-5 py-3 text-sm font-black text-zinc-400">
-                {pageText.page[language]} {page} {pageText.of[language]}{" "}
-                {totalPages}
-              </span>
+          <div className="mt-12 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 sm:rounded-[2rem] sm:p-5">
+            <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+              <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
+                <button
+                  type="button"
+                  disabled={page === 1}
+                  onClick={() => setPage((currentPage) => currentPage - 1)}
+                  className="min-h-12 rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {pageText.previous[language]}
+                </button>
 
-              <button
-                type="button"
-                disabled={page === totalPages}
-                onClick={() => setPage((currentPage) => currentPage + 1)}
-                className="rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {pageText.next[language]}
-              </button>
+                <span className="inline-flex min-h-12 items-center justify-center rounded-full bg-white/5 px-5 py-3 text-sm font-black text-zinc-300">
+                  {pageText.page[language]} {page} {pageText.of[language]}{" "}
+                  {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={page === totalPages}
+                  onClick={() => setPage((currentPage) => currentPage + 1)}
+                  className="min-h-12 rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {pageText.next[language]}
+                </button>
+              </div>
+
+              <label className="grid gap-2 lg:min-w-[220px]">
+                <span className="text-sm font-bold text-zinc-400">
+                  {pageText.perPage[language]}
+                </span>
+
+                <select
+                  value={limit}
+                  onChange={(event) => {
+                    setLimit(Number(event.target.value));
+                    setPage(1);
+                  }}
+                  className="min-h-12 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 font-semibold text-white outline-none transition focus:border-violet-400 sm:px-5 sm:py-4"
+                >
+                  <option value={3}>3 Events</option>
+                  <option value={6}>6 Events</option>
+                  <option value={9}>9 Events</option>
+                  <option value={24}>24 Events</option>
+                </select>
+              </label>
             </div>
-
-            <label className="grid gap-2 md:min-w-[220px]">
-              <span className="text-sm font-bold text-zinc-400">
-                Events per page
-              </span>
-
-              <select
-                value={limit}
-                onChange={(event) => {
-                  setLimit(Number(event.target.value));
-                  setPage(1);
-                }}
-                className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 font-semibold text-white outline-none transition focus:border-violet-400"
-              >
-                <option value={3}>3 Events</option>
-                <option value={6}>6 Events</option>
-                <option value={9}>9 Events</option>
-                <option value={24}>24 Events</option>
-              </select>
-            </label>
           </div>
         </div>
       </section>

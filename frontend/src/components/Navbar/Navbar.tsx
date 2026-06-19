@@ -35,19 +35,19 @@ export const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#08080c]/95 backdrop-blur-xl">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3 sm:px-6 sm:py-4">
         <Link to="/" onClick={closeMenu} className="flex items-center gap-3">
           <img
             src={logoUrl}
             alt={siteName}
-            className="h-14 w-32 object-contain sm:w-40"
+            className="h-12 w-28 object-contain sm:h-14 sm:w-36 lg:w-40"
           />
         </Link>
 
         <button
           type="button"
           onClick={() => setIsMenuOpen((currentValue) => !currentValue)}
-          className="grid h-11 w-11 place-items-center rounded-full border border-white/10 text-white lg:hidden"
+          className="grid h-11 w-11 place-items-center rounded-full border border-white/10 text-white transition hover:border-violet-400 hover:bg-white/5 lg:hidden"
           aria-label="Toggle navigation"
         >
           {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -59,8 +59,8 @@ export const Navbar = () => {
       </nav>
 
       {isMenuOpen && (
-        <div className="border-t border-white/10 bg-[#08080c] px-6 py-5 lg:hidden">
-          <div className="grid gap-4">
+        <div className="border-t border-white/10 bg-[#08080c] px-4 py-5 shadow-2xl shadow-black/40 sm:px-6 lg:hidden">
+          <div className="grid gap-3">
             <MobileLinks onNavigate={closeMenu} />
           </div>
         </div>
@@ -144,14 +144,18 @@ const MobileLinks = ({ onNavigate }: MobileLinksProps) => {
         {getNavText("contact", language)}
       </NavLink>
 
-      <div className="mt-2">
-        <LanguageSwitcher />
+      <div className="mt-3 border-t border-white/10 pt-4">
+        <LanguageSwitcher onSelect={onNavigate} />
       </div>
     </>
   );
 };
 
-const LanguageSwitcher = () => {
+interface LanguageSwitcherProps {
+  onSelect?: () => void;
+}
+
+const LanguageSwitcher = ({ onSelect }: LanguageSwitcherProps) => {
   const { language, setLanguage, languageOptions } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -162,6 +166,7 @@ const LanguageSwitcher = () => {
   const handleSelectLanguage = (nextLanguage: LanguageCode) => {
     setLanguage(nextLanguage);
     setIsOpen(false);
+    onSelect?.();
   };
 
   return (
@@ -169,7 +174,7 @@ const LanguageSwitcher = () => {
       <button
         type="button"
         onClick={() => setIsOpen((currentValue) => !currentValue)}
-        className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-xs font-black text-zinc-300 transition hover:border-violet-400 hover:text-white"
+        className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2.5 text-xs font-black text-zinc-300 transition hover:border-violet-400 hover:bg-white/5 hover:text-white sm:text-sm"
         aria-label="Change language"
       >
         <Globe2 size={15} />
@@ -179,7 +184,7 @@ const LanguageSwitcher = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-3 w-44 overflow-hidden rounded-2xl border border-white/10 bg-[#101018] p-2 shadow-2xl shadow-black/40">
+        <div className="absolute left-0 top-full z-50 mt-3 w-44 overflow-hidden rounded-2xl border border-white/10 bg-[#101018] p-2 shadow-2xl shadow-black/40 lg:left-auto lg:right-0">
           {languageOptions.map((option) => (
             <button
               key={option.code}
@@ -249,12 +254,16 @@ const getNavText = (key: NavTextKey, language: LanguageCode) => {
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   clsx(
-    "text-sm font-bold transition hover:text-white",
-    isActive ? "text-white" : "text-zinc-400",
+    "rounded-full px-3 py-2 text-sm font-bold transition",
+    isActive
+      ? "bg-white/10 text-white"
+      : "text-zinc-400 hover:bg-white/5 hover:text-white",
   );
 
 const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   clsx(
-    "rounded-2xl px-4 py-3 text-base font-bold transition hover:bg-white/5 hover:text-white",
-    isActive ? "bg-white/10 text-white" : "text-zinc-300",
+    "rounded-2xl px-4 py-3 text-base font-bold leading-6 transition sm:text-lg",
+    isActive
+      ? "bg-violet-600 text-white"
+      : "text-zinc-300 hover:bg-white/5 hover:text-white",
   );
