@@ -129,7 +129,7 @@ export const Footer = () => {
           {settings?.contactPhone && (
             <a
               href={`tel:${settings.contactPhone}`}
-              className="flex items-start gap-3 break-all text-sm transition hover:text-white mt-3"
+              className="flex items-start  gap-3 break-all text-sm transition hover:text-white mt-3"
             >
               <Phone size={22} className="mt-1 shrink-0 text-violet-300" />
               {settings.contactPhone}
