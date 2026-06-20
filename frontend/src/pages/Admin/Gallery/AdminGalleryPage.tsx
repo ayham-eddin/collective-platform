@@ -69,6 +69,7 @@ export const AdminGalleryPage = () => {
   useEffect(() => {
     const run = async () => {
       setIsLoading(true);
+      setErrorMessage("");
 
       try {
         await loadImages(page);
@@ -316,17 +317,17 @@ export const AdminGalleryPage = () => {
 
   return (
     <section>
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.35em] text-violet-300">
             Gallery
           </p>
 
-          <h1 className="mt-4 text-4xl font-black tracking-tight">
+          <h1 className="mt-4 break-words text-4xl font-black tracking-tight">
             Manage Gallery
           </h1>
 
-          <p className="mt-4 text-zinc-400">
+          <p className="mt-4 max-w-3xl text-zinc-400">
             Upload, edit, delete, filter and reorder gallery images from here.
           </p>
         </div>
@@ -335,7 +336,7 @@ export const AdminGalleryPage = () => {
           <button
             type="button"
             onClick={resetForm}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:border-violet-400 hover:text-violet-300"
+            className="btn btn-secondary-dark"
           >
             <ImagePlus size={18} />
             New Image
@@ -343,8 +344,8 @@ export const AdminGalleryPage = () => {
         )}
       </div>
 
-      <p className="mt-6 rounded-2xl border border-violet-400/20 bg-violet-500/10 p-4 text-sm font-bold text-violet-200">
-        Hint: max image size is 10MB. Recommended width: 1600–2000px.
+      <p className="mt-6 rounded-2xl border border-violet-400/20 bg-violet-500/10 p-4 text-sm font-bold leading-6 text-violet-200">
+        Hint: max image size is 10MB. Recommended upload size: 1600–2000px wide.
       </p>
 
       {message && (
@@ -373,8 +374,8 @@ export const AdminGalleryPage = () => {
         />
       )}
 
-      <section className="mt-12">
-        <div className="flex flex-wrap items-end justify-between gap-5">
+      <section className="mt-12 rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
             <h2 className="text-2xl font-black">Gallery Images</h2>
             <p className="mt-2 text-sm text-zinc-500">
@@ -382,7 +383,7 @@ export const AdminGalleryPage = () => {
             </p>
           </div>
 
-          <form onSubmit={handleApplySearch} className="flex gap-3">
+          <form onSubmit={handleApplySearch} className="grid gap-3 sm:flex">
             <input
               type="search"
               value={searchInput}
@@ -391,10 +392,7 @@ export const AdminGalleryPage = () => {
               className={inputClassName}
             />
 
-            <button
-              type="submit"
-              className="rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white transition hover:bg-violet-500"
-            >
+            <button type="submit" className="btn btn-primary">
               Search
             </button>
           </form>
@@ -435,26 +433,26 @@ export const AdminGalleryPage = () => {
           </label>
         </div>
 
-        {isLoading && <p className="mt-6 text-zinc-400">Loading images...</p>}
+        {isLoading && <p className="mt-8 text-zinc-400">Loading images...</p>}
 
         {!isLoading && images.length === 0 && (
-          <p className="mt-6 text-zinc-400">No gallery images found.</p>
+          <p className="mt-8 text-zinc-400">No gallery images found.</p>
         )}
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {images.map((image, index) => (
             <article
               key={image._id}
-              className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]"
+              className="overflow-hidden rounded-3xl border border-white/10 bg-black/30"
             >
               <img
                 src={image.image.url}
                 alt={image.title.de}
-                className="h-64 w-full object-cover"
+                className="h-56 w-full object-cover sm:h-64"
               />
 
               <div className="p-5">
-                <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                   <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black uppercase text-zinc-300">
                     {image.status}
                   </span>
@@ -464,10 +462,12 @@ export const AdminGalleryPage = () => {
                   </span>
                 </div>
 
-                <h3 className="text-xl font-black">{image.title.de}</h3>
+                <h3 className="break-words text-xl font-black">
+                  {image.title.de}
+                </h3>
 
                 {image.description?.de && (
-                  <p className="mt-2 line-clamp-2 text-sm text-zinc-400">
+                  <p className="mt-2 line-clamp-2 break-words text-sm leading-6 text-zinc-400">
                     {image.description.de}
                   </p>
                 )}
@@ -477,7 +477,7 @@ export const AdminGalleryPage = () => {
                     type="button"
                     onClick={() => void handleMoveImage(image._id, "up")}
                     disabled={!canUpdateGallery || index === 0}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-4 py-3 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="btn btn-secondary-dark btn-sm"
                   >
                     <ArrowUp size={16} />
                     Up
@@ -487,7 +487,7 @@ export const AdminGalleryPage = () => {
                     type="button"
                     onClick={() => void handleMoveImage(image._id, "down")}
                     disabled={!canUpdateGallery || index === images.length - 1}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-4 py-3 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="btn btn-secondary-dark btn-sm"
                   >
                     <ArrowDown size={16} />
                     Down
@@ -497,7 +497,7 @@ export const AdminGalleryPage = () => {
                     type="button"
                     onClick={() => handleEditImage(image)}
                     disabled={!canUpdateGallery}
-                    className="rounded-full border border-white/10 px-4 py-3 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="btn btn-secondary-dark btn-sm"
                   >
                     Edit
                   </button>
@@ -506,7 +506,7 @@ export const AdminGalleryPage = () => {
                     type="button"
                     onClick={() => void handleDeleteImage(image._id)}
                     disabled={!canDeleteGallery}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-4 py-3 text-sm font-bold text-zinc-300 transition hover:border-red-400 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="btn btn-danger btn-sm"
                   >
                     <Trash2 size={16} />
                     Delete
@@ -518,17 +518,17 @@ export const AdminGalleryPage = () => {
         </div>
 
         {totalPages > 1 && (
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
             <button
               type="button"
               disabled={page === 1}
               onClick={() => setPage((currentPage) => currentPage - 1)}
-              className="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn btn-secondary-dark btn-sm"
             >
               Previous
             </button>
 
-            <span className="text-sm font-bold text-zinc-400">
+            <span className="inline-flex min-h-10 items-center justify-center rounded-full bg-white/5 px-5 py-2 text-sm font-bold text-zinc-400">
               Page {page} of {totalPages}
             </span>
 
@@ -536,7 +536,7 @@ export const AdminGalleryPage = () => {
               type="button"
               disabled={page === totalPages}
               onClick={() => setPage((currentPage) => currentPage + 1)}
-              className="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn btn-secondary-dark btn-sm"
             >
               Next
             </button>
@@ -548,4 +548,4 @@ export const AdminGalleryPage = () => {
 };
 
 const inputClassName =
-  "w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-white outline-none transition placeholder:text-zinc-600 focus:border-violet-400";
+  "w-full min-h-12 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-violet-400";

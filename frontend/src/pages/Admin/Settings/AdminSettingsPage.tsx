@@ -94,9 +94,7 @@ export const AdminSettingsPage = () => {
   const handleLogoUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const imageFile = event.target.files?.[0];
 
-    if (!imageFile) {
-      return;
-    }
+    if (!imageFile) return;
 
     setIsUploadingLogo(true);
     setMessage("");
@@ -109,15 +107,14 @@ export const AdminSettingsPage = () => {
       setErrorMessage("Could not upload logo.");
     } finally {
       setIsUploadingLogo(false);
+      event.target.value = "";
     }
   };
 
   const handleFaviconUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const imageFile = event.target.files?.[0];
 
-    if (!imageFile) {
-      return;
-    }
+    if (!imageFile) return;
 
     setIsUploadingFavicon(true);
     setMessage("");
@@ -130,6 +127,7 @@ export const AdminSettingsPage = () => {
       setErrorMessage("Could not upload favicon.");
     } finally {
       setIsUploadingFavicon(false);
+      event.target.value = "";
     }
   };
 
@@ -176,13 +174,15 @@ export const AdminSettingsPage = () => {
 
   return (
     <section>
-      <p className="text-sm font-black uppercase tracking-[0.35em] text-violet-300">
+      <p className="text-xs font-black uppercase tracking-[0.3em] text-violet-300 sm:text-sm">
         Settings
       </p>
 
-      <h1 className="mt-4 text-4xl font-black tracking-tight">Site Settings</h1>
+      <h1 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">
+        Site Settings
+      </h1>
 
-      <p className="mt-4 text-zinc-400">
+      <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
         Manage logo, favicon, contact information and social media links.
       </p>
 
@@ -198,58 +198,30 @@ export const AdminSettingsPage = () => {
         </p>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-10 grid gap-8">
+      <form onSubmit={handleSubmit} className="mt-10 grid gap-6 sm:gap-8">
         <FormCard title="Branding">
           <div className="grid gap-6 lg:grid-cols-2">
-            <div>
-              <p className="mb-4 text-sm font-bold text-zinc-300">Logo</p>
+            <ImageUploadBox
+              title="Logo"
+              helpText="Recommended: transparent PNG/SVG-style image, around 512×512px or wider."
+              image={logo}
+              imageAlt="Site logo preview"
+              isUploading={isUploadingLogo}
+              uploadLabel="Upload Logo"
+              onUpload={handleLogoUpload}
+              previewClassName="h-24 w-24"
+            />
 
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:border-violet-400 hover:text-violet-300">
-                <Upload size={18} />
-                {isUploadingLogo ? "Uploading..." : "Upload Logo"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(event) => void handleLogoUpload(event)}
-                  className="hidden"
-                />
-              </label>
-
-              {logo && (
-                <div className="mt-5 inline-flex rounded-2xl bg-white p-4">
-                  <img
-                    src={logo.url}
-                    alt="Site logo preview"
-                    className="h-24 w-24 object-contain"
-                  />
-                </div>
-              )}
-            </div>
-
-            <div>
-              <p className="mb-4 text-sm font-bold text-zinc-300">Favicon</p>
-
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:border-violet-400 hover:text-violet-300">
-                <Upload size={18} />
-                {isUploadingFavicon ? "Uploading..." : "Upload Favicon"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(event) => void handleFaviconUpload(event)}
-                  className="hidden"
-                />
-              </label>
-
-              {favicon && (
-                <div className="mt-5 inline-flex rounded-2xl bg-white p-4">
-                  <img
-                    src={favicon.url}
-                    alt="Favicon preview"
-                    className="h-16 w-16 object-contain"
-                  />
-                </div>
-              )}
-            </div>
+            <ImageUploadBox
+              title="Favicon"
+              helpText="Recommended: square image, 64×64px or 128×128px."
+              image={favicon}
+              imageAlt="Favicon preview"
+              isUploading={isUploadingFavicon}
+              uploadLabel="Upload Favicon"
+              onUpload={handleFaviconUpload}
+              previewClassName="h-16 w-16"
+            />
           </div>
         </FormCard>
 
@@ -339,7 +311,7 @@ export const AdminSettingsPage = () => {
         <button
           type="submit"
           disabled={isSaving || isUploadingLogo || isUploadingFavicon}
-          className="inline-flex w-fit items-center gap-2 rounded-full bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn btn-primary w-fit disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Save size={18} />
           {isSaving ? "Saving..." : "Save Settings"}
@@ -349,35 +321,84 @@ export const AdminSettingsPage = () => {
   );
 };
 
-interface FormCardProps {
+interface ImageUploadBoxProps {
   title: string;
-  children: React.ReactNode;
+  helpText: string;
+  image?: ImageFile;
+  imageAlt: string;
+  isUploading: boolean;
+  uploadLabel: string;
+  onUpload: (event: ChangeEvent<HTMLInputElement>) => void;
+  previewClassName: string;
 }
 
-const FormCard = ({ title, children }: FormCardProps) => {
+const ImageUploadBox = ({
+  title,
+  helpText,
+  image,
+  imageAlt,
+  isUploading,
+  uploadLabel,
+  onUpload,
+  previewClassName,
+}: ImageUploadBoxProps) => {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-      <h2 className="text-2xl font-black">{title}</h2>
+    <div>
+      <p className="mb-2 text-sm font-bold text-zinc-300">{title}</p>
+      <p className="mb-4 text-sm leading-6 text-zinc-500">{helpText}</p>
+
+      <label className="btn btn-secondary-dark w-fit cursor-pointer">
+        <Upload size={18} />
+        {isUploading ? "Uploading..." : uploadLabel}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(event) => void onUpload(event)}
+          className="hidden"
+        />
+      </label>
+
+      {image && (
+        <div className="mt-5 inline-flex rounded-2xl bg-white p-4">
+          <img
+            src={image.url}
+            alt={imageAlt}
+            className={`${previewClassName} object-contain`}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const FormCard = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => {
+  return (
+    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 sm:rounded-3xl sm:p-6">
+      <h2 className="break-words text-xl font-black sm:text-2xl">{title}</h2>
       <div className="mt-6 grid gap-6">{children}</div>
     </div>
   );
 };
 
-interface InputGridProps {
-  children: React.ReactNode;
-}
-
-const InputGrid = ({ children }: InputGridProps) => {
+const InputGrid = ({ children }: { children: React.ReactNode }) => {
   return <div className="grid gap-5 lg:grid-cols-3">{children}</div>;
 };
 
-interface TextInputProps {
+const TextInput = ({
+  label,
+  value,
+  onChange,
+}: {
   label: string;
   value: string;
   onChange: (value: string) => void;
-}
-
-const TextInput = ({ label, value, onChange }: TextInputProps) => {
+}) => {
   return (
     <label className="grid gap-2">
       <span className="text-sm font-bold text-zinc-300">{label}</span>
@@ -391,13 +412,15 @@ const TextInput = ({ label, value, onChange }: TextInputProps) => {
   );
 };
 
-interface TextAreaInputProps {
+const TextAreaInput = ({
+  label,
+  value,
+  onChange,
+}: {
   label: string;
   value: string;
   onChange: (value: string) => void;
-}
-
-const TextAreaInput = ({ label, value, onChange }: TextAreaInputProps) => {
+}) => {
   return (
     <label className="grid gap-2">
       <span className="text-sm font-bold text-zinc-300">{label}</span>

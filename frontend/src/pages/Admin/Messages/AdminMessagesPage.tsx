@@ -12,18 +12,15 @@ import type {
 
 export const AdminMessagesPage = () => {
   const [messages, setMessages] = useState<ContactMessageItem[]>([]);
-
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-
   const [statusFilter, setStatusFilter] = useState<
     ContactMessageStatus | "all"
   >("all");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-
   const [isLoading, setIsLoading] = useState(true);
   const [messageText, setMessageText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -88,9 +85,7 @@ export const AdminMessagesPage = () => {
       "Are you sure you want to delete this message?",
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     setMessageText("");
     setErrorMessage("");
@@ -122,15 +117,15 @@ export const AdminMessagesPage = () => {
 
   return (
     <section>
-      <p className="text-sm font-black uppercase tracking-[0.35em] text-violet-300">
+      <p className="text-xs font-black uppercase tracking-[0.3em] text-violet-300 sm:text-sm">
         Messages
       </p>
 
-      <h1 className="mt-4 text-4xl font-black tracking-tight">
+      <h1 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">
         Contact Messages
       </h1>
 
-      <p className="mt-4 text-zinc-400">
+      <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
         Read, filter, archive and delete contact form messages from here.
       </p>
 
@@ -146,16 +141,16 @@ export const AdminMessagesPage = () => {
         </p>
       )}
 
-      <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-        <div className="flex flex-wrap items-end justify-between gap-5">
+      <div className="mt-10 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 sm:rounded-3xl sm:p-6">
+        <div className="grid gap-5 xl:grid-cols-[1fr_auto] xl:items-end">
           <div>
-            <h2 className="text-2xl font-black">Messages List</h2>
+            <h2 className="text-xl font-black sm:text-2xl">Messages List</h2>
             <p className="mt-2 text-sm text-zinc-500">
               Total results: {totalItems}
             </p>
           </div>
 
-          <form onSubmit={handleApplySearch} className="flex gap-3">
+          <form onSubmit={handleApplySearch} className="grid gap-3 sm:flex">
             <input
               type="search"
               value={searchInput}
@@ -164,10 +159,7 @@ export const AdminMessagesPage = () => {
               className={inputClassName}
             />
 
-            <button
-              type="submit"
-              className="rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white transition hover:bg-violet-500"
-            >
+            <button type="submit" className="btn btn-primary">
               Search
             </button>
           </form>
@@ -216,14 +208,14 @@ export const AdminMessagesPage = () => {
           <p className="mt-10 text-zinc-400">No contact messages found.</p>
         )}
 
-        <div className="mt-10 grid gap-6">
+        <div className="mt-10 grid gap-5 sm:gap-6">
           {messages.map((message) => (
             <article
               key={message._id}
-              className="rounded-3xl border border-white/10 bg-black/30 p-6"
+              className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5 sm:rounded-3xl sm:p-6"
             >
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
+              <div className="grid gap-5 xl:grid-cols-[1fr_auto] xl:items-start">
+                <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className={getStatusClassName(message.status)}>
                       {message.status}
@@ -234,21 +226,21 @@ export const AdminMessagesPage = () => {
                     </span>
                   </div>
 
-                  <h2 className="mt-4 text-2xl font-black">
+                  <h2 className="mt-4 break-words text-xl font-black sm:text-2xl">
                     {message.subject}
                   </h2>
 
-                  <p className="mt-2 text-zinc-400">
+                  <p className="mt-2 break-words text-sm leading-6 text-zinc-400 sm:text-base">
                     From: {message.fullName} · {message.email}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="grid gap-2 sm:flex sm:flex-wrap xl:justify-end">
                   <button
                     type="button"
                     onClick={() => void handleUpdateStatus(message._id, "read")}
                     disabled={message.status === "read"}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="btn btn-secondary-dark btn-sm disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <MailOpen size={16} />
                     Mark read
@@ -260,7 +252,7 @@ export const AdminMessagesPage = () => {
                       void handleUpdateStatus(message._id, "archived")
                     }
                     disabled={message.status === "archived"}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-zinc-300 transition hover:border-yellow-400 hover:text-yellow-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="btn btn-secondary-dark btn-sm disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Archive size={16} />
                     Archive
@@ -269,7 +261,7 @@ export const AdminMessagesPage = () => {
                   <button
                     type="button"
                     onClick={() => void handleDeleteMessage(message._id)}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-zinc-300 transition hover:border-red-400 hover:text-red-300"
+                    className="btn btn-danger btn-sm"
                   >
                     <Trash2 size={16} />
                     Delete
@@ -277,7 +269,7 @@ export const AdminMessagesPage = () => {
                 </div>
               </div>
 
-              <p className="mt-6 whitespace-pre-line rounded-2xl bg-black/30 p-5 leading-8 text-zinc-300">
+              <p className="mt-6 whitespace-pre-line break-words rounded-2xl bg-black/30 p-4 text-sm leading-7 text-zinc-300 sm:p-5 sm:text-base sm:leading-8">
                 {message.message}
               </p>
             </article>
@@ -285,17 +277,17 @@ export const AdminMessagesPage = () => {
         </div>
 
         {totalPages > 1 && (
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
             <button
               type="button"
               disabled={page === 1}
               onClick={() => setPage((currentPage) => currentPage - 1)}
-              className="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn btn-secondary-dark btn-sm disabled:cursor-not-allowed disabled:opacity-40"
             >
               Previous
             </button>
 
-            <span className="text-sm font-bold text-zinc-400">
+            <span className="inline-flex min-h-10 items-center justify-center rounded-full bg-white/5 px-5 py-2 text-sm font-black text-zinc-400">
               Page {page} of {totalPages}
             </span>
 
@@ -303,7 +295,7 @@ export const AdminMessagesPage = () => {
               type="button"
               disabled={page === totalPages}
               onClick={() => setPage((currentPage) => currentPage + 1)}
-              className="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn btn-secondary-dark btn-sm disabled:cursor-not-allowed disabled:opacity-40"
             >
               Next
             </button>

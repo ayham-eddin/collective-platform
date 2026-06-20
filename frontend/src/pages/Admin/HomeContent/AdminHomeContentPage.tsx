@@ -1,3 +1,4 @@
+// frontend/src/pages/Admin/HomeContent/AdminHomeContentPage.tsx
 import { Save, Upload } from "lucide-react";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {
@@ -150,9 +151,7 @@ export const AdminHomeContentPage = () => {
   ) => {
     const imageFile = event.target.files?.[0];
 
-    if (!imageFile) {
-      return;
-    }
+    if (!imageFile) return;
 
     setIsUploading(true);
     setErrorMessage("");
@@ -165,6 +164,7 @@ export const AdminHomeContentPage = () => {
       setErrorMessage("Could not upload hero image.");
     } finally {
       setIsUploading(false);
+      event.target.value = "";
     }
   };
 
@@ -248,15 +248,15 @@ export const AdminHomeContentPage = () => {
 
   return (
     <section>
-      <p className="text-sm font-black uppercase tracking-[0.35em] text-violet-300">
+      <p className="text-xs font-black uppercase tracking-[0.3em] text-violet-300 sm:text-sm">
         Home Content
       </p>
 
-      <h1 className="mt-4 text-4xl font-black tracking-tight">
+      <h1 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">
         Manage Homepage
       </h1>
 
-      <p className="mt-4 text-zinc-400">
+      <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
         Edit homepage hero section and about preview content.
       </p>
 
@@ -272,13 +272,13 @@ export const AdminHomeContentPage = () => {
         </p>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-10 grid gap-8">
+      <form onSubmit={handleSubmit} className="mt-10 grid gap-6 sm:gap-8">
         <FormCard title="Hero Image">
-          <p className="mb-5 text-sm text-zinc-500">
-            Max image size: 10MB. Recommended width: 1600–2000px.
-          </p>
+          <HelpText>
+            Recommended size: 1920×1080px or wider. Use JPG/WebP, max 10MB.
+          </HelpText>
 
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:border-violet-400 hover:text-violet-300">
+          <label className="btn btn-secondary-dark w-fit cursor-pointer">
             <Upload size={18} />
             {isUploading ? "Uploading..." : "Upload Hero Image"}
             <input
@@ -293,7 +293,7 @@ export const AdminHomeContentPage = () => {
             <img
               src={heroImage.url}
               alt="Homepage hero preview"
-              className="mt-6 h-72 w-full rounded-3xl object-cover"
+              className="mt-6 h-52 w-full rounded-[1.5rem] object-cover sm:h-72 sm:rounded-3xl"
             />
           )}
         </FormCard>
@@ -487,7 +487,7 @@ export const AdminHomeContentPage = () => {
         <button
           type="submit"
           disabled={isSaving || isUploading}
-          className="inline-flex w-fit items-center gap-2 rounded-full bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn btn-primary w-fit disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Save size={18} />
           {isSaving ? "Saving..." : "Save Homepage"}
@@ -504,28 +504,30 @@ interface FormCardProps {
 
 const FormCard = ({ title, children }: FormCardProps) => {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-      <h2 className="text-2xl font-black">{title}</h2>
+    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 sm:rounded-3xl sm:p-6">
+      <h2 className="break-words text-xl font-black sm:text-2xl">{title}</h2>
       <div className="mt-6 grid gap-6">{children}</div>
     </div>
   );
 };
 
-interface InputGridProps {
-  children: React.ReactNode;
-}
+const HelpText = ({ children }: { children: React.ReactNode }) => {
+  return <p className="text-sm leading-6 text-zinc-500">{children}</p>;
+};
 
-const InputGrid = ({ children }: InputGridProps) => {
+const InputGrid = ({ children }: { children: React.ReactNode }) => {
   return <div className="grid gap-5 lg:grid-cols-3">{children}</div>;
 };
 
-interface TextInputProps {
+const TextInput = ({
+  label,
+  value,
+  onChange,
+}: {
   label: string;
   value: string;
   onChange: (value: string) => void;
-}
-
-const TextInput = ({ label, value, onChange }: TextInputProps) => {
+}) => {
   return (
     <label className="grid gap-2">
       <span className="text-sm font-bold text-zinc-300">{label}</span>
@@ -539,13 +541,15 @@ const TextInput = ({ label, value, onChange }: TextInputProps) => {
   );
 };
 
-interface TextAreaInputProps {
+const TextAreaInput = ({
+  label,
+  value,
+  onChange,
+}: {
   label: string;
   value: string;
   onChange: (value: string) => void;
-}
-
-const TextAreaInput = ({ label, value, onChange }: TextAreaInputProps) => {
+}) => {
   return (
     <label className="grid gap-2">
       <span className="text-sm font-bold text-zinc-300">{label}</span>

@@ -80,6 +80,7 @@ export const AdminVideosPage = () => {
   useEffect(() => {
     const run = async () => {
       setIsLoading(true);
+      setErrorMessage("");
 
       try {
         await loadVideos(page);
@@ -125,6 +126,7 @@ export const AdminVideosPage = () => {
     }
 
     setIsUploadingThumbnail(true);
+    setMessageText("");
     setErrorMessage("");
 
     try {
@@ -156,6 +158,7 @@ export const AdminVideosPage = () => {
     }
 
     setIsUploadingVideo(true);
+    setMessageText("");
     setErrorMessage("");
 
     try {
@@ -180,27 +183,25 @@ export const AdminVideosPage = () => {
     state: VideoFormState,
     selectedThumbnail: MediaFile | null,
     selectedVideoFile: MediaFile | null,
-  ): VideoPayload => {
-    return {
-      title: {
-        de: state.titleDe,
-        en: state.titleEn,
-        ar: state.titleAr,
-      },
-      description: {
-        de: state.descriptionDe,
-        en: state.descriptionEn,
-        ar: state.descriptionAr,
-      },
-      type: state.type,
-      youtubeUrl: state.type === "youtube" ? state.youtubeUrl : undefined,
-      videoFile:
-        state.type === "uploaded" ? selectedVideoFile || undefined : undefined,
-      thumbnail: selectedThumbnail || undefined,
-      isFeatured: state.isFeatured,
-      status: state.status,
-    };
-  };
+  ): VideoPayload => ({
+    title: {
+      de: state.titleDe,
+      en: state.titleEn,
+      ar: state.titleAr,
+    },
+    description: {
+      de: state.descriptionDe,
+      en: state.descriptionEn,
+      ar: state.descriptionAr,
+    },
+    type: state.type,
+    youtubeUrl: state.type === "youtube" ? state.youtubeUrl : undefined,
+    videoFile:
+      state.type === "uploaded" ? selectedVideoFile || undefined : undefined,
+    thumbnail: selectedThumbnail || undefined,
+    isFeatured: state.isFeatured,
+    status: state.status,
+  });
 
   const handleCreateVideo = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -225,9 +226,9 @@ export const AdminVideosPage = () => {
       setFormState(initialVideoFormState);
       setThumbnail(null);
       setVideoFile(null);
-      setMessageText("Video created successfully.");
       setPage(1);
       await loadVideos(1);
+      setMessageText("Video created successfully.");
     } catch {
       setErrorMessage("Could not create video.");
     } finally {
@@ -236,6 +237,11 @@ export const AdminVideosPage = () => {
   };
 
   const startEditing = (video: VideoItem) => {
+    if (!canUpdateVideo) {
+      setErrorMessage("You do not have permission to update videos.");
+      return;
+    }
+
     setEditingVideoId(video._id);
     setEditFormState({
       titleDe: video.title.de,
@@ -315,10 +321,7 @@ export const AdminVideosPage = () => {
 
     try {
       await deleteAdminVideo(videoId);
-      setVideos((currentVideos) =>
-        currentVideos.filter((video) => video._id !== videoId),
-      );
-      setTotalItems((currentTotal) => Math.max(currentTotal - 1, 0));
+      await loadVideos(page);
       setMessageText("Video deleted successfully.");
     } catch {
       setErrorMessage("Could not delete video.");
@@ -329,21 +332,6 @@ export const AdminVideosPage = () => {
     event.preventDefault();
     setPage(1);
     setSearch(searchInput);
-  };
-
-  const handleStatusFilterChange = (value: VideoStatus | "all") => {
-    setStatusFilter(value);
-    setPage(1);
-  };
-
-  const handleTypeFilterChange = (value: VideoType | "all") => {
-    setTypeFilter(value);
-    setPage(1);
-  };
-
-  const handleLimitChange = (value: number) => {
-    setLimit(value);
-    setPage(1);
   };
 
   return (
@@ -359,22 +347,27 @@ export const AdminVideosPage = () => {
         publishing status.
       </p>
 
+      <p className="mt-6 rounded-2xl border border-violet-400/20 bg-violet-500/10 p-4 text-sm font-bold text-violet-200">
+        Hint: recommended thumbnail size is 1280×720px. Uploaded videos should
+        be optimized before upload.
+      </p>
+
       {messageText && (
-        <p className="mt-8 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-bold text-emerald-300">
+        <p className="mt-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-bold text-emerald-300">
           {messageText}
         </p>
       )}
 
       {errorMessage && (
-        <p className="mt-8 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-bold text-red-300">
+        <p className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-bold text-red-300">
           {errorMessage}
         </p>
       )}
 
-      {canCreateVideo ? (
+      {canCreateVideo && (
         <form
           onSubmit={handleCreateVideo}
-          className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6"
+          className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:p-6"
         >
           <div className="flex items-center gap-3">
             <Plus className="text-violet-300" size={24} />
@@ -399,19 +392,15 @@ export const AdminVideosPage = () => {
           <button
             type="submit"
             disabled={isSaving || isUploadingThumbnail || isUploadingVideo}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-violet-600 px-6 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn btn-primary mt-6 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Save size={18} />
             {isSaving ? "Creating..." : "Create Video"}
           </button>
         </form>
-      ) : (
-        <p className="mt-10 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm font-bold text-yellow-300">
-          You do not have permission to create videos.
-        </p>
       )}
 
-      <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+      <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
             <h2 className="text-2xl font-black">Videos</h2>
@@ -420,7 +409,10 @@ export const AdminVideosPage = () => {
             </p>
           </div>
 
-          <form onSubmit={handleApplySearch} className="flex gap-3">
+          <form
+            onSubmit={handleApplySearch}
+            className="grid w-full gap-3 sm:w-auto sm:grid-cols-[minmax(220px,1fr)_auto]"
+          >
             <input
               type="search"
               value={searchInput}
@@ -429,62 +421,55 @@ export const AdminVideosPage = () => {
               className={inputClassName}
             />
 
-            <button
-              type="submit"
-              className="rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white transition hover:bg-violet-500"
-            >
+            <button type="submit" className="btn btn-primary">
               Search
             </button>
           </form>
         </div>
 
         <div className="mt-6 grid gap-5 md:grid-cols-3">
-          <label className="grid gap-2">
-            <span className="text-sm font-bold text-zinc-300">Status</span>
-            <select
-              value={statusFilter}
-              onChange={(event) =>
-                handleStatusFilterChange(
-                  event.target.value as VideoStatus | "all",
-                )
-              }
-              className={inputClassName}
-            >
-              <option value="all">All statuses</option>
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="archived">Archived</option>
-            </select>
-          </label>
+          <SelectInput
+            label="Status"
+            value={statusFilter}
+            onChange={(value) => {
+              setStatusFilter(value as VideoStatus | "all");
+              setPage(1);
+            }}
+            options={[
+              ["all", "All statuses"],
+              ["draft", "Draft"],
+              ["published", "Published"],
+              ["archived", "Archived"],
+            ]}
+          />
 
-          <label className="grid gap-2">
-            <span className="text-sm font-bold text-zinc-300">Type</span>
-            <select
-              value={typeFilter}
-              onChange={(event) =>
-                handleTypeFilterChange(event.target.value as VideoType | "all")
-              }
-              className={inputClassName}
-            >
-              <option value="all">All types</option>
-              <option value="youtube">YouTube</option>
-              <option value="uploaded">Uploaded</option>
-            </select>
-          </label>
-          <label className="grid gap-2">
-            <span className="text-sm font-bold text-zinc-300">Per page</span>
-            <select
-              value={limit}
-              onChange={(event) =>
-                handleLimitChange(Number(event.target.value))
-              }
-              className={inputClassName}
-            >
-              <option value={6}>6 videos</option>
-              <option value={10}>10 videos</option>
-              <option value={20}>20 videos</option>
-            </select>
-          </label>
+          <SelectInput
+            label="Type"
+            value={typeFilter}
+            onChange={(value) => {
+              setTypeFilter(value as VideoType | "all");
+              setPage(1);
+            }}
+            options={[
+              ["all", "All types"],
+              ["youtube", "YouTube"],
+              ["uploaded", "Uploaded"],
+            ]}
+          />
+
+          <SelectInput
+            label="Per page"
+            value={String(limit)}
+            onChange={(value) => {
+              setLimit(Number(value));
+              setPage(1);
+            }}
+            options={[
+              ["6", "6 videos"],
+              ["10", "10 videos"],
+              ["20", "20 videos"],
+            ]}
+          />
         </div>
 
         {isLoading && <p className="mt-8 text-zinc-400">Loading videos...</p>}
@@ -501,7 +486,7 @@ export const AdminVideosPage = () => {
               return (
                 <article
                   key={video._id}
-                  className="rounded-3xl border border-white/10 bg-black/30 p-6"
+                  className="rounded-3xl border border-white/10 bg-black/30 p-5 sm:p-6"
                 >
                   {isEditing ? (
                     <>
@@ -529,7 +514,7 @@ export const AdminVideosPage = () => {
                           disabled={
                             isSaving || isUploadingThumbnail || isUploadingVideo
                           }
-                          className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-black text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="btn btn-primary disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           <Save size={17} />
                           {isSaving ? "Saving..." : "Save Changes"}
@@ -538,7 +523,7 @@ export const AdminVideosPage = () => {
                         <button
                           type="button"
                           onClick={cancelEditing}
-                          className="inline-flex items-center gap-2 rounded-full border border-white/10 px-6 py-3 text-sm font-bold text-zinc-300 transition hover:border-zinc-400 hover:text-white"
+                          className="btn btn-secondary-dark"
                         >
                           <X size={17} />
                           Cancel
@@ -552,18 +537,18 @@ export const AdminVideosPage = () => {
                           <img
                             src={video.thumbnail.url}
                             alt={video.title.de}
-                            className="h-40 w-full object-cover"
+                            className="h-44 w-full object-cover lg:h-40"
                           />
                         ) : (
-                          <div className="grid h-40 place-items-center text-sm text-zinc-500">
+                          <div className="grid h-44 place-items-center text-sm text-zinc-500 lg:h-40">
                             No thumbnail
                           </div>
                         )}
                       </div>
 
-                      <div>
+                      <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-3">
-                          <h3 className="text-2xl font-black">
+                          <h3 className="break-words text-2xl font-black">
                             {video.title.de}
                           </h3>
 
@@ -583,7 +568,7 @@ export const AdminVideosPage = () => {
                         </div>
 
                         {video.description?.de && (
-                          <p className="mt-4 max-w-3xl leading-7 text-zinc-400">
+                          <p className="mt-4 max-w-3xl break-words leading-7 text-zinc-400">
                             {video.description.de}
                           </p>
                         )}
@@ -594,7 +579,7 @@ export const AdminVideosPage = () => {
                               href={video.youtubeUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex text-sm font-bold text-violet-300 transition hover:text-violet-200"
+                              className="text-sm font-bold text-violet-300 transition hover:text-violet-200"
                             >
                               Open YouTube video
                             </a>
@@ -605,7 +590,7 @@ export const AdminVideosPage = () => {
                               href={video.videoFile.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex text-sm font-bold text-violet-300 transition hover:text-violet-200"
+                              className="text-sm font-bold text-violet-300 transition hover:text-violet-200"
                             >
                               Open uploaded video
                             </a>
@@ -614,25 +599,15 @@ export const AdminVideosPage = () => {
                       </div>
 
                       <div className="flex gap-2 lg:justify-end">
-                        {canUpdateVideo ? (
-                          <button
-                            type="button"
-                            onClick={() => startEditing(video)}
-                            className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-violet-400 hover:text-violet-300"
-                            aria-label="Edit video"
-                          >
-                            <Edit size={17} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled
-                            className="grid h-10 w-10 cursor-not-allowed place-items-center rounded-full border border-white/10 text-zinc-600 opacity-50"
-                            aria-label="Edit disabled"
-                          >
-                            <Edit size={17} />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => startEditing(video)}
+                          disabled={!canUpdateVideo}
+                          className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:text-zinc-600 disabled:opacity-50"
+                          aria-label="Edit video"
+                        >
+                          <Edit size={17} />
+                        </button>
 
                         <button
                           type="button"
@@ -658,7 +633,7 @@ export const AdminVideosPage = () => {
               type="button"
               disabled={page === 1}
               onClick={() => setPage((currentPage) => currentPage - 1)}
-              className="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn btn-secondary-dark btn-sm disabled:cursor-not-allowed disabled:opacity-40"
             >
               Previous
             </button>
@@ -671,7 +646,7 @@ export const AdminVideosPage = () => {
               type="button"
               disabled={page === totalPages}
               onClick={() => setPage((currentPage) => currentPage + 1)}
-              className="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn btn-secondary-dark btn-sm disabled:cursor-not-allowed disabled:opacity-40"
             >
               Next
             </button>
@@ -679,6 +654,32 @@ export const AdminVideosPage = () => {
         )}
       </div>
     </section>
+  );
+};
+
+interface SelectInputProps {
+  label: string;
+  value: string;
+  options: string[][];
+  onChange: (value: string) => void;
+}
+
+const SelectInput = ({ label, value, options, onChange }: SelectInputProps) => {
+  return (
+    <label className="grid gap-2">
+      <span className="text-sm font-bold text-zinc-300">{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={inputClassName}
+      >
+        {options.map(([optionValue, optionLabel]) => (
+          <option key={optionValue} value={optionValue}>
+            {optionLabel}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 };
 

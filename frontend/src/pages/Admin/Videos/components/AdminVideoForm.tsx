@@ -106,7 +106,7 @@ export const AdminVideoForm = ({
           </select>
         </label>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-4">
+        <label className="flex min-h-[58px] items-center gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-4">
           <input
             type="checkbox"
             checked={formState.isFeatured}
@@ -131,22 +131,22 @@ export const AdminVideoForm = ({
       )}
 
       {formState.type === "uploaded" && (
-        <div>
+        <div className="rounded-3xl border border-white/10 bg-black/20 p-5">
           <p className="text-sm font-bold text-zinc-300">Video File</p>
 
-          <div className="mt-3 flex flex-wrap items-center gap-4">
+          <div className="mt-4 flex flex-wrap items-center gap-4">
             {videoFile && (
               <a
                 href={videoFile.url}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-violet-300 transition hover:border-violet-400"
+                className="btn btn-secondary-dark btn-sm"
               >
                 Open uploaded video
               </a>
             )}
 
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:border-violet-400 hover:text-violet-300">
+            <label className="btn btn-secondary-dark btn-sm cursor-pointer">
               <Upload size={17} />
               {isUploadingVideo ? "Uploading video..." : "Upload Video"}
               <input
@@ -162,7 +162,7 @@ export const AdminVideoForm = ({
               <button
                 type="button"
                 onClick={() => onVideoFileChange(null)}
-                className="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:border-red-400 hover:text-red-300"
+                className="btn btn-secondary-dark btn-sm hover:border-red-400 hover:text-red-300"
               >
                 Remove Video
               </button>
@@ -171,10 +171,10 @@ export const AdminVideoForm = ({
         </div>
       )}
 
-      <div>
+      <div className="rounded-3xl border border-white/10 bg-black/20 p-5">
         <p className="text-sm font-bold text-zinc-300">Thumbnail</p>
 
-        <div className="mt-3 flex flex-wrap items-center gap-4">
+        <div className="mt-4 flex flex-wrap items-center gap-4">
           {thumbnail && (
             <img
               src={thumbnail.url}
@@ -183,7 +183,7 @@ export const AdminVideoForm = ({
             />
           )}
 
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:border-violet-400 hover:text-violet-300">
+          <label className="btn btn-secondary-dark btn-sm cursor-pointer">
             <Upload size={17} />
             {isUploadingThumbnail ? "Uploading..." : "Upload Thumbnail"}
             <input
@@ -199,7 +199,7 @@ export const AdminVideoForm = ({
             <button
               type="button"
               onClick={() => onThumbnailChange(null)}
-              className="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:border-red-400 hover:text-red-300"
+              className="btn btn-secondary-dark btn-sm hover:border-red-400 hover:text-red-300"
             >
               Remove Thumbnail
             </button>

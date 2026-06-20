@@ -33,14 +33,18 @@ export const AdminGalleryForm = ({
   return (
     <form
       onSubmit={onSubmit}
-      className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6"
+      className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:p-6"
     >
       <h2 className="text-2xl font-black">
         {editingImageId ? "Edit Image" : "Create Image"}
       </h2>
 
+      <p className="mt-3 text-sm font-bold leading-6 text-zinc-500">
+        Recommended upload size: 1600–2000px wide. Max image size: 10MB.
+      </p>
+
       <div className="mt-6">
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:border-violet-400 hover:text-violet-300">
+        <label className="btn btn-secondary-dark cursor-pointer">
           <Upload size={18} />
           {isUploading ? "Uploading..." : "Upload Image"}
           <input
@@ -56,7 +60,7 @@ export const AdminGalleryForm = ({
           <img
             src={uploadedImage.url}
             alt="Gallery preview"
-            className="mt-6 h-72 w-full rounded-3xl object-cover"
+            className="mt-6 h-56 w-full rounded-3xl object-cover sm:h-72"
           />
         )}
       </div>
@@ -113,7 +117,7 @@ export const AdminGalleryForm = ({
           </select>
         </label>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-4">
+        <label className="flex min-h-12 items-center gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
           <input
             type="checkbox"
             checked={formState.isFeatured}
@@ -128,11 +132,11 @@ export const AdminGalleryForm = ({
         </label>
       </div>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
         <button
           type="submit"
           disabled={isSaving || isUploading}
-          className="inline-flex items-center gap-2 rounded-full bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn btn-primary"
         >
           <Save size={18} />
           {isSaving
@@ -146,7 +150,7 @@ export const AdminGalleryForm = ({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="rounded-full border border-white/10 px-7 py-4 text-sm font-bold text-zinc-300 transition hover:border-zinc-400 hover:text-white"
+            className="btn btn-secondary-dark"
           >
             Cancel
           </button>
@@ -197,4 +201,4 @@ const TextAreaInput = ({ label, value, onChange }: TextAreaInputProps) => {
 };
 
 const inputClassName =
-  "w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-white outline-none transition placeholder:text-zinc-600 focus:border-violet-400";
+  "w-full min-h-12 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-violet-400";

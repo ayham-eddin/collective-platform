@@ -112,6 +112,18 @@ select {
   font-size: 12px;
 }
 
+.btn-danger {
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.15);
+  color: #fecaca;
+}
+
+.btn-danger:hover {
+  border-color: #f87171;
+  background: #dc2626;
+  color: #ffffff;
+}
+
 .section-title {
   overflow-wrap: anywhere;
   font-size: clamp(2.25rem, 8vw, 3.75rem);

@@ -1,4 +1,3 @@
-import { Plus, Power, Save, ShieldCheck, Trash2, UserCog } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   createAdminRole,
@@ -15,7 +14,6 @@ import type { AdminItem, AdminRole } from "../../../types/admin.types";
 import {
   initialFormState,
   initialRoleFormState,
-  inputClassName,
   permissionModules,
 } from "./adminAdmins.constants";
 import type {
@@ -25,8 +23,10 @@ import type {
   PermissionModule,
   RoleFormState,
 } from "./adminAdmins.types";
-import { PermissionEditor } from "./components/PermissionEditor";
-import { TextInput } from "./components/TextInput";
+import { AdminCreateForm } from "./components/AdminCreateForm";
+import { AdminUsersTable } from "./components/AdminUsersTable";
+import { RoleCreateForm } from "./components/RoleCreateForm";
+import { RolesList } from "./components/RolesList";
 
 export const AdminAdminsPage = () => {
   const currentAdmin = getStoredAdmin();
@@ -245,7 +245,7 @@ export const AdminAdminsPage = () => {
     }
   };
 
-  const startEditing = (admin: AdminItem) => {
+  const startEditingAdmin = (admin: AdminItem) => {
     setEditingAdminId(admin._id);
     setEditFullName(admin.fullName);
     setEditRoleId(admin.role._id);
@@ -254,14 +254,14 @@ export const AdminAdminsPage = () => {
     setErrorMessage("");
   };
 
-  const cancelEditing = () => {
+  const cancelEditingAdmin = () => {
     setEditingAdminId(null);
     setEditFullName("");
     setEditRoleId("");
     setEditPassword("");
   };
 
-  const handleSaveEdit = async (adminId: string) => {
+  const handleSaveAdmin = async (adminId: string) => {
     setIsSaving(true);
     setMessageText("");
     setErrorMessage("");
@@ -279,7 +279,7 @@ export const AdminAdminsPage = () => {
         ),
       );
 
-      cancelEditing();
+      cancelEditingAdmin();
       setMessageText("Admin updated successfully.");
     } catch {
       setErrorMessage("Could not update admin.");
@@ -379,423 +379,56 @@ export const AdminAdminsPage = () => {
         </p>
       )}
 
-      <form
+      <RoleCreateForm
+        roleFormState={roleFormState}
+        isSaving={isSaving}
         onSubmit={handleCreateRole}
-        className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6"
-      >
-        <div className="flex items-center gap-3">
-          <ShieldCheck className="text-violet-300" size={24} />
-          <h2 className="text-2xl font-black">Create Role</h2>
-        </div>
+        onRoleFormChange={setRoleFormState}
+        onTogglePermission={togglePermissionAction}
+      />
 
-        <div className="mt-6">
-          <TextInput
-            label="Role Name"
-            value={roleFormState.name}
-            onChange={(value) =>
-              setRoleFormState((currentState) => ({
-                ...currentState,
-                name: value,
-              }))
-            }
-            required
-          />
-        </div>
+      <RolesList
+        roles={roles}
+        editingRoleId={editingRoleId}
+        editRoleName={editRoleName}
+        editPermissions={editPermissions}
+        isSaving={isSaving}
+        onStartEditingRole={startEditingRole}
+        onCancelEditingRole={cancelEditingRole}
+        onSaveRole={handleSaveRole}
+        onDeleteRole={handleDeleteRole}
+        onEditRoleNameChange={setEditRoleName}
+        onEditPermissionsChange={setEditPermissions}
+        onTogglePermission={togglePermissionAction}
+      />
 
-        <div className="mt-6">
-          <PermissionEditor
-            permissions={roleFormState.permissions}
-            onToggle={(moduleName, action) =>
-              setRoleFormState((currentState) => ({
-                ...currentState,
-                permissions: togglePermissionAction(
-                  currentState.permissions,
-                  moduleName,
-                  action,
-                ),
-              }))
-            }
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-violet-600 px-6 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <Plus size={18} />
-          {isSaving ? "Creating..." : "Create Role"}
-        </button>
-      </form>
-
-      <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-        <h2 className="text-2xl font-black">Roles & Permissions</h2>
-
-        <div className="mt-6 grid gap-5">
-          {roles.map((role) => {
-            const isEditingRole = editingRoleId === role._id;
-
-            return (
-              <div
-                key={role._id}
-                className="rounded-3xl border border-white/10 bg-black/30 p-5"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
-                    {isEditingRole ? (
-                      <TextInput
-                        label="Role Name"
-                        value={editRoleName}
-                        onChange={setEditRoleName}
-                      />
-                    ) : (
-                      <>
-                        <h3 className="text-xl font-black">{role.name}</h3>
-                        <p className="mt-1 text-sm text-zinc-500">
-                          {role.isSuperAdmin
-                            ? "Full system access"
-                            : "Custom permissions"}
-                        </p>
-                      </>
-                    )}
-                  </div>
-
-                  {!role.isSuperAdmin && (
-                    <div className="flex gap-2">
-                      {isEditingRole ? (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => void handleSaveRole(role._id)}
-                            disabled={isSaving}
-                            className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-emerald-400 hover:text-emerald-300 disabled:opacity-50"
-                            aria-label="Save role"
-                          >
-                            <Save size={17} />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={cancelEditingRole}
-                            className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-zinc-300 transition hover:border-zinc-400 hover:text-white"
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => startEditingRole(role)}
-                            className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300"
-                          >
-                            Edit
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => void handleDeleteRole(role)}
-                            className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-red-400 hover:text-red-300"
-                            aria-label="Delete role"
-                          >
-                            <Trash2 size={17} />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {isEditingRole ? (
-                  <div className="mt-5">
-                    <PermissionEditor
-                      permissions={editPermissions}
-                      onToggle={(moduleName, action) =>
-                        setEditPermissions((currentPermissions) =>
-                          togglePermissionAction(
-                            currentPermissions,
-                            moduleName,
-                            action,
-                          ),
-                        )
-                      }
-                    />
-                  </div>
-                ) : (
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {role.isSuperAdmin ? (
-                      <span className="rounded-full bg-violet-500/20 px-3 py-1 text-xs font-black uppercase text-violet-300">
-                        All Permissions
-                      </span>
-                    ) : (
-                      role.permissions.map((permission) => (
-                        <span
-                          key={permission.module}
-                          className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-zinc-300"
-                        >
-                          {permission.module}:{" "}
-                          {permission.actions.length > 0
-                            ? permission.actions.join(", ")
-                            : "none"}
-                        </span>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <form
+      <AdminCreateForm
+        formState={formState}
+        roles={roles}
+        isSaving={isSaving}
         onSubmit={handleCreateAdmin}
-        className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6"
-      >
-        <div className="flex items-center gap-3">
-          <UserCog className="text-violet-300" size={24} />
-          <h2 className="text-2xl font-black">Create Admin</h2>
-        </div>
+        onFieldChange={updateField}
+      />
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-4">
-          <TextInput
-            label="Full Name"
-            value={formState.fullName}
-            onChange={(value) => updateField("fullName", value)}
-            required
-          />
-
-          <TextInput
-            label="Email"
-            type="email"
-            value={formState.email}
-            onChange={(value) => updateField("email", value)}
-            required
-          />
-
-          <TextInput
-            label="Password"
-            type="password"
-            value={formState.password}
-            onChange={(value) => updateField("password", value)}
-            required
-          />
-
-          <label className="grid gap-2">
-            <span className="text-sm font-bold text-zinc-300">Role</span>
-            <select
-              value={formState.roleId}
-              onChange={(event) => updateField("roleId", event.target.value)}
-              required
-              className={inputClassName}
-            >
-              {roles.map((role) => (
-                <option key={role._id} value={role._id}>
-                  {role.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <button
-          type="submit"
-          disabled={isSaving || roles.length === 0}
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-violet-600 px-6 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <Plus size={18} />
-          {isSaving ? "Creating..." : "Create Admin"}
-        </button>
-      </form>
-
-      <div className="mt-10">
-        <h2 className="text-2xl font-black">Admin Users</h2>
-
-        {isLoading && <p className="mt-6 text-zinc-400">Loading admins...</p>}
-
-        {!isLoading && admins.length === 0 && (
-          <p className="mt-6 text-zinc-400">No admins found.</p>
-        )}
-
-        {!isLoading && admins.length > 0 && (
-          <div className="mt-6 overflow-hidden rounded-3xl border border-white/10">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px] border-collapse">
-                <thead className="bg-white/[0.04] text-left text-sm text-zinc-400">
-                  <tr>
-                    <th className="px-6 py-4">Admin</th>
-                    <th className="px-6 py-4">Role</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4">Last Login</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-white/10">
-                  {admins.map((admin) => {
-                    const isEditing = editingAdminId === admin._id;
-                    const isSuperAdmin = admin.role.isSuperAdmin;
-                    const isCurrentAdmin = currentAdmin?.id === admin._id;
-
-                    return (
-                      <tr
-                        key={admin._id}
-                        className="transition hover:bg-white/[0.03]"
-                      >
-                        <td className="px-6 py-5">
-                          {isEditing ? (
-                            <div className="grid gap-3">
-                              <TextInput
-                                label="Full Name"
-                                value={editFullName}
-                                onChange={setEditFullName}
-                              />
-
-                              <TextInput
-                                label="New Password"
-                                type="password"
-                                value={editPassword}
-                                onChange={setEditPassword}
-                                placeholder="Leave empty to keep password"
-                              />
-                            </div>
-                          ) : (
-                            <div>
-                              <p className="font-black text-white">
-                                {admin.fullName}
-                              </p>
-                              <p className="mt-1 text-sm text-zinc-500">
-                                {admin.email}
-                              </p>
-                              {isCurrentAdmin && (
-                                <p className="mt-2 text-xs font-black uppercase text-violet-300">
-                                  Current account
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </td>
-
-                        <td className="px-6 py-5">
-                          {isEditing ? (
-                            <select
-                              value={editRoleId}
-                              onChange={(event) =>
-                                setEditRoleId(event.target.value)
-                              }
-                              className={inputClassName}
-                              disabled={isSuperAdmin}
-                            >
-                              {roles.map((role) => (
-                                <option key={role._id} value={role._id}>
-                                  {role.name}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black uppercase text-zinc-300">
-                              {admin.role.name}
-                            </span>
-                          )}
-                        </td>
-
-                        <td className="px-6 py-5">
-                          <span
-                            className={[
-                              "rounded-full px-3 py-1 text-xs font-black uppercase",
-                              admin.isActive
-                                ? "bg-emerald-500/20 text-emerald-300"
-                                : "bg-red-500/20 text-red-300",
-                            ].join(" ")}
-                          >
-                            {admin.isActive ? "Active" : "Disabled"}
-                          </span>
-                        </td>
-
-                        <td className="px-6 py-5 text-zinc-400">
-                          {admin.lastLoginAt
-                            ? new Date(admin.lastLoginAt).toLocaleString(
-                                "de-DE",
-                              )
-                            : "Never"}
-                        </td>
-
-                        <td className="px-6 py-5">
-                          <div className="flex justify-end gap-2">
-                            {isEditing ? (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={() => void handleSaveEdit(admin._id)}
-                                  disabled={isSaving}
-                                  className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-emerald-400 hover:text-emerald-300 disabled:opacity-50"
-                                  aria-label="Save admin"
-                                >
-                                  <Save size={17} />
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={cancelEditing}
-                                  className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-zinc-300 transition hover:border-zinc-400 hover:text-white"
-                                >
-                                  Cancel
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={() => startEditing(admin)}
-                                  className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-zinc-300 transition hover:border-violet-400 hover:text-violet-300"
-                                >
-                                  Edit
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={() => void handleToggleActive(admin)}
-                                  disabled={isCurrentAdmin}
-                                  className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-yellow-400 hover:text-yellow-300 disabled:cursor-not-allowed disabled:opacity-40"
-                                  aria-label="Toggle admin status"
-                                  title={
-                                    isCurrentAdmin
-                                      ? "You cannot disable your own account"
-                                      : undefined
-                                  }
-                                >
-                                  <Power size={17} />
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={() => void handleDeleteAdmin(admin)}
-                                  disabled={isSuperAdmin || isCurrentAdmin}
-                                  className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-zinc-300 transition hover:border-red-400 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-40"
-                                  aria-label="Delete admin"
-                                  title={
-                                    isCurrentAdmin
-                                      ? "You cannot delete your own account"
-                                      : isSuperAdmin
-                                        ? "Super Admin cannot be deleted"
-                                        : undefined
-                                  }
-                                >
-                                  <Trash2 size={17} />
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-      </div>
+      <AdminUsersTable
+        admins={admins}
+        roles={roles}
+        currentAdminId={currentAdmin?.id}
+        editingAdminId={editingAdminId}
+        editFullName={editFullName}
+        editRoleId={editRoleId}
+        editPassword={editPassword}
+        isLoading={isLoading}
+        isSaving={isSaving}
+        onStartEditing={startEditingAdmin}
+        onCancelEditing={cancelEditingAdmin}
+        onSaveAdmin={handleSaveAdmin}
+        onToggleActive={handleToggleActive}
+        onDeleteAdmin={handleDeleteAdmin}
+        onEditFullNameChange={setEditFullName}
+        onEditRoleIdChange={setEditRoleId}
+        onEditPasswordChange={setEditPassword}
+      />
     </section>
   );
 };
