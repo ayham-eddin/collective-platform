@@ -11,16 +11,8 @@ const fallbackHeroImage =
   "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
 
 const pageText = {
-  heroEyebrow: {
-    de: "Unsere Story",
-    en: "Our Story",
-    ar: "قصتنا",
-  },
-  heroTitle: {
-    de: "Galerie",
-    en: "Gallery",
-    ar: "المعرض",
-  },
+  heroEyebrow: { de: "Unsere Story", en: "Our Story", ar: "قصتنا" },
+  heroTitle: { de: "Galerie", en: "Gallery", ar: "المعرض" },
   sectionEyebrow: {
     de: "Glückliche Momente",
     en: "Happy Moments",
@@ -41,16 +33,8 @@ const pageText = {
     en: "Search images...",
     ar: "ابحث في الصور...",
   },
-  searchButton: {
-    de: "Suchen",
-    en: "Search",
-    ar: "بحث",
-  },
-  clearButton: {
-    de: "Zurücksetzen",
-    en: "Clear",
-    ar: "مسح",
-  },
+  searchButton: { de: "Suchen", en: "Search", ar: "بحث" },
+  clearButton: { de: "Zurücksetzen", en: "Clear", ar: "مسح" },
   loading: {
     de: "Galerie wird geladen...",
     en: "Loading gallery...",
@@ -61,31 +45,11 @@ const pageText = {
     en: "No gallery images available.",
     ar: "لا توجد صور في المعرض حالياً.",
   },
-  category: {
-    de: "Galerie",
-    en: "Gallery",
-    ar: "المعرض",
-  },
-  previous: {
-    de: "Zurück",
-    en: "Previous",
-    ar: "السابق",
-  },
-  next: {
-    de: "Weiter",
-    en: "Next",
-    ar: "التالي",
-  },
-  page: {
-    de: "Seite",
-    en: "Page",
-    ar: "الصفحة",
-  },
-  of: {
-    de: "von",
-    en: "of",
-    ar: "من",
-  },
+  category: { de: "Galerie", en: "Gallery", ar: "المعرض" },
+  previous: { de: "Zurück", en: "Previous", ar: "السابق" },
+  next: { de: "Weiter", en: "Next", ar: "التالي" },
+  page: { de: "Seite", en: "Page", ar: "الصفحة" },
+  of: { de: "von", en: "of", ar: "من" },
 };
 
 export const GalleryPage = () => {
@@ -167,10 +131,7 @@ export const GalleryPage = () => {
     );
   }, [heroImages, images]);
 
-  const handleApplySearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setPage(1);
-    setSearch(searchInput);
+  const resetLightbox = () => {
     setSelectedIndex(null);
     setLightboxImages([]);
     setLightboxPage(1);
@@ -178,15 +139,18 @@ export const GalleryPage = () => {
     setLightboxTotalItems(0);
   };
 
+  const handleApplySearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPage(1);
+    setSearch(searchInput);
+    resetLightbox();
+  };
+
   const handleClearSearch = () => {
     setSearchInput("");
     setSearch("");
     setPage(1);
-    setSelectedIndex(null);
-    setLightboxImages([]);
-    setLightboxPage(1);
-    setLightboxTotalPages(1);
-    setLightboxTotalItems(0);
+    resetLightbox();
   };
 
   const handleOpenLightbox = (index: number) => {
@@ -205,7 +169,6 @@ export const GalleryPage = () => {
     }
 
     const nextPage = lightboxPage + 1;
-
     setIsLightboxLoadingMore(true);
 
     try {
@@ -232,8 +195,8 @@ export const GalleryPage = () => {
     selectedIndex !== null ? selectedIndex - lightboxStartOffset : 0;
 
   return (
-    <main className="bg-[#f4f3fb] text-[#252530]">
-      <section className="relative min-h-[460px] overflow-hidden bg-black text-white">
+    <main className="overflow-hidden bg-[#f4f3fb] text-[#252530]">
+      <section className="relative min-h-[520px] overflow-hidden bg-black text-white sm:min-h-[580px] lg:min-h-[640px]">
         <img
           src={heroImage?.image.url || fallbackHeroImage}
           alt={getLocalizedText(
@@ -241,50 +204,48 @@ export const GalleryPage = () => {
             language,
             "Schu Fi Ma Fi Gallery",
           )}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/30" />
 
-        <div className="relative mx-auto flex min-h-[460px] max-w-7xl items-end px-6 py-20">
+        <div className="relative mx-auto flex min-h-[520px] max-w-7xl items-end px-5 py-14 sm:min-h-[580px] sm:px-6 sm:py-20 lg:min-h-[640px]">
           <div>
-            <p className="text-lg font-bold text-violet-300">
+            <p className="text-sm font-black uppercase tracking-[0.28em] text-violet-300 sm:text-base lg:text-lg">
               {pageText.heroEyebrow[language]}
             </p>
 
-            <h1 className="mt-4 text-6xl font-black tracking-tight md:text-8xl">
-              {pageText.heroTitle[language]}
-            </h1>
+            <h1 className="hero-title mt-5">{pageText.heroTitle[language]}</h1>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-24">
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 lg:py-24">
         <div className="max-w-4xl">
-          <p className="text-xl font-bold italic text-violet-400">
+          <p className="text-base font-bold italic text-violet-500 sm:text-lg">
             {pageText.sectionEyebrow[language]}
           </p>
 
-          <h2 className="mt-5 text-5xl font-black leading-tight tracking-tight md:text-7xl">
+          <h2 className="section-title mt-5">
             {pageText.sectionTitle[language]}
           </h2>
 
-          <p className="mt-8 text-lg leading-8 text-zinc-700">
+          <p className="mt-6 text-base leading-8 text-zinc-700 sm:text-lg">
             {pageText.sectionDescription[language]}
           </p>
         </div>
 
         <form
           onSubmit={handleApplySearch}
-          className="mt-12 flex flex-wrap gap-3 rounded-[2rem] bg-white p-4 shadow-xl shadow-black/5"
+          className="mt-10 grid gap-3 rounded-[1.5rem] bg-white p-4 shadow-xl shadow-black/5 sm:rounded-[2rem] md:grid-cols-[1fr_auto_auto]"
         >
           <input
             type="search"
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder={pageText.searchPlaceholder[language]}
-            className="min-w-[240px] flex-1 rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-4 font-semibold outline-none transition focus:border-violet-400 focus:bg-white"
+            className="min-h-12 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 font-semibold text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-violet-400 focus:bg-white sm:px-5 sm:py-4"
           />
 
           <button type="submit" className="btn btn-primary">
@@ -295,7 +256,7 @@ export const GalleryPage = () => {
             <button
               type="button"
               onClick={handleClearSearch}
-              className="rounded-2xl border border-zinc-200 px-7 py-4 text-sm font-black uppercase tracking-wide text-zinc-700 transition hover:border-violet-400 hover:text-violet-600"
+              className="btn btn-secondary-light"
             >
               {pageText.clearButton[language]}
             </button>
@@ -318,13 +279,13 @@ export const GalleryPage = () => {
           </p>
         )}
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {images.map((item, index) => (
             <button
               key={item._id}
               type="button"
               onClick={() => handleOpenLightbox(index)}
-              className="group relative min-h-[360px] overflow-hidden rounded-[2rem] bg-zinc-900 text-left shadow-2xl shadow-black/20"
+              className="group relative min-h-[320px] overflow-hidden rounded-[1.5rem] bg-zinc-900 text-left shadow-2xl shadow-black/20 sm:min-h-[360px] sm:rounded-[2rem]"
             >
               <img
                 src={item.image.url}
@@ -333,17 +294,17 @@ export const GalleryPage = () => {
                   language,
                   pageText.category[language],
                 )}
-                className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent" />
 
-              <div className="absolute left-6 top-6 rounded-md bg-violet-600 px-5 py-3 text-sm font-black text-white">
+              <div className="absolute left-4 top-4 max-w-[calc(100%-2rem)] rounded-full bg-violet-600 px-4 py-2 text-xs font-black uppercase tracking-wide text-white sm:left-6 sm:top-6 sm:px-5 sm:py-3 sm:text-sm">
                 {pageText.category[language]}
               </div>
 
-              <div className="absolute bottom-0 left-0 right-0 p-7">
-                <h3 className="text-3xl font-black tracking-tight text-white">
+              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7">
+                <h3 className="break-words text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl">
                   {getLocalizedText(
                     item.title,
                     language,
@@ -352,7 +313,7 @@ export const GalleryPage = () => {
                 </h3>
 
                 {item.description && (
-                  <p className="mt-3 max-w-sm text-zinc-300">
+                  <p className="mt-3 line-clamp-2 max-w-sm break-words text-sm leading-7 text-zinc-200 sm:text-base">
                     {getLocalizedText(item.description, language, "")}
                   </p>
                 )}
@@ -362,29 +323,31 @@ export const GalleryPage = () => {
         </div>
 
         {totalPages > 1 && (
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
-            <button
-              type="button"
-              disabled={page === 1}
-              onClick={() => setPage((currentPage) => currentPage - 1)}
-              className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-black text-zinc-700 transition hover:border-violet-500 hover:text-violet-600 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {pageText.previous[language]}
-            </button>
+          <div className="mt-12 rounded-[1.5rem] border border-zinc-200 bg-white p-4 shadow-xl shadow-black/5 sm:rounded-[2rem] sm:p-5">
+            <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
+              <button
+                type="button"
+                disabled={page === 1}
+                onClick={() => setPage((currentPage) => currentPage - 1)}
+                className="btn btn-secondary-light"
+              >
+                {pageText.previous[language]}
+              </button>
 
-            <span className="text-sm font-black text-zinc-500">
-              {pageText.page[language]} {page} {pageText.of[language]}{" "}
-              {totalPages}
-            </span>
+              <span className="inline-flex min-h-11 items-center justify-center rounded-full bg-zinc-100 px-5 py-3 text-sm font-black text-zinc-600 sm:min-h-12">
+                {pageText.page[language]} {page} {pageText.of[language]}{" "}
+                {totalPages}
+              </span>
 
-            <button
-              type="button"
-              disabled={page === totalPages}
-              onClick={() => setPage((currentPage) => currentPage + 1)}
-              className=""
-            >
-              {pageText.next[language]}
-            </button>
+              <button
+                type="button"
+                disabled={page === totalPages}
+                onClick={() => setPage((currentPage) => currentPage + 1)}
+                className="btn btn-secondary-light"
+              >
+                {pageText.next[language]}
+              </button>
+            </div>
           </div>
         )}
       </section>

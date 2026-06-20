@@ -47,41 +47,17 @@ const pageText = {
     en: "← Back to events",
     ar: "→ العودة إلى الفعاليات",
   },
-  eventFallback: {
-    de: "Event",
-    en: "Event",
-    ar: "فعالية",
-  },
-  lineup: {
-    de: "Lineup",
-    en: "Lineup",
-    ar: "البرنامج",
-  },
-  videos: {
-    de: "Videos",
-    en: "Videos",
-    ar: "فيديوهات",
-  },
+  eventFallback: { de: "Event", en: "Event", ar: "فعالية" },
+  lineup: { de: "Lineup", en: "Lineup", ar: "البرنامج" },
+  videos: { de: "Videos", en: "Videos", ar: "فيديوهات" },
   eventDetails: {
     de: "Event Details",
     en: "Event Details",
     ar: "تفاصيل الفعالية",
   },
-  date: {
-    de: "Datum",
-    en: "Date",
-    ar: "التاريخ",
-  },
-  time: {
-    de: "Uhrzeit",
-    en: "Time",
-    ar: "الوقت",
-  },
-  location: {
-    de: "Ort",
-    en: "Location",
-    ar: "المكان",
-  },
+  date: { de: "Datum", en: "Date", ar: "التاريخ" },
+  time: { de: "Uhrzeit", en: "Time", ar: "الوقت" },
+  location: { de: "Ort", en: "Location", ar: "المكان" },
   copyAddress: {
     de: "Adresse kopieren",
     en: "Copy address",
@@ -102,11 +78,7 @@ const pageText = {
     en: "Open Google Maps",
     ar: "فتح Google Maps",
   },
-  buyTickets: {
-    de: "Tickets kaufen",
-    en: "Buy tickets",
-    ar: "شراء التذاكر",
-  },
+  buyTickets: { de: "Tickets kaufen", en: "Buy tickets", ar: "شراء التذاكر" },
 };
 
 export const EventDetailsPage = () => {
@@ -156,7 +128,7 @@ export const EventDetailsPage = () => {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#0b0b10] px-6 py-20 text-zinc-400">
+      <main className="min-h-screen bg-[#0b0b10] px-5 py-20 text-zinc-400 sm:px-6">
         {pageText.loading[language]}
       </main>
     );
@@ -164,12 +136,12 @@ export const EventDetailsPage = () => {
 
   if (errorMessage || !event) {
     return (
-      <main className="min-h-screen bg-[#0b0b10] px-6 py-20">
+      <main className="min-h-screen bg-[#0b0b10] px-5 py-20 sm:px-6">
         <p className="text-red-400">
           {errorMessage || pageText.notFound[language]}
         </p>
 
-        <Link to="/events" className="mt-6 inline-block text-violet-300">
+        <Link to="/events" className="btn btn-secondary-dark mt-6">
           {pageText.backToEvents[language]}
         </Link>
       </main>
@@ -192,59 +164,52 @@ export const EventDetailsPage = () => {
   );
 
   return (
-    <main className="bg-[#0b0b10] text-white">
+    <main className="overflow-hidden bg-[#0b0b10] text-white">
       <section
-        className="relative min-h-[640px] overflow-hidden bg-cover bg-center"
+        className="relative min-h-[560px] overflow-hidden bg-cover bg-[center_10%] sm:min-h-[620px] lg:min-h-[680px]"
         style={{
           backgroundImage: event.coverImage
             ? `url(${event.coverImage.url})`
             : "linear-gradient(to bottom, #18181b, #0b0b10)",
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/65 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b10] via-black/20 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b10] via-black/25 to-black/30" />
 
-        <div className="relative mx-auto flex min-h-[640px] max-w-7xl items-end px-6 py-20">
+        <div className="relative mx-auto flex min-h-[560px] max-w-7xl items-end px-5 py-14 sm:min-h-[620px] sm:px-6 sm:py-20 lg:min-h-[680px]">
           <div className="max-w-5xl">
-            <Link
-              to="/events"
-              className="mb-8 inline-flex rounded-full border border-white/20 px-5 py-3 text-sm font-black text-white transition hover:bg-white hover:text-black"
-            >
+            <Link to="/events" className="btn btn-secondary-dark btn-sm mb-8">
               {pageText.backToEvents[language]}
             </Link>
 
-            <p className="text-lg font-black uppercase tracking-[0.35em] text-violet-300">
+            <p className="break-words text-sm font-black uppercase tracking-[0.28em] text-violet-300 sm:text-base lg:text-lg">
               {event.category || pageText.eventFallback[language]}
             </p>
 
-            <h1 className="mt-5 text-6xl font-black leading-none tracking-tight md:text-8xl">
-              {eventTitle}
-            </h1>
+            <h1 className="hero-title mt-5">{eventTitle}</h1>
 
-            <p className="mt-8 max-w-3xl text-xl leading-9 text-zinc-200">
+            <p className="mt-6 max-w-3xl break-words text-base leading-8 text-zinc-200 sm:text-lg lg:text-xl lg:leading-9">
               {getLocalizedText(event.shortDescription, language, "")}
             </p>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-20 lg:grid-cols-[1fr_380px]">
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1fr_380px] lg:py-24">
         <div>
-          <p className="text-xl leading-9 text-zinc-300">
+          <p className="whitespace-pre-line break-words text-base leading-8 text-zinc-300 sm:text-lg lg:text-xl lg:leading-9">
             {getLocalizedText(event.description, language, "")}
           </p>
 
           {event.lineup.length > 0 && (
-            <div className="mt-14">
-              <h2 className="text-4xl font-black tracking-tight">
-                {pageText.lineup[language]}
-              </h2>
+            <div className="mt-12 lg:mt-14">
+              <h2 className="section-title">{pageText.lineup[language]}</h2>
 
               <div className="mt-6 flex flex-wrap gap-3">
                 {event.lineup.map((artist) => (
                   <span
                     key={artist}
-                    className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-bold text-zinc-200"
+                    className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-zinc-200 sm:px-5 sm:py-3"
                   >
                     {artist}
                   </span>
@@ -254,19 +219,17 @@ export const EventDetailsPage = () => {
           )}
 
           {event.videos.length > 0 && (
-            <div className="mt-16">
+            <div className="mt-14 lg:mt-16">
               <div className="flex items-center gap-3">
                 <Video className="text-violet-300" size={26} />
-                <h2 className="text-4xl font-black tracking-tight">
-                  {pageText.videos[language]}
-                </h2>
+                <h2 className="section-title">{pageText.videos[language]}</h2>
               </div>
 
               <div className="mt-8 grid gap-8">
                 {event.videos.map((video) => (
                   <article
                     key={video.youtubeUrl}
-                    className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03]"
+                    className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.03] sm:rounded-[2rem]"
                   >
                     <iframe
                       src={getYoutubeEmbedUrl(video.youtubeUrl)}
@@ -276,13 +239,13 @@ export const EventDetailsPage = () => {
                       allowFullScreen
                     />
 
-                    <div className="p-6">
-                      <h3 className="text-2xl font-black">
+                    <div className="p-5 sm:p-6">
+                      <h3 className="break-words text-2xl font-black">
                         {getLocalizedText(video.title, language, "Video")}
                       </h3>
 
                       {video.description && (
-                        <p className="mt-2 text-zinc-400">
+                        <p className="mt-2 break-words text-zinc-400">
                           {getLocalizedText(video.description, language, "")}
                         </p>
                       )}
@@ -294,7 +257,7 @@ export const EventDetailsPage = () => {
           )}
         </div>
 
-        <aside className="h-fit rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/20 lg:sticky lg:top-28">
+        <aside className="h-fit rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/20 sm:rounded-[2rem] sm:p-6 lg:sticky lg:top-28">
           <h2 className="text-2xl font-black">
             {pageText.eventDetails[language]}
           </h2>
@@ -340,7 +303,7 @@ export const EventDetailsPage = () => {
                 href={event.googleMapsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="btn btn-secondary-light"
+                className="btn btn-secondary-dark"
               >
                 <ExternalLink size={18} />
                 {pageText.openMaps[language]}
@@ -374,11 +337,11 @@ interface DetailRowProps {
 const DetailRow = ({ icon, label, value }: DetailRowProps) => {
   return (
     <div className="flex gap-4 rounded-2xl border border-white/10 bg-black/30 p-4">
-      <div className="mt-1 text-violet-300">{icon}</div>
+      <div className="mt-1 shrink-0 text-violet-300">{icon}</div>
 
-      <div>
+      <div className="min-w-0">
         <p className="text-sm font-bold text-zinc-500">{label}</p>
-        <p className="mt-1 font-bold text-zinc-100">{value}</p>
+        <p className="mt-1 break-words font-bold text-zinc-100">{value}</p>
       </div>
     </div>
   );

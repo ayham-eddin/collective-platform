@@ -32,61 +32,21 @@ const pageText = {
     en: "Search videos...",
     ar: "ابحث في الفيديوهات...",
   },
-  searchButton: {
-    de: "Suchen",
-    en: "Search",
-    ar: "بحث",
-  },
-  clearButton: {
-    de: "Zurücksetzen",
-    en: "Clear",
-    ar: "مسح",
-  },
-  typeLabel: {
-    de: "Video-Typ",
-    en: "Video type",
-    ar: "نوع الفيديو",
-  },
-  allTypes: {
-    de: "Alle Videos",
-    en: "All videos",
-    ar: "كل الفيديوهات",
-  },
-  youtubeOnly: {
-    de: "YouTube",
-    en: "YouTube",
-    ar: "يوتيوب",
-  },
-  uploadedOnly: {
-    de: "Uploaded",
-    en: "Uploaded",
-    ar: "مرفوعة",
-  },
+  searchButton: { de: "Suchen", en: "Search", ar: "بحث" },
+  clearButton: { de: "Zurücksetzen", en: "Clear", ar: "مسح" },
+  typeLabel: { de: "Video-Typ", en: "Video type", ar: "نوع الفيديو" },
+  allTypes: { de: "Alle Videos", en: "All videos", ar: "كل الفيديوهات" },
+  youtubeOnly: { de: "YouTube", en: "YouTube", ar: "يوتيوب" },
+  uploadedOnly: { de: "Uploaded", en: "Uploaded", ar: "مرفوعة" },
   perPage: {
     de: "Videos pro Seite",
     en: "Videos per page",
     ar: "عدد الفيديوهات",
   },
-  previous: {
-    de: "Zurück",
-    en: "Previous",
-    ar: "السابق",
-  },
-  next: {
-    de: "Weiter",
-    en: "Next",
-    ar: "التالي",
-  },
-  page: {
-    de: "Seite",
-    en: "Page",
-    ar: "الصفحة",
-  },
-  of: {
-    de: "von",
-    en: "of",
-    ar: "من",
-  },
+  previous: { de: "Zurück", en: "Previous", ar: "السابق" },
+  next: { de: "Weiter", en: "Next", ar: "التالي" },
+  page: { de: "Seite", en: "Page", ar: "الصفحة" },
+  of: { de: "von", en: "of", ar: "من" },
   loading: {
     de: "Videos werden geladen...",
     en: "Loading videos...",
@@ -169,37 +129,35 @@ export const VideosPage = () => {
   };
 
   return (
-    <main className="bg-[#f4f3fb] text-[#252530]">
-      <section className="relative min-h-[460px] overflow-hidden bg-black text-white">
+    <main className="overflow-hidden bg-[#f4f3fb] text-[#252530]">
+      <section className="relative min-h-[520px] overflow-hidden bg-black text-white sm:min-h-[580px] lg:min-h-[640px]">
         <img
           src={heroImageUrl}
           alt="Schu Fi Ma Fi videos"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/30" />
 
-        <div className="relative mx-auto flex min-h-[460px] max-w-7xl items-end px-6 py-20">
+        <div className="relative mx-auto flex min-h-[520px] max-w-7xl items-end px-5 py-14 sm:min-h-[580px] sm:px-6 sm:py-20 lg:min-h-[640px]">
           <div>
-            <p className="text-lg font-bold text-violet-300">
+            <p className="text-sm font-black uppercase tracking-[0.28em] text-violet-300 sm:text-base lg:text-lg">
               {pageText.heroEyebrow[language]}
             </p>
 
-            <h1 className="mt-4 text-6xl font-black tracking-tight md:text-8xl">
-              {pageText.heroTitle[language]}
-            </h1>
+            <h1 className="hero-title mt-5">{pageText.heroTitle[language]}</h1>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-24">
+      <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20 lg:py-24">
         <div className="text-center">
-          <p className="text-xl font-bold italic text-violet-400">
+          <p className="text-base font-bold italic text-violet-500 sm:text-lg">
             {pageText.sectionEyebrow[language]}
           </p>
 
-          <h2 className="mt-5 text-5xl font-black tracking-tight md:text-6xl">
+          <h2 className="section-title mx-auto mt-5 max-w-4xl">
             {pageText.sectionTitle[language]}
           </h2>
 
@@ -208,15 +166,18 @@ export const VideosPage = () => {
           </p>
         </div>
 
-        <div className="mt-12 rounded-[2rem] bg-white p-5 shadow-xl shadow-black/5">
+        <div className="mt-10 rounded-[1.5rem] bg-white p-4 shadow-xl shadow-black/5 sm:rounded-[2rem] sm:p-5">
           <div className="grid gap-4 lg:grid-cols-[1fr_220px_220px]">
-            <form onSubmit={handleApplySearch} className="flex gap-3">
+            <form
+              onSubmit={handleApplySearch}
+              className="grid gap-3 sm:grid-cols-[1fr_auto_auto]"
+            >
               <input
                 type="search"
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
                 placeholder={pageText.searchPlaceholder[language]}
-                className="min-w-0 flex-1 rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-4 font-semibold outline-none transition focus:border-violet-400 focus:bg-white"
+                className="min-h-12 min-w-0 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 font-semibold text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-violet-400 focus:bg-white sm:px-5 sm:py-4"
               />
 
               <button type="submit" className="btn btn-primary">
@@ -227,7 +188,7 @@ export const VideosPage = () => {
                 <button
                   type="button"
                   onClick={handleClearSearch}
-                  className="rounded-2xl border border-zinc-200 px-6 py-4 text-sm font-black uppercase tracking-wide text-zinc-700 transition hover:border-violet-400 hover:text-violet-600"
+                  className="btn btn-secondary-light"
                 >
                   {pageText.clearButton[language]}
                 </button>
@@ -295,7 +256,7 @@ export const VideosPage = () => {
           </p>
         )}
 
-        <div className="mt-16 grid gap-12">
+        <div className="mt-12 grid gap-8 lg:mt-16">
           {videos.map((video) => {
             const title = video.title[language] || video.title.de;
             const description =
@@ -304,14 +265,14 @@ export const VideosPage = () => {
             return (
               <article
                 key={video._id}
-                className="rounded-[2rem] bg-white p-5 shadow-2xl shadow-black/10"
+                className="rounded-[1.5rem] bg-white p-4 shadow-2xl shadow-black/10 sm:rounded-[2rem] sm:p-5"
               >
-                <h3 className="mb-6 text-center text-3xl font-black">
+                <h3 className="mb-5 break-words text-center text-2xl font-black leading-tight sm:text-3xl">
                   {title}
                 </h3>
 
                 {video.type === "youtube" && video.youtubeUrl && (
-                  <div className="overflow-hidden rounded-[1.5rem] bg-black shadow-2xl shadow-black/25">
+                  <div className="overflow-hidden rounded-[1.25rem] bg-black shadow-2xl shadow-black/25 sm:rounded-[1.5rem]">
                     <iframe
                       src={getYoutubeEmbedUrl(video.youtubeUrl)}
                       title={title}
@@ -323,7 +284,7 @@ export const VideosPage = () => {
                 )}
 
                 {video.type === "uploaded" && video.videoFile?.url && (
-                  <div className="overflow-hidden rounded-[1.5rem] bg-black shadow-2xl shadow-black/25">
+                  <div className="overflow-hidden rounded-[1.25rem] bg-black shadow-2xl shadow-black/25 sm:rounded-[1.5rem]">
                     <video
                       src={video.videoFile.url}
                       controls
@@ -334,7 +295,7 @@ export const VideosPage = () => {
                 )}
 
                 {description && (
-                  <p className="mt-4 text-center text-zinc-600">
+                  <p className="mt-4 break-words text-center text-base leading-7 text-zinc-600">
                     {description}
                   </p>
                 )}
@@ -344,18 +305,18 @@ export const VideosPage = () => {
         </div>
 
         {totalPages > 1 && (
-          <div className="mt-12 flex flex-col gap-5 rounded-[2rem] border border-zinc-200 bg-white p-5 shadow-xl shadow-black/5 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-wrap items-center justify-center gap-3 md:justify-start">
+          <div className="mt-12 rounded-[1.5rem] border border-zinc-200 bg-white p-4 shadow-xl shadow-black/5 sm:rounded-[2rem] sm:p-5">
+            <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
               <button
                 type="button"
                 disabled={page === 1}
                 onClick={() => setPage((currentPage) => currentPage - 1)}
-                className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-black text-zinc-700 transition hover:border-violet-500 hover:text-violet-600 disabled:cursor-not-allowed disabled:opacity-40"
+                className="btn btn-secondary-light"
               >
                 {pageText.previous[language]}
               </button>
 
-              <span className="rounded-full bg-zinc-100 px-5 py-3 text-sm font-black text-zinc-500">
+              <span className="inline-flex min-h-11 items-center justify-center rounded-full bg-zinc-100 px-5 py-3 text-sm font-black text-zinc-600 sm:min-h-12">
                 {pageText.page[language]} {page} {pageText.of[language]}{" "}
                 {totalPages}
               </span>
@@ -364,7 +325,7 @@ export const VideosPage = () => {
                 type="button"
                 disabled={page === totalPages}
                 onClick={() => setPage((currentPage) => currentPage + 1)}
-                className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-black text-zinc-700 transition hover:border-violet-500 hover:text-violet-600 disabled:cursor-not-allowed disabled:opacity-40"
+                className="btn btn-secondary-light"
               >
                 {pageText.next[language]}
               </button>
@@ -389,4 +350,4 @@ const getYoutubeEmbedUrl = (youtubeUrl: string) => {
 };
 
 const selectClassName =
-  "rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-4 font-semibold text-zinc-800 outline-none transition focus:border-violet-400 focus:bg-white";
+  "min-h-12 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 font-semibold text-zinc-800 outline-none transition focus:border-violet-400 focus:bg-white sm:px-5 sm:py-4";

@@ -124,7 +124,7 @@ export const GalleryLightbox = ({
 
   return (
     <div
-      className="fixed inset-0 z-[100] bg-black/95 px-4 py-6 text-white"
+      className="fixed inset-0 z-[100] overflow-y-auto bg-black/95 px-4 py-6 text-white"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
@@ -132,7 +132,7 @@ export const GalleryLightbox = ({
       <button
         type="button"
         onClick={onClose}
-        className="absolute right-5 top-5 z-20 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+        className="fixed right-4 top-4 z-30 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/20 sm:right-5 sm:top-5"
         aria-label={lightboxText.close[language]}
       >
         <X size={24} />
@@ -146,7 +146,7 @@ export const GalleryLightbox = ({
               event.stopPropagation();
               goToPreviousImage();
             }}
-            className="absolute left-5 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            className="fixed bottom-6 left-4 z-30 grid h-12 w-12 place-items-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/20 sm:left-5 sm:top-1/2 sm:-translate-y-1/2"
             aria-label={lightboxText.previous[language]}
           >
             <ChevronLeft size={28} />
@@ -159,7 +159,7 @@ export const GalleryLightbox = ({
               goToNextImage();
             }}
             disabled={isLoadingMore}
-            className="absolute right-5 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-wait disabled:opacity-60"
+            className="fixed bottom-6 right-4 z-30 grid h-12 w-12 place-items-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/20 disabled:cursor-wait disabled:opacity-60 sm:right-5 sm:top-1/2 sm:-translate-y-1/2"
             aria-label={lightboxText.next[language]}
           >
             {isLoadingMore ? (
@@ -172,24 +172,26 @@ export const GalleryLightbox = ({
       )}
 
       <div
-        className="mx-auto flex h-full max-w-6xl flex-col items-center justify-center gap-6"
+        className="mx-auto flex min-h-full max-w-6xl flex-col items-center justify-center gap-5 py-14 sm:gap-6"
         onClick={(event) => event.stopPropagation()}
       >
         <img
           src={activeImage.image.url}
           alt={activeTitle}
-          className="max-h-[72vh] max-w-full rounded-3xl object-contain shadow-2xl shadow-black"
+          className="max-h-[68vh] max-w-full rounded-[1.5rem] object-contain shadow-2xl shadow-black sm:max-h-[72vh] sm:rounded-3xl"
         />
 
-        <div className="max-w-3xl text-center">
+        <div className="max-w-3xl px-3 text-center">
           <p className="text-sm font-bold text-violet-300">
             {Math.min(activeIndex + 1, totalItems)} / {totalItems}
           </p>
 
-          <h2 className="mt-3 text-3xl font-black">{activeTitle}</h2>
+          <h2 className="mt-3 break-words text-2xl font-black leading-tight sm:text-3xl">
+            {activeTitle}
+          </h2>
 
           {activeImage.description && (
-            <p className="mt-3 text-zinc-300">
+            <p className="mt-3 break-words text-sm leading-7 text-zinc-300 sm:text-base">
               {getLocalizedText(activeImage.description, language, "")}
             </p>
           )}

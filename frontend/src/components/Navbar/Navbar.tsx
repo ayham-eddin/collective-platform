@@ -53,7 +53,7 @@ export const Navbar = () => {
           {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
 
-        <div className="hidden items-center gap-5 lg:flex">
+        <div className="hidden items-center gap-3 lg:flex">
           <DesktopLinks />
         </div>
       </nav>
@@ -174,7 +174,7 @@ const LanguageSwitcher = ({ onSelect }: LanguageSwitcherProps) => {
       <button
         type="button"
         onClick={() => setIsOpen((currentValue) => !currentValue)}
-        className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2.5 text-xs font-black text-zinc-300 transition hover:border-violet-400 hover:bg-white/5 hover:text-white sm:text-sm"
+        className="flex min-h-10 items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-xs font-black text-zinc-300 transition hover:border-violet-400 hover:bg-white/5 hover:text-white sm:text-sm"
         aria-label="Change language"
       >
         <Globe2 size={15} />

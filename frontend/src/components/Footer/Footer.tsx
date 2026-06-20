@@ -1,4 +1,4 @@
-import { Mail, MapPin, Music2, Play } from "lucide-react";
+import { Mail, MapPin, Phone, Music2, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logoFallback from "../../assets/logo-white.png";
@@ -90,86 +90,60 @@ export const Footer = () => {
     settings?.contactEmail || "contact@schufimafi-collective.com";
 
   return (
-    <footer
-      id="contact"
-      className="border-t border-white/10 bg-[#08080c] text-white"
-    >
-      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:py-20">
+    <footer className="border-t border-white/10 bg-[#08080c] text-white">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-6 sm:py-16 md:grid-cols-2 lg:grid-cols-[1.35fr_1fr_1fr_1fr] lg:gap-12 lg:py-20">
         <div>
           <Link to="/" className="inline-flex items-center">
             <img
               src={logoUrl}
               alt={siteName}
-              className="h-32 w-48 object-contain sm:h-40 sm:w-56"
+              className="h-24 w-40 object-contain sm:h-32 sm:w-48 lg:h-36 lg:w-56"
             />
           </Link>
 
-          <p className="mt-6 max-w-sm font-semibold leading-8 text-zinc-500">
+          <p className="mt-5 max-w-sm break-words text-sm font-semibold leading-7 text-zinc-400 sm:text-base sm:leading-8">
             {siteDescription}
           </p>
         </div>
 
-        <div>
-          <h3 className="text-xl font-black">
-            {footerText.quickLinks[language]}
-          </h3>
+        <FooterColumn title={footerText.quickLinks[language]}>
+          <FooterLink to="/">{footerText.home[language]}</FooterLink>
+          <FooterLink to="/events">{footerText.events[language]}</FooterLink>
+          <FooterLink to="/about">{footerText.about[language]}</FooterLink>
+          <FooterLink to="/gallery">{footerText.gallery[language]}</FooterLink>
+          <FooterLink to="/videos">{footerText.videos[language]}</FooterLink>
+          <FooterLink to="/contact">
+            {footerText.contactLink[language]}
+          </FooterLink>
+        </FooterColumn>
 
-          <div className="mt-6 grid gap-4 text-zinc-500">
-            <Link to="/" className="transition hover:text-white">
-              {footerText.home[language]}
-            </Link>
-            <Link to="/events" className="transition hover:text-white">
-              {footerText.events[language]}
-            </Link>
-            <Link to="/about" className="transition hover:text-white">
-              {footerText.about[language]}
-            </Link>
-            <Link to="/gallery" className="transition hover:text-white">
-              {footerText.gallery[language]}
-            </Link>
-            <Link to="/videos" className="transition hover:text-white">
-              {footerText.videos[language]}
-            </Link>
-            <Link to="/contact" className="transition hover:text-white">
-              {footerText.contactLink[language]}
-            </Link>
-          </div>
-        </div>
+        <FooterColumn title={footerText.contact[language]}>
+          <a
+            href={`mailto:${contactEmail}`}
+            className="flex items-start gap-3 break-all text-sm transition hover:text-white mt-3"
+          >
+            <Mail size={20} className="mt-1 shrink-0 text-violet-300" />
+            <span>{contactEmail}</span>
+          </a>
 
-        <div>
-          <h3 className="text-xl font-black">{footerText.contact[language]}</h3>
-
-          <div className="mt-6 grid gap-4 text-zinc-500">
+          {settings?.contactPhone && (
             <a
-              href={`mailto:${contactEmail}`}
-              className="flex items-center gap-3 break-all transition hover:text-white"
+              href={`tel:${settings.contactPhone}`}
+              className="flex items-start gap-3 break-all text-sm transition hover:text-white mt-3"
             >
-              <Mail size={20} />
-              {contactEmail}
+              <Phone size={22} className="mt-1 shrink-0 text-violet-300" />
+              {settings.contactPhone}
             </a>
+          )}
 
-            {settings?.contactPhone && (
-              <a
-                href={`tel:${settings.contactPhone}`}
-                className="transition hover:text-white"
-              >
-                {settings.contactPhone}
-              </a>
-            )}
+          <p className="flex items-start gap-3 break-all text-sm transition hover:text-white mt-3">
+            <MapPin size={22} className="mt-1 shrink-0 text-violet-300" />
+            <span>Düsseldorf</span>
+          </p>
+        </FooterColumn>
 
-            <p className="flex items-center gap-3">
-              <MapPin size={22} />
-              Düsseldorf
-            </p>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-xl font-black">
-            {footerText.socialMedia[language]}
-          </h3>
-
-          <div className="mt-6 flex flex-wrap gap-3">
+        <FooterColumn title={footerText.socialMedia[language]}>
+          <div className="flex flex-wrap gap-3">
             {settings?.facebookUrl && (
               <a
                 href={settings.facebookUrl}
@@ -222,15 +196,15 @@ export const Footer = () => {
               !settings?.instagramUrl &&
               !settings?.youtubeUrl &&
               !settings?.tiktokUrl && (
-                <p className="text-zinc-500">
+                <p className="text-sm leading-7 text-zinc-400">
                   {footerText.noSocialLinks[language]}
                 </p>
               )}
           </div>
-        </div>
+        </FooterColumn>
       </div>
 
-      <div className="mx-auto max-w-7xl border-t border-white/10 px-6 py-8 text-center text-sm font-bold text-zinc-500">
+      <div className="mx-auto max-w-7xl border-t border-white/10 px-5 py-7 text-center text-sm font-bold leading-6 text-zinc-500 sm:px-6">
         {footerText.developedBy[language]} © {new Date().getFullYear()}{" "}
         {siteName}
       </div>
@@ -238,5 +212,34 @@ export const Footer = () => {
   );
 };
 
+interface FooterColumnProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+const FooterColumn = ({ title, children }: FooterColumnProps) => {
+  return (
+    <div>
+      <h3 className="text-lg font-black sm:text-xl">{title}</h3>
+      <div className="mt-5 grid gap-3 text-sm font-semibold leading-7 sm:mt-6 sm:text-base">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+interface FooterLinkProps {
+  to: string;
+  children: React.ReactNode;
+}
+
+const FooterLink = ({ to, children }: FooterLinkProps) => {
+  return (
+    <Link to={to} className="text-zinc-400 transition hover:text-white">
+      {children}
+    </Link>
+  );
+};
+
 const socialLinkClass =
-  "grid h-12 w-12 place-items-center rounded-full border border-white/15 text-lg font-black text-zinc-400 transition hover:border-violet-400 hover:bg-violet-500 hover:text-white";
+  "grid h-11 w-11 place-items-center rounded-full border border-white/15 text-lg font-black text-zinc-300 transition hover:border-violet-400 hover:bg-violet-500 hover:text-white sm:h-12 sm:w-12";

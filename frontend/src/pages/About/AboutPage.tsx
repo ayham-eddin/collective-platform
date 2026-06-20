@@ -15,21 +15,9 @@ const storyImageUrl =
   "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
 
 const pageText = {
-  breadcrumbHome: {
-    de: "Home",
-    en: "Home",
-    ar: "الرئيسية",
-  },
-  breadcrumbAbout: {
-    de: "Über uns",
-    en: "About us",
-    ar: "من نحن",
-  },
-  heroTitle: {
-    de: "Über Uns",
-    en: "About Us",
-    ar: "من نحن",
-  },
+  breadcrumbHome: { de: "Home", en: "Home", ar: "الرئيسية" },
+  breadcrumbAbout: { de: "Über uns", en: "About us", ar: "من نحن" },
+  heroTitle: { de: "Über Uns", en: "About Us", ar: "من نحن" },
   historyEyebrow: {
     de: "Unsere wertvolle Geschichte",
     en: "Our valuable story",
@@ -50,16 +38,8 @@ const pageText = {
     en: "We do our very best to make every event a success and do everything needed. We are the perfect choice when you need people with strong experience to manage your event.",
     ar: "نبذل أقصى جهدنا لجعل كل فعالية ناجحة ونقوم بكل ما يلزم. نحن الخيار المناسب عندما تحتاج إلى أشخاص لديهم خبرة قوية لإدارة فعاليتك.",
   },
-  eventsButton: {
-    de: "Unsere Events",
-    en: "Our Events",
-    ar: "فعالياتنا",
-  },
-  storyEyebrow: {
-    de: "Unsere Story",
-    en: "Our Story",
-    ar: "قصتنا",
-  },
+  eventsButton: { de: "Unsere Events", en: "Our Events", ar: "فعالياتنا" },
+  storyEyebrow: { de: "Unsere Story", en: "Our Story", ar: "قصتنا" },
   storyTitle: {
     de: "Wir lieben es, glückliche Momente zu teilen",
     en: "We love sharing happy moments",
@@ -70,11 +50,7 @@ const pageText = {
     en: "Here you can find some photos from events we organized.",
     ar: "هنا تجد بعض الصور من الفعاليات التي قمنا بتنظيمها.",
   },
-  teamEyebrow: {
-    de: "Unser Team",
-    en: "Our Team",
-    ar: "فريقنا",
-  },
+  teamEyebrow: { de: "Unser Team", en: "Our Team", ar: "فريقنا" },
   teamTitle: {
     de: "Menschen hinter dem Kollektiv",
     en: "People behind the collective",
@@ -95,11 +71,7 @@ const pageText = {
     en: "No team members available.",
     ar: "لا يوجد أعضاء فريق حالياً.",
   },
-  featuredLabel: {
-    de: "Featured",
-    en: "Featured",
-    ar: "مميز",
-  },
+  featuredLabel: { de: "Featured", en: "Featured", ar: "مميز" },
 };
 
 export const AboutPage = () => {
@@ -124,20 +96,20 @@ export const AboutPage = () => {
   }, []);
 
   return (
-    <main className="bg-[#f4f3fb] text-[#252530]">
-      <section className="relative min-h-[560px] overflow-hidden bg-black text-white">
+    <main className="overflow-hidden bg-[#f4f3fb] text-[#252530]">
+      <section className="relative min-h-[520px] overflow-hidden bg-black text-white sm:min-h-[580px] lg:min-h-[640px]">
         <img
           src={aboutHeroImageUrl}
           alt="Schu Fi Ma Fi Kollektiv live event"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/30" />
 
-        <div className="relative mx-auto flex min-h-[560px] max-w-7xl items-end px-6 py-20">
+        <div className="relative mx-auto flex min-h-[520px] max-w-7xl items-end px-5 py-14 sm:min-h-[580px] sm:px-6 sm:py-20 lg:min-h-[640px]">
           <div>
-            <div className="mb-6 flex items-center gap-3 text-lg font-bold text-white/85">
+            <div className="mb-6 flex flex-wrap items-center gap-3 text-sm font-bold text-white/85 sm:text-base">
               <Link to="/" className="transition hover:text-violet-300">
                 {pageText.breadcrumbHome[language]}
               </Link>
@@ -145,26 +117,24 @@ export const AboutPage = () => {
               <span>{pageText.breadcrumbAbout[language]}</span>
             </div>
 
-            <h1 className="text-6xl font-black tracking-tight md:text-8xl">
-              {pageText.heroTitle[language]}
-            </h1>
+            <h1 className="hero-title">{pageText.heroTitle[language]}</h1>
 
-            <div className="mt-10 h-px w-full max-w-5xl border-t border-dashed border-white/50" />
+            <div className="mt-8 h-px w-full max-w-5xl border-t border-dashed border-white/40" />
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[1fr_0.9fr]">
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1fr_0.9fr] lg:py-24">
         <div>
-          <p className="text-xl font-bold italic text-violet-400">
+          <p className="text-base font-bold italic text-violet-500 sm:text-lg">
             {pageText.historyEyebrow[language]}
           </p>
 
-          <h2 className="mt-6 max-w-4xl text-5xl font-black leading-tight tracking-tight md:text-6xl">
+          <h2 className="section-title mt-5 max-w-4xl">
             {pageText.historyTitle[language]}
           </h2>
 
-          <div className="mt-10 grid gap-8 text-lg leading-8 text-zinc-800 md:grid-cols-2">
+          <div className="mt-8 grid gap-6 text-base leading-8 text-zinc-800 md:grid-cols-2 lg:text-lg">
             <p className="whitespace-pre-line">
               {pageText.historyTextOne[language]}
             </p>
@@ -172,54 +142,54 @@ export const AboutPage = () => {
             <p>{pageText.historyTextTwo[language]}</p>
           </div>
 
-          <Link to="/events" className="mt-10 btn btn-primary">
+          <Link to="/events" className="btn btn-primary mt-9">
             {pageText.eventsButton[language]}
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-[2rem] shadow-2xl shadow-black/20">
+        <div className="overflow-hidden rounded-[1.5rem] shadow-2xl shadow-black/20 sm:rounded-[2rem]">
           <img
             src={teamImageUrl}
             alt="Schu Fi Ma Fi team"
-            className="h-full min-h-[520px] w-full object-cover"
+            className="h-[340px] w-full object-cover sm:h-[460px] lg:h-full lg:min-h-[520px]"
           />
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <p className="text-xl font-bold italic text-violet-400">
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 lg:py-24">
+        <p className="text-base font-bold italic text-violet-500 sm:text-lg">
           {pageText.storyEyebrow[language]}
         </p>
 
-        <h2 className="mt-6 text-5xl font-black tracking-tight md:text-7xl">
+        <h2 className="section-title mt-5 max-w-5xl">
           {pageText.storyTitle[language]}
         </h2>
 
-        <p className="mt-8 max-w-3xl text-lg leading-8 text-zinc-700">
+        <p className="mt-6 max-w-3xl text-base leading-8 text-zinc-700 sm:text-lg">
           {pageText.storyDescription[language]}
         </p>
 
-        <div className="mt-10 overflow-hidden rounded-[2rem] shadow-2xl shadow-black/20">
+        <div className="mt-9 overflow-hidden rounded-[1.5rem] shadow-2xl shadow-black/20 sm:rounded-[2rem]">
           <img
             src={storyImageUrl}
             alt="Schu Fi Ma Fi event story"
-            className="h-[620px] w-full object-cover"
+            className="h-[340px] w-full object-cover sm:h-[480px] lg:h-[620px]"
           />
         </div>
       </section>
 
-      <section className="overflow-hidden bg-[#08080c] py-24 text-white">
-        <div className="mx-auto max-w-7xl px-6">
+      <section className="overflow-hidden bg-[#08080c] py-16 text-white sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-7xl px-5 sm:px-6">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xl font-bold italic text-violet-300">
+            <p className="text-base font-bold italic text-violet-300 sm:text-lg">
               {pageText.teamEyebrow[language]}
             </p>
 
-            <h2 className="mt-4 text-5xl font-black tracking-tight md:text-6xl">
+            <h2 className="section-title mt-4">
               {pageText.teamTitle[language]}
             </h2>
 
-            <p className="mt-6 text-lg leading-8 text-zinc-400">
+            <p className="mt-6 text-base leading-8 text-zinc-400 sm:text-lg">
               {pageText.teamDescription[language]}
             </p>
           </div>

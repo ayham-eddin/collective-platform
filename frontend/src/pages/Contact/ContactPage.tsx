@@ -149,84 +149,84 @@ export const ContactPage = () => {
     settings?.contactEmail || "contact@schufimafi-collective.com";
 
   return (
-    <main className="bg-[#f4f3fb] text-[#252530]">
-      <section className="relative overflow-hidden bg-[#08080c] text-white">
+    <main className="overflow-hidden bg-[#f4f3fb] text-[#252530]">
+      <section className="relative min-h-[520px] overflow-hidden bg-[#08080c] text-white sm:min-h-[580px] lg:min-h-[640px]">
         <div className="absolute left-0 top-0 h-80 w-80 rounded-full bg-violet-600/20 blur-3xl" />
-        <div className="absolute right-0 bottom-0 h-80 w-80 rounded-full bg-fuchsia-600/10 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-fuchsia-600/10 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-24 md:py-32">
-          <p className="text-lg font-black uppercase tracking-[0.35em] text-violet-300">
-            {pageText.eyebrow[language]}
-          </p>
+        <div className="relative mx-auto flex min-h-[520px] max-w-7xl items-end px-5 py-14 sm:min-h-[580px] sm:px-6 sm:py-20 lg:min-h-[640px]">
+          <div className="max-w-4xl">
+            <p className="text-sm font-black uppercase tracking-[0.28em] text-violet-300 sm:text-base lg:text-lg">
+              {pageText.eyebrow[language]}
+            </p>
 
-          <h1 className="mt-6 max-w-4xl text-6xl font-black leading-none tracking-tight md:text-8xl">
-            {pageText.title[language]}
-          </h1>
+            <h1 className="hero-title mt-5">{pageText.title[language]}</h1>
 
-          <p className="mt-8 max-w-2xl text-xl leading-9 text-zinc-300">
-            {pageText.subtitle[language]}
-          </p>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg lg:text-xl">
+              {pageText.subtitle[language]}
+            </p>
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-24 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="rounded-[2rem] bg-[#08080c] p-8 text-white shadow-2xl shadow-black/20">
-          <p className="text-lg font-bold italic text-violet-300">
+      <section className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10 lg:py-24">
+        <aside className="rounded-[1.5rem] bg-[#08080c] p-6 text-white shadow-2xl shadow-black/20 sm:rounded-[2rem] sm:p-8">
+          <p className="text-base font-bold italic text-violet-300 sm:text-lg">
             {pageText.contactEyebrow[language]}
           </p>
 
-          <h2 className="mt-4 text-4xl font-black tracking-tight">
+          <h2 className="mt-4 break-words text-3xl font-black leading-tight tracking-tight sm:text-4xl">
             {pageText.contactTitle[language]}
           </h2>
 
-          <div className="mt-10 grid gap-6 text-zinc-300">
+          <div className="mt-8 grid gap-5 text-zinc-300 sm:mt-10">
             <a
               href={`mailto:${contactEmail}`}
-              className="flex items-center gap-4 transition hover:text-white"
+              className="flex items-start gap-4 transition hover:text-white"
             >
-              <span className="grid h-12 w-12 place-items-center rounded-full bg-violet-600/20 text-violet-300">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-violet-600/20 text-violet-300 sm:h-12 sm:w-12">
                 <Mail size={21} />
               </span>
-              <span className="break-all">{contactEmail}</span>
+              <span className="break-all leading-7">{contactEmail}</span>
             </a>
 
             {settings?.contactPhone && (
               <a
                 href={`tel:${settings.contactPhone}`}
-                className="flex items-center gap-4 transition hover:text-white"
+                className="flex items-start gap-4 transition hover:text-white"
               >
-                <span className="grid h-12 w-12 place-items-center rounded-full bg-violet-600/20 text-violet-300">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-violet-600/20 text-violet-300 sm:h-12 sm:w-12">
                   <Phone size={21} />
                 </span>
-                <span>{settings.contactPhone}</span>
+                <span className="leading-7">{settings.contactPhone}</span>
               </a>
             )}
 
-            <p className="flex items-center gap-4">
-              <span className="grid h-12 w-12 place-items-center rounded-full bg-violet-600/20 text-violet-300">
+            <p className="flex items-start gap-4">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-violet-600/20 text-violet-300 sm:h-12 sm:w-12">
                 <MapPin size={21} />
               </span>
-              <span>Düsseldorf, NRW</span>
+              <span className="leading-7">Düsseldorf, NRW</span>
             </p>
           </div>
         </aside>
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-[2rem] bg-white p-6 shadow-2xl shadow-black/10 md:p-8"
+          className="rounded-[1.5rem] bg-white p-5 shadow-2xl shadow-black/10 sm:rounded-[2rem] sm:p-8"
         >
-          <h2 className="text-4xl font-black tracking-tight">
+          <h2 className="break-words text-3xl font-black leading-tight tracking-tight sm:text-4xl">
             {pageText.formTitle[language]}
           </h2>
 
           {successMessage && (
-            <p className="mt-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-bold text-emerald-700">
+            <p className="mt-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-bold leading-6 text-emerald-700">
               {successMessage}
             </p>
           )}
 
           {errorMessage && (
-            <p className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-bold text-red-700">
+            <p className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-bold leading-6 text-red-700">
               {errorMessage}
             </p>
           )}
@@ -269,7 +269,7 @@ export const ContactPage = () => {
           <button
             type="submit"
             disabled={isSending}
-            className="btn btn-primary mt-9"
+            className="btn btn-primary mt-8 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Send size={18} />
             {isSending ? pageText.sending[language] : pageText.send[language]}
@@ -303,7 +303,7 @@ const TextInput = ({
         value={value}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4 text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-violet-400 focus:bg-white"
+        className={inputClassName}
       />
     </label>
   );
@@ -330,8 +330,11 @@ const TextAreaInput = ({
         required={required}
         rows={7}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full resize-none rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4 text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-violet-400 focus:bg-white"
+        className={`${inputClassName} resize-none`}
       />
     </label>
   );
 };
+
+const inputClassName =
+  "w-full min-h-12 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-violet-400 focus:bg-white sm:px-5 sm:py-4";
