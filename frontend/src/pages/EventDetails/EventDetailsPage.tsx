@@ -12,6 +12,7 @@ import { Link, useParams } from "react-router-dom";
 import { useLanguage } from "../../contexts/useLanguage";
 import { getPublicEventBySlug } from "../../services/events.service";
 import type { EventItem, LocalizedText } from "../../types/event.types";
+import { updateSeo } from "../../utils/seo";
 
 const getYoutubeEmbedUrl = (youtubeUrl: string) => {
   if (youtubeUrl.includes("watch?v=")) {
@@ -109,6 +110,31 @@ export const EventDetailsPage = () => {
 
     void loadEvent();
   }, [slug]);
+
+  useEffect(() => {
+    if (!event) {
+      return;
+    }
+
+    const eventTitle = getLocalizedText(
+      event.title,
+      language,
+      pageText.eventFallback[language],
+    );
+
+    const eventDescription = getLocalizedText(
+      event.shortDescription,
+      language,
+      getLocalizedText(event.description, language, "Schu Fi Ma Fi Event"),
+    );
+
+    updateSeo({
+      title: `${eventTitle} | Schu Fi Ma Fi Collective`,
+      description: eventDescription,
+      imageUrl: event.coverImage?.url,
+      type: "article",
+    });
+  }, [event, language]);
 
   const handleCopyAddress = async () => {
     if (!event) {
