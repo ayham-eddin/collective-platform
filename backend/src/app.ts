@@ -18,16 +18,17 @@ app.use(
   }),
 );
 
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 100,
+    skip: (request) => request.path === "/api/health",
   }),
 );
-
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 app.use("/api", apiRoutes);
 
