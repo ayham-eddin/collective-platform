@@ -3,6 +3,7 @@ import {
   GalleryImageDocument,
   GalleryImageStatus,
 } from "../../database/models/GalleryImage";
+import { deleteFromCloudinary } from "../uploads/uploads.service";
 
 type GalleryImageInput = Partial<GalleryImageDocument>;
 
@@ -193,15 +194,19 @@ export const reorderGalleryImages = async ({ items }: ReorderGalleryInput) => {
 };
 
 export const softDeleteGalleryImage = async (id: string) => {
-  const image = await GalleryImage.findOneAndUpdate(
-    { _id: id, isDeleted: false },
-    { isDeleted: true },
-    { new: true },
-  );
+  const image = await GalleryImage.findOne({
+    _id: id,
+    isDeleted: false,
+  });
 
   if (!image) {
     throw new Error("Gallery image not found");
   }
+
+  await deleteFromCloudinary(image.image?.publicId, "image");
+
+  image.isDeleted = true;
+  await image.save();
 
   return image;
 };

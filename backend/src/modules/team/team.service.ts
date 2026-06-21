@@ -2,6 +2,7 @@ import {
   TeamMember,
   TeamMemberDocument,
 } from "../../database/models/TeamMember";
+import { deleteFromCloudinary } from "../uploads/uploads.service";
 
 type TeamMemberInput = Partial<TeamMemberDocument>;
 
@@ -48,22 +49,19 @@ export const updateTeamMember = async (id: string, data: TeamMemberInput) => {
 };
 
 export const deleteTeamMember = async (id: string) => {
-  const member = await TeamMember.findOneAndUpdate(
-    {
-      _id: id,
-      isDeleted: false,
-    },
-    {
-      isDeleted: true,
-    },
-    {
-      new: true,
-    },
-  );
+  const member = await TeamMember.findOne({
+    _id: id,
+    isDeleted: false,
+  });
 
   if (!member) {
     throw new Error("Team member not found");
   }
+
+  await deleteFromCloudinary(member.image?.publicId, "image");
+
+  member.isDeleted = true;
+  await member.save();
 
   return member;
 };

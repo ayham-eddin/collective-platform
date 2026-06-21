@@ -1,4 +1,5 @@
 import { Event, EventDocument, EventStatus } from "../../database/models/Event";
+import { deleteFromCloudinary } from "../uploads/uploads.service";
 
 type EventInput = Partial<EventDocument>;
 
@@ -176,15 +177,24 @@ export const updateEvent = async (id: string, data: EventInput) => {
 };
 
 export const softDeleteEvent = async (id: string) => {
-  const event = await Event.findOneAndUpdate(
-    { _id: id, isDeleted: false },
-    { isDeleted: true },
-    { new: true },
-  );
+  const event = await Event.findOne({
+    _id: id,
+    isDeleted: false,
+  });
 
   if (!event) {
     throw new Error("Event not found");
   }
+
+  await Promise.all([
+    deleteFromCloudinary(event.coverImage?.publicId, "image"),
+    ...event.galleryImages.map((image) =>
+      deleteFromCloudinary(image.publicId, "image"),
+    ),
+  ]);
+
+  event.isDeleted = true;
+  await event.save();
 
   return event;
 };

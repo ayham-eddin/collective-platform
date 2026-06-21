@@ -33,3 +33,16 @@ export const uploadBufferToCloudinary = async (
     uploadStream.end(fileBuffer);
   });
 };
+
+export const deleteFromCloudinary = async (
+  publicId: string | undefined,
+  resourceType: "image" | "video" = "image",
+): Promise<void> => {
+  if (!publicId) {
+    return;
+  }
+
+  await cloudinary.uploader.destroy(publicId, {
+    resource_type: resourceType,
+  });
+};

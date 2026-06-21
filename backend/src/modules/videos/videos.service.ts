@@ -1,4 +1,5 @@
 import { Video, VideoDocument, VideoStatus } from "../../database/models/Video";
+import { deleteFromCloudinary } from "../uploads/uploads.service";
 
 type VideoInput = Partial<VideoDocument>;
 
@@ -135,15 +136,22 @@ export const updateVideo = async (id: string, data: VideoInput) => {
 };
 
 export const softDeleteVideo = async (id: string) => {
-  const video = await Video.findOneAndUpdate(
-    { _id: id, isDeleted: false },
-    { isDeleted: true },
-    { new: true },
-  );
+  const video = await Video.findOne({
+    _id: id,
+    isDeleted: false,
+  });
 
   if (!video) {
     throw new Error("Video not found");
   }
+
+  await Promise.all([
+    deleteFromCloudinary(video.thumbnail?.publicId, "image"),
+    deleteFromCloudinary(video.videoFile?.publicId, "video"),
+  ]);
+
+  video.isDeleted = true;
+  await video.save();
 
   return video;
 };
