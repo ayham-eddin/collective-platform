@@ -1,7 +1,9 @@
 import { LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { ScrollToTop } from "../../routes/components/ScrollToTop";
 import { getStoredAdmin, logoutAdmin } from "../../services/auth.service";
+import { getAdminDashboardStats } from "../../services/dashboard.service";
 import type {
   PermissionAction,
   PermissionModule,
@@ -57,6 +59,30 @@ const adminNavItems: AdminNavItem[] = [
 export const AdminLayout = () => {
   const navigate = useNavigate();
   const admin = getStoredAdmin();
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+
+  useEffect(() => {
+    const loadUnreadMessagesCount = async () => {
+      try {
+        const stats = await getAdminDashboardStats();
+        setUnreadMessagesCount(stats.unreadMessages);
+      } catch {
+        setUnreadMessagesCount(0);
+      }
+    };
+
+    void loadUnreadMessagesCount();
+
+    const handleWindowFocus = () => {
+      void loadUnreadMessagesCount();
+    };
+
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, []);
 
   const handleLogout = () => {
     logoutAdmin();
@@ -99,7 +125,13 @@ export const AdminLayout = () => {
                 end={item.end}
                 className={adminLinkClass}
               >
-                {item.label}
+                <span>{item.label}</span>
+
+                {item.path === "/admin/messages" && unreadMessagesCount > 0 && (
+                  <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-xs font-black text-white">
+                    {unreadMessagesCount}
+                  </span>
+                )}
               </NavLink>
             ))}
           </nav>
@@ -140,7 +172,7 @@ export const AdminLayout = () => {
 
 const adminLinkClass = ({ isActive }: { isActive: boolean }) =>
   [
-    "shrink-0 rounded-2xl px-4 py-3 text-sm font-bold transition",
+    "inline-flex shrink-0 items-center rounded-2xl px-4 py-3 text-sm font-bold transition",
     isActive
       ? "bg-violet-600 text-white"
       : "text-zinc-400 hover:bg-white/5 hover:text-white",

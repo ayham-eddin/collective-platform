@@ -10,6 +10,7 @@ import type {
   HomeContentItem,
   LocalizedText,
 } from "../../types/homeContent.types";
+import { getOptimizedCloudinaryUrl } from "../../utils/cloudinary";
 
 const fallbackHeroImageUrl =
   "https://res.cloudinary.com/dabhyvhy3/image/upload/v1781453481/Layali1_ukdkuw.png";
@@ -118,7 +119,10 @@ export const HomePage = () => {
       )
     : "";
 
-  const heroImageUrl = homeContent?.heroImage?.url || fallbackHeroImageUrl;
+  const heroImageUrl = getOptimizedCloudinaryUrl(
+    homeContent?.heroImage?.url || fallbackHeroImageUrl,
+    1600,
+  );
 
   return (
     <main className="overflow-hidden bg-[#f4f3fb] text-[#252530]">
@@ -164,7 +168,7 @@ export const HomePage = () => {
               )}
             </p>
 
-            <div className="mt-9 flex gap-3">
+            <div className="mt-9 flex flex-wrap gap-3">
               <Link
                 to={homeContent?.primaryButton.url || "/events"}
                 className="btn btn-primary"
@@ -223,22 +227,46 @@ export const HomePage = () => {
         )}
 
         {featuredEvent && (
-          <div className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12">
-            <div className="relative overflow-hidden rounded-[1.5rem] bg-zinc-900 shadow-2xl shadow-black/25 sm:rounded-[2rem]">
+          <div className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-[0.92fr_1.08fr] lg:gap-12">
+            <div className="mx-auto w-full max-w-[560px] overflow-hidden rounded-[1.5rem] bg-black shadow-2xl shadow-black/25 sm:rounded-[2rem]">
               {featuredEvent.coverImage && (
-                <img
-                  src={featuredEvent.coverImage.url}
-                  alt={getLocalizedText(
-                    featuredEvent.coverImage.alt,
-                    language,
-                    getLocalizedText(
-                      featuredEvent.title,
+                <div className="relative aspect-square overflow-hidden">
+                  <img
+                    src={getOptimizedCloudinaryUrl(
+                      featuredEvent.coverImage.url,
+                      1000,
+                    )}
+                    alt={getLocalizedText(
+                      featuredEvent.coverImage.alt,
                       language,
-                      pageText.eventFallback[language],
-                    ),
-                  )}
-                  className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[560px]"
-                />
+                      getLocalizedText(
+                        featuredEvent.title,
+                        language,
+                        pageText.eventFallback[language],
+                      ),
+                    )}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-xl"
+                  />
+
+                  <img
+                    src={getOptimizedCloudinaryUrl(
+                      featuredEvent.coverImage.url,
+                      1000,
+                    )}
+                    alt={getLocalizedText(
+                      featuredEvent.coverImage.alt,
+                      language,
+                      getLocalizedText(
+                        featuredEvent.title,
+                        language,
+                        pageText.eventFallback[language],
+                      ),
+                    )}
+                    loading="lazy"
+                    className="relative z-10 h-full w-full object-contain"
+                  />
+                </div>
               )}
             </div>
 
