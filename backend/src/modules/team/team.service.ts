@@ -6,34 +6,48 @@ import { deleteFromCloudinary } from "../uploads/uploads.service";
 
 type TeamMemberInput = Partial<TeamMemberDocument>;
 
+const deleteReplacedImage = async (
+  oldPublicId: string | undefined,
+  newPublicId: string | undefined,
+) => {
+  if (oldPublicId && newPublicId && oldPublicId !== newPublicId) {
+    await deleteFromCloudinary(oldPublicId, "image");
+  }
+};
+
 export const createTeamMember = async (data: TeamMemberInput) => {
   return TeamMember.create(data);
 };
 
 export const getPublicTeamMembers = async () => {
-  return TeamMember.find({
-    isDeleted: false,
-  }).sort({
+  return TeamMember.find({ isDeleted: false }).sort({
     sortOrder: 1,
     createdAt: -1,
   });
 };
 
 export const getAdminTeamMembers = async () => {
-  return TeamMember.find({
-    isDeleted: false,
-  }).sort({
+  return TeamMember.find({ isDeleted: false }).sort({
     sortOrder: 1,
     createdAt: -1,
   });
 };
 
 export const updateTeamMember = async (id: string, data: TeamMemberInput) => {
+  const existingMember = await TeamMember.findOne({
+    _id: id,
+    isDeleted: false,
+  });
+
+  if (!existingMember) throw new Error("Team member not found");
+
+  await deleteReplacedImage(
+    existingMember.image?.publicId,
+    data.image?.publicId,
+  );
+
   const member = await TeamMember.findOneAndUpdate(
-    {
-      _id: id,
-      isDeleted: false,
-    },
+    { _id: id, isDeleted: false },
     data,
     {
       new: true,
@@ -41,9 +55,7 @@ export const updateTeamMember = async (id: string, data: TeamMemberInput) => {
     },
   );
 
-  if (!member) {
-    throw new Error("Team member not found");
-  }
+  if (!member) throw new Error("Team member not found");
 
   return member;
 };
@@ -54,9 +66,7 @@ export const deleteTeamMember = async (id: string) => {
     isDeleted: false,
   });
 
-  if (!member) {
-    throw new Error("Team member not found");
-  }
+  if (!member) throw new Error("Team member not found");
 
   await deleteFromCloudinary(member.image?.publicId, "image");
 

@@ -33,6 +33,15 @@ interface GetPublicGalleryImagesOptions {
   search?: string;
 }
 
+const deleteReplacedImage = async (
+  oldPublicId: string | undefined,
+  newPublicId: string | undefined,
+) => {
+  if (oldPublicId && newPublicId && oldPublicId !== newPublicId) {
+    await deleteFromCloudinary(oldPublicId, "image");
+  }
+};
+
 export const createGalleryImage = async (data: GalleryImageInput) => {
   const lastImage = await GalleryImage.findOne({ isDeleted: false }).sort({
     sortOrder: -1,
@@ -52,13 +61,9 @@ export const getAdminGalleryImages = async ({
   status = "all",
   search = "",
 }: GetAdminGalleryImagesOptions) => {
-  const query: GalleryQuery = {
-    isDeleted: false,
-  };
+  const query: GalleryQuery = { isDeleted: false };
 
-  if (status !== "all") {
-    query.status = status;
-  }
+  if (status !== "all") query.status = status;
 
   if (search.trim()) {
     query.$or = [
@@ -152,9 +157,7 @@ export const getGalleryImageById = async (id: string) => {
     isDeleted: false,
   }).populate("relatedEvent");
 
-  if (!image) {
-    throw new Error("Gallery image not found");
-  }
+  if (!image) throw new Error("Gallery image not found");
 
   return image;
 };
@@ -163,6 +166,18 @@ export const updateGalleryImage = async (
   id: string,
   data: GalleryImageInput,
 ) => {
+  const existingImage = await GalleryImage.findOne({
+    _id: id,
+    isDeleted: false,
+  });
+
+  if (!existingImage) throw new Error("Gallery image not found");
+
+  await deleteReplacedImage(
+    existingImage.image?.publicId,
+    data.image?.publicId,
+  );
+
   const image = await GalleryImage.findOneAndUpdate(
     { _id: id, isDeleted: false },
     data,
@@ -172,9 +187,7 @@ export const updateGalleryImage = async (
     },
   );
 
-  if (!image) {
-    throw new Error("Gallery image not found");
-  }
+  if (!image) throw new Error("Gallery image not found");
 
   return image;
 };
@@ -194,14 +207,9 @@ export const reorderGalleryImages = async ({ items }: ReorderGalleryInput) => {
 };
 
 export const softDeleteGalleryImage = async (id: string) => {
-  const image = await GalleryImage.findOne({
-    _id: id,
-    isDeleted: false,
-  });
+  const image = await GalleryImage.findOne({ _id: id, isDeleted: false });
 
-  if (!image) {
-    throw new Error("Gallery image not found");
-  }
+  if (!image) throw new Error("Gallery image not found");
 
   await deleteFromCloudinary(image.image?.publicId, "image");
 

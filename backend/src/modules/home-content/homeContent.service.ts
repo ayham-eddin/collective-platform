@@ -2,6 +2,7 @@ import {
   HomeContent,
   HomeContentDocument,
 } from "../../database/models/HomeContent";
+import { deleteFromCloudinary } from "../uploads/uploads.service";
 
 type HomeContentInput = Partial<HomeContentDocument>;
 
@@ -62,18 +63,30 @@ const defaultHomeContent = {
   },
 };
 
+const deleteReplacedImage = async (
+  oldPublicId: string | undefined,
+  newPublicId: string | undefined,
+) => {
+  if (oldPublicId && newPublicId && oldPublicId !== newPublicId) {
+    await deleteFromCloudinary(oldPublicId, "image");
+  }
+};
+
 export const getHomeContent = async () => {
   const existingContent = await HomeContent.findOne();
 
-  if (existingContent) {
-    return existingContent;
-  }
+  if (existingContent) return existingContent;
 
   return HomeContent.create(defaultHomeContent);
 };
 
 export const updateHomeContent = async (data: HomeContentInput) => {
   const existingContent = await getHomeContent();
+
+  await deleteReplacedImage(
+    existingContent.heroImage?.publicId,
+    data.heroImage?.publicId,
+  );
 
   const updatedContent = await HomeContent.findByIdAndUpdate(
     existingContent._id,
@@ -84,9 +97,7 @@ export const updateHomeContent = async (data: HomeContentInput) => {
     },
   );
 
-  if (!updatedContent) {
-    throw new Error("Home content not found");
-  }
+  if (!updatedContent) throw new Error("Home content not found");
 
   return updatedContent;
 };

@@ -34,10 +34,17 @@ const getStartOfToday = () => {
   return today;
 };
 
-const applySearchQuery = (query: EventQuery, search: string) => {
-  if (!search.trim()) {
-    return;
+const deleteReplacedImage = async (
+  oldPublicId: string | undefined,
+  newPublicId: string | undefined,
+) => {
+  if (oldPublicId && newPublicId && oldPublicId !== newPublicId) {
+    await deleteFromCloudinary(oldPublicId, "image");
   }
+};
+
+const applySearchQuery = (query: EventQuery, search: string) => {
+  if (!search.trim()) return;
 
   query.$or = [
     { "title.de": { $regex: search, $options: "i" } },
@@ -68,17 +75,10 @@ export const getAdminEvents = async ({
   featured = "all",
   search = "",
 }: GetEventsOptions) => {
-  const query: EventQuery = {
-    isDeleted: false,
-  };
+  const query: EventQuery = { isDeleted: false };
 
-  if (status !== "all") {
-    query.status = status;
-  }
-
-  if (featured !== "all") {
-    query.isFeatured = featured === "true";
-  }
+  if (status !== "all") query.status = status;
+  if (featured !== "all") query.isFeatured = featured === "true";
 
   applySearchQuery(query, search);
 
@@ -103,14 +103,9 @@ export const getAdminEvents = async ({
 };
 
 export const getAdminEventById = async (id: string) => {
-  const event = await Event.findOne({
-    _id: id,
-    isDeleted: false,
-  });
+  const event = await Event.findOne({ _id: id, isDeleted: false });
 
-  if (!event) {
-    throw new Error("Event not found");
-  }
+  if (!event) throw new Error("Event not found");
 
   return event;
 };
@@ -164,17 +159,13 @@ export const getPublicGroupedEvents = async ({
   const baseUpcomingQuery: EventQuery = {
     isDeleted: false,
     status: "published",
-    eventDate: {
-      $gte: today,
-    },
+    eventDate: { $gte: today },
   };
 
   const basePastQuery: EventQuery = {
     isDeleted: false,
     status: "published",
-    eventDate: {
-      $lt: today,
-    },
+    eventDate: { $lt: today },
   };
 
   applySearchQuery(baseUpcomingQuery, search);
@@ -202,19 +193,26 @@ export const getPublicGroupedEvents = async ({
 };
 
 export const getEventBySlug = async (slug: string) => {
-  const event = await Event.findOne({
-    slug,
-    isDeleted: false,
-  });
+  const event = await Event.findOne({ slug, isDeleted: false });
 
-  if (!event) {
-    throw new Error("Event not found");
-  }
+  if (!event) throw new Error("Event not found");
 
   return event;
 };
 
 export const updateEvent = async (id: string, data: EventInput) => {
+  const existingEvent = await Event.findOne({
+    _id: id,
+    isDeleted: false,
+  });
+
+  if (!existingEvent) throw new Error("Event not found");
+
+  await deleteReplacedImage(
+    existingEvent.coverImage?.publicId,
+    data.coverImage?.publicId,
+  );
+
   const event = await Event.findOneAndUpdate(
     { _id: id, isDeleted: false },
     data,
@@ -224,22 +222,15 @@ export const updateEvent = async (id: string, data: EventInput) => {
     },
   );
 
-  if (!event) {
-    throw new Error("Event not found");
-  }
+  if (!event) throw new Error("Event not found");
 
   return event;
 };
 
 export const softDeleteEvent = async (id: string) => {
-  const event = await Event.findOne({
-    _id: id,
-    isDeleted: false,
-  });
+  const event = await Event.findOne({ _id: id, isDeleted: false });
 
-  if (!event) {
-    throw new Error("Event not found");
-  }
+  if (!event) throw new Error("Event not found");
 
   await Promise.all([
     deleteFromCloudinary(event.coverImage?.publicId, "image"),

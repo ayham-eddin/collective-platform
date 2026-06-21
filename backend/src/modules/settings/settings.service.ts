@@ -2,6 +2,7 @@ import {
   SiteSettings,
   SiteSettingsDocument,
 } from "../../database/models/SiteSettings";
+import { deleteFromCloudinary } from "../uploads/uploads.service";
 
 type SiteSettingsInput = Partial<SiteSettingsDocument>;
 
@@ -24,18 +25,33 @@ const defaultSiteSettings = {
   tiktokUrl: "",
 };
 
+const deleteReplacedImage = async (
+  oldPublicId: string | undefined,
+  newPublicId: string | undefined,
+) => {
+  if (oldPublicId && newPublicId && oldPublicId !== newPublicId) {
+    await deleteFromCloudinary(oldPublicId, "image");
+  }
+};
+
 export const getSiteSettings = async () => {
   const existingSettings = await SiteSettings.findOne();
 
-  if (existingSettings) {
-    return existingSettings;
-  }
+  if (existingSettings) return existingSettings;
 
   return SiteSettings.create(defaultSiteSettings);
 };
 
 export const updateSiteSettings = async (data: SiteSettingsInput) => {
   const existingSettings = await getSiteSettings();
+
+  await Promise.all([
+    deleteReplacedImage(existingSettings.logo?.publicId, data.logo?.publicId),
+    deleteReplacedImage(
+      existingSettings.favicon?.publicId,
+      data.favicon?.publicId,
+    ),
+  ]);
 
   const updatedSettings = await SiteSettings.findByIdAndUpdate(
     existingSettings._id,
@@ -46,9 +62,7 @@ export const updateSiteSettings = async (data: SiteSettingsInput) => {
     },
   );
 
-  if (!updatedSettings) {
-    throw new Error("Site settings not found");
-  }
+  if (!updatedSettings) throw new Error("Site settings not found");
 
   return updatedSettings;
 };
