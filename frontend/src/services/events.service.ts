@@ -12,6 +12,20 @@ interface EventsResponse {
   };
 }
 
+interface PublicGroupedEventsResponse {
+  success: boolean;
+  data: {
+    upcomingEvents: EventItem[];
+    pastEvents: EventItem[];
+  };
+  pagination: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+  };
+}
+
 interface EventResponse {
   success: boolean;
   data: EventItem;
@@ -41,6 +55,19 @@ export const getPublicEvents = async (
   const response = await api.get<EventsResponse>("/events/public", {
     params,
   });
+
+  return response.data;
+};
+
+export const getPublicGroupedEvents = async (
+  params: GetPublicEventsParams,
+): Promise<PublicGroupedEventsResponse> => {
+  const response = await api.get<PublicGroupedEventsResponse>(
+    "/events/public-grouped",
+    {
+      params,
+    },
+  );
 
   return response.data;
 };

@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { EventCard } from "../../components/EventCard/EventCard";
 import { useLanguage } from "../../contexts/useLanguage";
-import { getPublicEvents } from "../../services/events.service";
+import { getPublicGroupedEvents } from "../../services/events.service";
 import type { EventItem, LocalizedText } from "../../types/event.types";
 
 const fallbackHeroImage =
@@ -23,20 +23,20 @@ const pageText = {
     en: "Discover upcoming events, concerts, festivals and community gatherings by Schu Fi Ma Fi.",
     ar: "اكتشف الفعاليات القادمة والحفلات والمهرجانات ولقاءات المجتمع من شو في ما في.",
   },
-  featuredEyebrow: {
-    de: "Featured Events",
-    en: "Featured Events",
-    ar: "فعاليات مميزة",
+  upcomingEyebrow: {
+    de: "Upcoming Events",
+    en: "Upcoming Events",
+    ar: "الفعاليات القادمة",
   },
-  featuredTitle: {
-    de: "Aktuelle Highlights",
-    en: "Current Highlights",
-    ar: "أبرز الفعاليات الحالية",
+  upcomingTitle: {
+    de: "Kommende Events",
+    en: "Upcoming Events",
+    ar: "الفعاليات القادمة",
   },
-  featuredDescription: {
-    de: "Hier findest du die wichtigsten veröffentlichten Veranstaltungen.",
-    en: "Here you can find the most important published events.",
-    ar: "هنا تجد أهم الفعاليات المنشورة.",
+  upcomingDescription: {
+    de: "Die nächsten veröffentlichten Veranstaltungen werden automatisch nach Datum sortiert.",
+    en: "The next published events are automatically sorted by date.",
+    ar: "يتم ترتيب الفعاليات القادمة تلقائياً حسب التاريخ الأقرب.",
   },
   searchPlaceholder: {
     de: "Events suchen...",
@@ -63,10 +63,10 @@ const pageText = {
     en: "No published events yet.",
     ar: "لا توجد فعاليات منشورة بعد.",
   },
-  noFeatured: {
-    de: "Noch keine Featured Events.",
-    en: "No featured events yet.",
-    ar: "لا توجد فعاليات مميزة بعد.",
+  noUpcoming: {
+    de: "Aktuell keine kommenden Events.",
+    en: "No upcoming events at the moment.",
+    ar: "لا توجد فعاليات قادمة حالياً.",
   },
   showPrevious: {
     de: "Vergangene Events anzeigen",
@@ -117,7 +117,9 @@ const pageText = {
 
 export const EventsPage = () => {
   const { language } = useLanguage();
-  const [events, setEvents] = useState<EventItem[]>([]);
+
+  const [upcomingEvents, setUpcomingEvents] = useState<EventItem[]>([]);
+  const [pastEvents, setPastEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [showPreviousEvents, setShowPreviousEvents] = useState(false);
@@ -129,13 +131,14 @@ export const EventsPage = () => {
   const [search, setSearch] = useState("");
 
   const loadEvents = async (targetPage: number) => {
-    const response = await getPublicEvents({
+    const response = await getPublicGroupedEvents({
       page: targetPage,
       limit,
       search,
     });
 
-    setEvents(response.data);
+    setUpcomingEvents(response.data.upcomingEvents);
+    setPastEvents(response.data.pastEvents);
     setTotalPages(response.pagination.totalPages || 1);
   };
 
@@ -157,15 +160,9 @@ export const EventsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, limit, search]);
 
-  const featuredEvents = useMemo(() => {
-    return events.filter((event) => event.isFeatured);
-  }, [events]);
+  const heroEvent = upcomingEvents[0] || pastEvents[0];
 
-  const previousEvents = useMemo(() => {
-    return events.filter((event) => !event.isFeatured);
-  }, [events]);
-
-  const heroEvent = featuredEvents[0] || events[0];
+  const hasAnyEvents = upcomingEvents.length > 0 || pastEvents.length > 0;
 
   const handleApplySearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -220,16 +217,16 @@ export const EventsPage = () => {
           <div className="mb-10 grid gap-5 lg:grid-cols-[1fr_0.8fr] lg:items-end">
             <div>
               <p className="text-base font-bold italic text-violet-300 sm:text-lg">
-                {pageText.featuredEyebrow[language]}
+                {pageText.upcomingEyebrow[language]}
               </p>
 
               <h2 className="mt-3 break-words text-4xl font-black leading-tight tracking-tight sm:text-5xl md:text-6xl">
-                {pageText.featuredTitle[language]}
+                {pageText.upcomingTitle[language]}
               </h2>
             </div>
 
             <p className="max-w-xl text-base leading-8 text-zinc-400">
-              {pageText.featuredDescription[language]}
+              {pageText.upcomingDescription[language]}
             </p>
           </div>
 
@@ -266,24 +263,75 @@ export const EventsPage = () => {
 
           {errorMessage && <p className="text-red-400">{errorMessage}</p>}
 
-          {!isLoading && !errorMessage && events.length === 0 && (
+          {!isLoading && !errorMessage && !hasAnyEvents && (
             <p className="text-zinc-400">{pageText.noEvents[language]}</p>
           )}
 
           {!isLoading &&
             !errorMessage &&
-            events.length > 0 &&
-            featuredEvents.length === 0 && (
-              <p className="text-zinc-400">{pageText.noFeatured[language]}</p>
+            hasAnyEvents &&
+            upcomingEvents.length === 0 && (
+              <p className="text-zinc-400">{pageText.noUpcoming[language]}</p>
             )}
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {featuredEvents.map((event) => (
+            {upcomingEvents.map((event) => (
               <EventCard key={event._id} event={event} />
             ))}
           </div>
 
-          {previousEvents.length > 0 && (
+          {totalPages > 1 && (
+            <div className="mt-12 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 sm:rounded-[2rem] sm:p-5">
+              <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+                <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
+                  <button
+                    type="button"
+                    disabled={page === 1}
+                    onClick={() => setPage((currentPage) => currentPage - 1)}
+                    className="min-h-12 rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {pageText.previous[language]}
+                  </button>
+
+                  <span className="inline-flex min-h-12 items-center justify-center rounded-full bg-white/5 px-5 py-3 text-sm font-black text-zinc-300">
+                    {pageText.page[language]} {page} {pageText.of[language]}{" "}
+                    {totalPages}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={page === totalPages}
+                    onClick={() => setPage((currentPage) => currentPage + 1)}
+                    className="min-h-12 rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {pageText.next[language]}
+                  </button>
+                </div>
+
+                <label className="grid gap-2 lg:min-w-[220px]">
+                  <span className="text-sm font-bold text-zinc-400">
+                    {pageText.perPage[language]}
+                  </span>
+
+                  <select
+                    value={limit}
+                    onChange={(event) => {
+                      setLimit(Number(event.target.value));
+                      setPage(1);
+                    }}
+                    className="min-h-12 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 font-semibold text-white outline-none transition focus:border-violet-400 sm:px-5 sm:py-4"
+                  >
+                    <option value={3}>3 Events</option>
+                    <option value={6}>6 Events</option>
+                    <option value={9}>9 Events</option>
+                    <option value={24}>24 Events</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          )}
+
+          {pastEvents.length > 0 && (
             <div className="mt-14 text-center">
               <button
                 type="button"
@@ -299,7 +347,7 @@ export const EventsPage = () => {
             </div>
           )}
 
-          {showPreviousEvents && previousEvents.length > 0 && (
+          {showPreviousEvents && pastEvents.length > 0 && (
             <section className="mt-16 border-t border-white/10 pt-14">
               <div className="mb-10">
                 <p className="text-base font-bold italic text-violet-300 sm:text-lg">
@@ -312,61 +360,12 @@ export const EventsPage = () => {
               </div>
 
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {previousEvents.map((event) => (
+                {pastEvents.map((event) => (
                   <EventCard key={event._id} event={event} />
                 ))}
               </div>
             </section>
           )}
-
-          <div className="mt-12 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 sm:rounded-[2rem] sm:p-5">
-            <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
-              <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
-                <button
-                  type="button"
-                  disabled={page === 1}
-                  onClick={() => setPage((currentPage) => currentPage - 1)}
-                  className="min-h-12 rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {pageText.previous[language]}
-                </button>
-
-                <span className="inline-flex min-h-12 items-center justify-center rounded-full bg-white/5 px-5 py-3 text-sm font-black text-zinc-300">
-                  {pageText.page[language]} {page} {pageText.of[language]}{" "}
-                  {totalPages}
-                </span>
-
-                <button
-                  type="button"
-                  disabled={page === totalPages}
-                  onClick={() => setPage((currentPage) => currentPage + 1)}
-                  className="min-h-12 rounded-full border border-white/15 px-6 py-3 text-sm font-black text-zinc-300 transition hover:border-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {pageText.next[language]}
-                </button>
-              </div>
-
-              <label className="grid gap-2 lg:min-w-[220px]">
-                <span className="text-sm font-bold text-zinc-400">
-                  {pageText.perPage[language]}
-                </span>
-
-                <select
-                  value={limit}
-                  onChange={(event) => {
-                    setLimit(Number(event.target.value));
-                    setPage(1);
-                  }}
-                  className="min-h-12 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 font-semibold text-white outline-none transition focus:border-violet-400 sm:px-5 sm:py-4"
-                >
-                  <option value={3}>3 Events</option>
-                  <option value={6}>6 Events</option>
-                  <option value={9}>9 Events</option>
-                  <option value={24}>24 Events</option>
-                </select>
-              </label>
-            </div>
-          </div>
         </div>
       </section>
     </main>

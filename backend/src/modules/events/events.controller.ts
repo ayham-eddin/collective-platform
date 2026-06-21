@@ -5,6 +5,7 @@ import {
   getAdminEvents,
   getEventBySlug,
   getPublicEvents,
+  getPublicGroupedEvents,
   softDeleteEvent,
   updateEvent,
 } from "./events.service";
@@ -83,6 +84,30 @@ export const getPublicEventsController = async (
   response.status(200).json({
     success: true,
     data: result.items,
+    pagination: result.pagination,
+  });
+};
+
+export const getPublicGroupedEventsController = async (
+  request: Request,
+  response: Response,
+): Promise<void> => {
+  const page = Number(request.query.page || 1);
+  const limit = Number(request.query.limit || 3);
+  const search = String(request.query.search || "");
+
+  const result = await getPublicGroupedEvents({
+    page,
+    limit,
+    search,
+  });
+
+  response.status(200).json({
+    success: true,
+    data: {
+      upcomingEvents: result.upcomingEvents,
+      pastEvents: result.pastEvents,
+    },
     pagination: result.pagination,
   });
 };

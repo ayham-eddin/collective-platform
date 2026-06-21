@@ -8,12 +8,14 @@ import {
   getAdminEventsController,
   getEventBySlugController,
   getPublicEventsController,
+  getPublicGroupedEventsController,
   updateEventController,
 } from "./events.controller";
 
 export const eventRoutes = Router();
 
 eventRoutes.get("/public", getPublicEventsController);
+eventRoutes.get("/public-grouped", getPublicGroupedEventsController);
 eventRoutes.get("/public/:slug", getEventBySlugController);
 
 eventRoutes.get(

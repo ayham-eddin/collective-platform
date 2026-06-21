@@ -7,6 +7,10 @@ type EventQuery = {
   isDeleted: boolean;
   status?: EventStatus;
   isFeatured?: boolean;
+  eventDate?: {
+    $gte?: Date;
+    $lt?: Date;
+  };
   $or?: Array<Record<string, string | { $regex: string; $options: string }>>;
 };
 
@@ -17,6 +21,41 @@ interface GetEventsOptions {
   featured?: "all" | "true" | "false";
   search?: string;
 }
+
+interface GetPublicGroupedEventsOptions {
+  page: number;
+  limit: number;
+  search?: string;
+}
+
+const getStartOfToday = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
+
+const applySearchQuery = (query: EventQuery, search: string) => {
+  if (!search.trim()) {
+    return;
+  }
+
+  query.$or = [
+    { "title.de": { $regex: search, $options: "i" } },
+    { "title.en": { $regex: search, $options: "i" } },
+    { "title.ar": { $regex: search, $options: "i" } },
+    { "shortDescription.de": { $regex: search, $options: "i" } },
+    { "shortDescription.en": { $regex: search, $options: "i" } },
+    { "shortDescription.ar": { $regex: search, $options: "i" } },
+    { "description.de": { $regex: search, $options: "i" } },
+    { "description.en": { $regex: search, $options: "i" } },
+    { "description.ar": { $regex: search, $options: "i" } },
+    { "location.de": { $regex: search, $options: "i" } },
+    { "location.en": { $regex: search, $options: "i" } },
+    { "location.ar": { $regex: search, $options: "i" } },
+    { category: { $regex: search, $options: "i" } },
+    { lineup: { $regex: search, $options: "i" } },
+  ];
+};
 
 export const createEvent = async (data: EventInput) => {
   return Event.create(data);
@@ -41,24 +80,7 @@ export const getAdminEvents = async ({
     query.isFeatured = featured === "true";
   }
 
-  if (search.trim()) {
-    query.$or = [
-      { "title.de": { $regex: search, $options: "i" } },
-      { "title.en": { $regex: search, $options: "i" } },
-      { "title.ar": { $regex: search, $options: "i" } },
-      { "shortDescription.de": { $regex: search, $options: "i" } },
-      { "shortDescription.en": { $regex: search, $options: "i" } },
-      { "shortDescription.ar": { $regex: search, $options: "i" } },
-      { "description.de": { $regex: search, $options: "i" } },
-      { "description.en": { $regex: search, $options: "i" } },
-      { "description.ar": { $regex: search, $options: "i" } },
-      { "location.de": { $regex: search, $options: "i" } },
-      { "location.en": { $regex: search, $options: "i" } },
-      { "location.ar": { $regex: search, $options: "i" } },
-      { category: { $regex: search, $options: "i" } },
-      { lineup: { $regex: search, $options: "i" } },
-    ];
-  }
+  applySearchQuery(query, search);
 
   const safePage = Math.max(page, 1);
   const safeLimit = Math.min(Math.max(limit, 1), 50);
@@ -107,24 +129,7 @@ export const getPublicEvents = async ({
     status: "published",
   };
 
-  if (search.trim()) {
-    query.$or = [
-      { "title.de": { $regex: search, $options: "i" } },
-      { "title.en": { $regex: search, $options: "i" } },
-      { "title.ar": { $regex: search, $options: "i" } },
-      { "shortDescription.de": { $regex: search, $options: "i" } },
-      { "shortDescription.en": { $regex: search, $options: "i" } },
-      { "shortDescription.ar": { $regex: search, $options: "i" } },
-      { "description.de": { $regex: search, $options: "i" } },
-      { "description.en": { $regex: search, $options: "i" } },
-      { "description.ar": { $regex: search, $options: "i" } },
-      { "location.de": { $regex: search, $options: "i" } },
-      { "location.en": { $regex: search, $options: "i" } },
-      { "location.ar": { $regex: search, $options: "i" } },
-      { category: { $regex: search, $options: "i" } },
-      { lineup: { $regex: search, $options: "i" } },
-    ];
-  }
+  applySearchQuery(query, search);
 
   const safePage = Math.max(page, 1);
   const safeLimit = Math.min(Math.max(limit, 1), 50);
@@ -142,6 +147,56 @@ export const getPublicEvents = async ({
       limit: safeLimit,
       totalItems,
       totalPages: Math.ceil(totalItems / safeLimit),
+    },
+  };
+};
+
+export const getPublicGroupedEvents = async ({
+  page,
+  limit,
+  search = "",
+}: GetPublicGroupedEventsOptions) => {
+  const today = getStartOfToday();
+  const safePage = Math.max(page, 1);
+  const safeLimit = Math.min(Math.max(limit, 1), 50);
+  const skip = (safePage - 1) * safeLimit;
+
+  const baseUpcomingQuery: EventQuery = {
+    isDeleted: false,
+    status: "published",
+    eventDate: {
+      $gte: today,
+    },
+  };
+
+  const basePastQuery: EventQuery = {
+    isDeleted: false,
+    status: "published",
+    eventDate: {
+      $lt: today,
+    },
+  };
+
+  applySearchQuery(baseUpcomingQuery, search);
+  applySearchQuery(basePastQuery, search);
+
+  const [upcomingEvents, upcomingTotalItems, pastEvents] = await Promise.all([
+    Event.find(baseUpcomingQuery)
+      .sort({ eventDate: 1, startTime: 1 })
+      .skip(skip)
+      .limit(safeLimit),
+    Event.countDocuments(baseUpcomingQuery),
+    Event.find(basePastQuery).sort({ eventDate: -1, startTime: -1 }),
+  ]);
+
+  return {
+    upcomingEvents,
+    pastEvents,
+    pagination: {
+      page: safePage,
+      limit: safeLimit,
+      totalItems: upcomingTotalItems,
+      totalPages: Math.ceil(upcomingTotalItems / safeLimit),
     },
   };
 };
