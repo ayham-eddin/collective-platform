@@ -34,6 +34,15 @@ type EventFormState = {
   isFeatured: boolean;
 };
 
+type VideoFieldName =
+  | "youtubeUrl"
+  | "titleDe"
+  | "titleEn"
+  | "titleAr"
+  | "descriptionDe"
+  | "descriptionEn"
+  | "descriptionAr";
+
 const eventCategories = [
   "Festival",
   "Konzert",
@@ -82,6 +91,42 @@ const createSlug = (value: string) => {
     .replace(/^-+|-+$/g, "");
 };
 
+const normalizeYoutubeUrl = (value: string) => {
+  const trimmedUrl = value.trim();
+
+  if (!trimmedUrl) {
+    return "";
+  }
+
+  try {
+    const url = new URL(trimmedUrl);
+
+    if (url.hostname.includes("youtu.be")) {
+      const videoId = url.pathname.replace("/", "");
+
+      if (!videoId) {
+        return "";
+      }
+
+      return `https://www.youtube.com/watch?v=${videoId}`;
+    }
+
+    if (url.hostname.includes("youtube.com")) {
+      const videoId = url.searchParams.get("v");
+
+      if (!videoId) {
+        return "";
+      }
+
+      return `https://www.youtube.com/watch?v=${videoId}`;
+    }
+
+    return "";
+  } catch {
+    return "";
+  }
+};
+
 export const AdminCreateEventPage = () => {
   const navigate = useNavigate();
 
@@ -121,6 +166,7 @@ export const AdminCreateEventPage = () => {
       setErrorMessage("Could not upload cover image.");
     } finally {
       setIsUploadingCover(false);
+      event.target.value = "";
     }
   };
 
@@ -153,14 +199,7 @@ export const AdminCreateEventPage = () => {
 
   const updateVideoField = (
     videoIndex: number,
-    fieldName:
-      | "youtubeUrl"
-      | "titleDe"
-      | "titleEn"
-      | "titleAr"
-      | "descriptionDe"
-      | "descriptionEn"
-      | "descriptionAr",
+    fieldName: VideoFieldName,
     value: string,
   ) => {
     setVideos((currentVideos): EventVideo[] =>
@@ -208,6 +247,18 @@ export const AdminCreateEventPage = () => {
     try {
       const slug = createSlug(formState.titleEn || formState.titleDe);
 
+      const hasInvalidYoutubeUrl = videos.some(
+        (video) =>
+          video.youtubeUrl.trim() !== "" &&
+          normalizeYoutubeUrl(video.youtubeUrl) === "",
+      );
+
+      if (hasInvalidYoutubeUrl) {
+        setErrorMessage("Please enter a valid YouTube URL.");
+        setIsSaving(false);
+        return;
+      }
+
       await createAdminEvent({
         title: {
           de: formState.titleDe,
@@ -239,7 +290,7 @@ export const AdminCreateEventPage = () => {
         videos: videos
           .filter((video) => video.youtubeUrl.trim() !== "")
           .map((video) => ({
-            youtubeUrl: video.youtubeUrl,
+            youtubeUrl: normalizeYoutubeUrl(video.youtubeUrl),
             title: {
               de: video.title.de || "Video",
               en: video.title.en || "Video",
@@ -551,6 +602,30 @@ export const AdminCreateEventPage = () => {
                       }
                     />
                   </div>
+
+                  <div className="grid gap-5 lg:grid-cols-3">
+                    <TextAreaInput
+                      label="Video Description DE"
+                      value={video.description?.de || ""}
+                      onChange={(value) =>
+                        updateVideoField(index, "descriptionDe", value)
+                      }
+                    />
+                    <TextAreaInput
+                      label="Video Description EN"
+                      value={video.description?.en || ""}
+                      onChange={(value) =>
+                        updateVideoField(index, "descriptionEn", value)
+                      }
+                    />
+                    <TextAreaInput
+                      label="Video Description AR"
+                      value={video.description?.ar || ""}
+                      onChange={(value) =>
+                        updateVideoField(index, "descriptionAr", value)
+                      }
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -604,7 +679,7 @@ export const AdminCreateEventPage = () => {
 
         <button
           type="submit"
-          disabled={isSaving}
+          disabled={isSaving || isUploadingCover}
           className="inline-flex w-fit items-center gap-2 rounded-full bg-violet-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Save size={18} />

@@ -1,4 +1,5 @@
-import { Mail, MapPin, Phone, Music2, Play } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
+import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logoFallback from "../../assets/logo-white.png";
@@ -152,7 +153,7 @@ export const Footer = () => {
                 className={socialLinkClass}
                 aria-label="Facebook"
               >
-                f
+                <FaFacebookF />
               </a>
             )}
 
@@ -164,7 +165,7 @@ export const Footer = () => {
                 className={socialLinkClass}
                 aria-label="Instagram"
               >
-                ◎
+                <FaInstagram />
               </a>
             )}
 
@@ -176,7 +177,7 @@ export const Footer = () => {
                 className={socialLinkClass}
                 aria-label="YouTube"
               >
-                <Play size={18} />
+                <FaYoutube size={18} />
               </a>
             )}
 
@@ -188,7 +189,7 @@ export const Footer = () => {
                 className={socialLinkClass}
                 aria-label="TikTok"
               >
-                <Music2 size={18} />
+                <FaTiktok size={18} />
               </a>
             )}
 
