@@ -5,8 +5,8 @@ import { loginAdmin, saveAdminSession } from "../../../services/auth.service";
 export const AdminLoginPage = () => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("admin@example.com");
-  const [password, setPassword] = useState("ChangeMe123!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
