@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AdminLayout } from "../layouts/AdminLayout/AdminLayout";
 import { MainLayout } from "../layouts/MainLayout";
 import { AboutPage } from "../pages/About/AboutPage";
+import { AdminActivityLogsPage } from "../pages/Admin/ActivityLogs/AdminActivityLogsPage";
 import { AdminAdminsPage } from "../pages/Admin/Admins/AdminAdminsPage";
 import { AdminDashboardPage } from "../pages/Admin/Dashboard/AdminDashboardPage";
 import { AdminCreateEventPage } from "../pages/Admin/Events/AdminCreateEventPage";
@@ -145,6 +146,10 @@ const router = createBrowserRouter([
                 path: "admins",
                 element: <AdminAdminsPage />,
               },
+              {
+                path: "activity-logs",
+                element: <AdminActivityLogsPage />,
+              },
             ],
           },
         ],
@@ -187,9 +192,5 @@ const router = createBrowserRouter([
 ]);
 
 export const AppRouter = () => {
-  return (
-    <>
-      <RouterProvider router={router} />
-    </>
-  );
+  return <RouterProvider router={router} />;
 };

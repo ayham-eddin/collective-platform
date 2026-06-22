@@ -54,6 +54,13 @@ const adminNavItems: AdminNavItem[] = [
     action: "read",
     superAdminOnly: true,
   },
+  {
+    label: "Activity Logs",
+    path: "/admin/activity-logs",
+    module: "admins",
+    action: "read",
+    superAdminOnly: true,
+  },
 ];
 
 export const AdminLayout = () => {
