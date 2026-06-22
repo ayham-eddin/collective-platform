@@ -10,8 +10,13 @@ const getActionFromMethod = (method: string): ActivityAction => {
   return "unknown";
 };
 
-const getModuleFromPath = (path: string) => {
-  const pathParts = path.split("/").filter(Boolean);
+const getCleanPath = (originalUrl: string) => {
+  return originalUrl.split("?")[0] || originalUrl;
+};
+
+const getModuleFromPath = (originalUrl: string) => {
+  const cleanPath = getCleanPath(originalUrl);
+  const pathParts = cleanPath.split("/").filter(Boolean);
 
   if (pathParts[0] === "api" && pathParts[1]) {
     return pathParts[1];
@@ -20,8 +25,9 @@ const getModuleFromPath = (path: string) => {
   return "unknown";
 };
 
-const getTargetIdFromPath = (path: string) => {
-  const pathParts = path.split("/").filter(Boolean);
+const getTargetIdFromPath = (originalUrl: string) => {
+  const cleanPath = getCleanPath(originalUrl);
+  const pathParts = cleanPath.split("/").filter(Boolean);
   const lastPart = pathParts[pathParts.length - 1];
 
   if (!lastPart) {
@@ -40,19 +46,25 @@ const shouldTrackActivity = (request: Request) => {
     return false;
   }
 
-  if (request.path.includes("/auth/login")) {
+  const cleanPath = getCleanPath(request.originalUrl);
+
+  if (!cleanPath.startsWith("/api/")) {
     return false;
   }
 
-  if (request.path.includes("/contact/public")) {
+  if (cleanPath.includes("/auth/login")) {
     return false;
   }
 
-  if (request.path.includes("/uploads/")) {
+  if (cleanPath.includes("/contact/public")) {
     return false;
   }
 
-  return request.path.startsWith("/api/");
+  if (cleanPath.includes("/uploads/")) {
+    return false;
+  }
+
+  return true;
 };
 
 export const requestLogger = (
@@ -84,26 +96,49 @@ export const adminActivityLogger = (
     }
 
     if (!request.admin?.adminId) {
+      console.warn("[ACTIVITY_LOG_SKIPPED] Missing admin id", {
+        method: request.method,
+        path: request.originalUrl,
+        statusCode: response.statusCode,
+      });
       return;
     }
 
     if (response.statusCode >= 400) {
+      console.warn("[ACTIVITY_LOG_SKIPPED] Request failed", {
+        adminId: request.admin.adminId,
+        method: request.method,
+        path: request.originalUrl,
+        statusCode: response.statusCode,
+      });
       return;
     }
 
     void ActivityLog.create({
       adminId: request.admin.adminId,
       action: getActionFromMethod(request.method),
-      module: getModuleFromPath(request.path),
+      module: getModuleFromPath(request.originalUrl),
       method: request.method,
       path: request.originalUrl,
       statusCode: response.statusCode,
-      targetId: getTargetIdFromPath(request.path),
+      targetId: getTargetIdFromPath(request.originalUrl),
       ip: request.ip,
-      userAgent: request.headers["user-agent"],
-    }).catch((error: unknown) => {
-      console.error("[ACTIVITY_LOG_ERROR]", error);
-    });
+      userAgent:
+        typeof request.headers["user-agent"] === "string"
+          ? request.headers["user-agent"]
+          : "",
+    })
+      .then(() => {
+        console.log("[ACTIVITY_LOG_CREATED]", {
+          adminId: request.admin?.adminId,
+          action: getActionFromMethod(request.method),
+          module: getModuleFromPath(request.originalUrl),
+          path: request.originalUrl,
+        });
+      })
+      .catch((error: unknown) => {
+        console.error("[ACTIVITY_LOG_ERROR]", error);
+      });
   });
 
   next();
