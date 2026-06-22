@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { activityLogRoutes } from "../modules/activity-logs/activityLogs.routes";
 import { adminRoutes } from "../modules/admin/admin.routes";
 import { authRoutes } from "../modules/auth/auth.routes";
 import { contactRoutes } from "../modules/contact/contact.routes";
@@ -22,6 +23,7 @@ apiRoutes.get("/health", (request, response) => {
 
 apiRoutes.use("/auth", authRoutes);
 apiRoutes.use("/admins", adminRoutes);
+apiRoutes.use("/activity-logs", activityLogRoutes);
 apiRoutes.use("/events", eventRoutes);
 apiRoutes.use("/gallery", galleryRoutes);
 apiRoutes.use("/uploads", uploadRoutes);
