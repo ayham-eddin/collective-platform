@@ -1,10 +1,14 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
-import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
 import { env } from "./config/env";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware";
+import {
+  adminActivityLogger,
+  requestLogger,
+} from "./middleware/log.middleware";
 import { apiRoutes } from "./routes";
 
 export const app = express();
@@ -21,6 +25,9 @@ app.use(
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.use(requestLogger);
+app.use(adminActivityLogger);
 
 app.use(
   rateLimit({
