@@ -92,7 +92,7 @@ export const updateHomeContent = async (data: HomeContentInput) => {
     existingContent._id,
     data,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );

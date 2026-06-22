@@ -217,7 +217,7 @@ export const updateEvent = async (id: string, data: EventInput) => {
     { _id: id, isDeleted: false },
     data,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );

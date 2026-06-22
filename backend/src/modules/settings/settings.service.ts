@@ -57,7 +57,7 @@ export const updateSiteSettings = async (data: SiteSettingsInput) => {
     existingSettings._id,
     data,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );

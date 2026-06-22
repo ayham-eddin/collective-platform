@@ -182,7 +182,7 @@ export const updateGalleryImage = async (
     { _id: id, isDeleted: false },
     data,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );
@@ -198,7 +198,7 @@ export const reorderGalleryImages = async ({ items }: ReorderGalleryInput) => {
       GalleryImage.findOneAndUpdate(
         { _id: item.id, isDeleted: false },
         { sortOrder: item.sortOrder },
-        { new: true },
+        { returnDocument: "after" },
       ),
     ),
   );

@@ -192,7 +192,7 @@ export const updateAdmin = async (adminId: string, data: UpdateAdminInput) => {
   }
 
   const admin = await Admin.findByIdAndUpdate(adminId, updateData, {
-    new: true,
+    returnDocument: "after",
     runValidators: true,
   })
     .select("-password")

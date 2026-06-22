@@ -123,7 +123,7 @@ export const updateVideo = async (id: string, data: VideoInput) => {
     { _id: id, isDeleted: false },
     data,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );

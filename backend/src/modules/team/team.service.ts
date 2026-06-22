@@ -50,7 +50,7 @@ export const updateTeamMember = async (id: string, data: TeamMemberInput) => {
     { _id: id, isDeleted: false },
     data,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );

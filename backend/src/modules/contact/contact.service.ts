@@ -83,7 +83,7 @@ export const updateContactMessage = async (
     { _id: id, isDeleted: false },
     data,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );
@@ -99,7 +99,7 @@ export const softDeleteContactMessage = async (id: string) => {
   const message = await ContactMessage.findOneAndUpdate(
     { _id: id, isDeleted: false },
     { isDeleted: true },
-    { new: true },
+    { returnDocument: "after" },
   );
 
   if (!message) {
