@@ -11,6 +11,8 @@ export interface ActivityLogItem {
   adminId?: ActivityLogAdmin;
   action: ActivityAction;
   module: string;
+  itemType?: string;
+  itemTitle?: string;
   method: string;
   path: string;
   statusCode: number;

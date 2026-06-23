@@ -6,6 +6,8 @@ export interface ActivityLogDocument extends Document {
   adminId?: Types.ObjectId;
   action: ActivityAction;
   module: string;
+  itemType?: string;
+  itemTitle?: string;
   method: string;
   path: string;
   statusCode: number;
@@ -26,6 +28,8 @@ const activityLogSchema = new Schema<ActivityLogDocument>(
       default: "unknown",
     },
     module: { type: String, required: true, trim: true },
+    itemType: { type: String, trim: true },
+    itemTitle: { type: String, trim: true },
     method: { type: String, required: true, trim: true },
     path: { type: String, required: true, trim: true },
     statusCode: { type: Number, required: true },
