@@ -1,0 +1,8 @@
+{
+  "name": "collective-platform",
+  "private": true,
+  "scripts": {
+    "backup:mongo": "./scripts/backup-mongodb.sh",
+    "restore:mongo": "./scripts/restore-mongodb.sh"
+  }
+}
