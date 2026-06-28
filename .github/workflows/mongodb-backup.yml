@@ -30,4 +30,4 @@ jobs:
         with:
           name: mongodb-backup
           path: backups/mongodb/*.gz
-          retention-days: 30
+          retention-days: 60
