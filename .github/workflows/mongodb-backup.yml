@@ -15,7 +15,7 @@ jobs:
           curl -fsSL https://pgp.mongodb.com/server-8.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
           echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
           sudo apt-get update
-          sudo apt-get install -y mongodb-database-tools
+          sudo apt-get install -y mongodb-database-tools rclone
 
       - name: Create backup
         run: |
@@ -24,6 +24,23 @@ jobs:
             --uri="${{ secrets.MONGO_URI }}" \
             --gzip \
             --archive="backups/mongodb/backup-$(date +%Y-%m-%d-%H-%M).gz"
+
+      - name: Configure rclone
+        run: |
+          mkdir -p ~/.config/rclone
+          cat > ~/.config/rclone/rclone.conf << 'EOF'
+          ${{ secrets.RCLONE_CONFIG }}
+          EOF
+
+      - name: Upload backup to Google Drive
+        run: |
+          rclone mkdir gdrive:MongoDB-Backups
+          rclone copy backups/mongodb/*.gz gdrive:MongoDB-Backups
+          rclone ls gdrive:MongoDB-Backups
+
+      - name: Delete Google Drive backups older than 60 days
+        run: |
+          rclone delete gdrive:MongoDB-Backups --min-age 60d
 
       - name: Upload backup artifact
         uses: actions/upload-artifact@v4
