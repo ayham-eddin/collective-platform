@@ -4,6 +4,7 @@ set -e
 
 ENV_FILE="backend/.env"
 BACKUP_DIR="backups/mongodb"
+DRIVE_REMOTE="gdrive:MongoDB-Backups"
 DATE=$(date +"%Y-%m-%d-%H-%M")
 BACKUP_FILE="$BACKUP_DIR/backup-$DATE.gz"
 
@@ -21,10 +22,24 @@ if [ -z "$MONGO_URI" ]; then
   exit 1
 fi
 
+echo "Creating MongoDB backup..."
+
 mongodump \
   --uri="$MONGO_URI" \
   --gzip \
   --archive="$BACKUP_FILE"
 
-echo "Backup created:"
+echo "Uploading backup to Google Drive..."
+
+rclone mkdir "$DRIVE_REMOTE"
+
+rclone copy "$BACKUP_FILE" "$DRIVE_REMOTE"
+
+echo "Cleaning Google Drive backups older than 60 days..."
+
+rclone delete "$DRIVE_REMOTE" --min-age 60d
+
+echo "Backup completed successfully:"
 echo "$BACKUP_FILE"
+echo "Uploaded to:"
+echo "$DRIVE_REMOTE"
